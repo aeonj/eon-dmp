@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>$!{config.title} - $!{config.poweredby}</title>
+<meta name="keywords" content="$!config.keywords" />
+<meta name="description" content="$!config.description" />
+<meta name="generator" content="iaeon 1.3" />
+<meta name="author" content="$!{config.meta_author}" />
+<meta name="copyright" content="$!{config.copyRight}" />
+$!httpInclude.include("/manage/html_tag.htm?showLoading=false&exportParams=true&isSubPage=false&exportExceptionWindow=true&exportUserinfo=true")
+<script src="$!webPath/static/js/system/manage/index.js"></script>
+<script src="$!webPath/static/js/system/manage/extTabCloseMenu.js"></script>
+</head>
+<body #if(${cls}!='off')class='${cls}'#end #if(${onload}!='off')onload='${onload}'#end #if(${any}!='off')${any}#end>
+$!httpInclude.include("/manage/viewport_tag.htm")
+</body>
+</html>

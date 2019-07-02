@@ -1,0 +1,58 @@
+server:
+  port: 8180
+spring:
+  datasource:
+    primary:
+      jdbc-url: jdbc:mysql://localhost:3306/eon?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      username: root
+      password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    secondary:
+      jdbc-url: jdbc:mysql://localhost:3306/eon_2?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      username: root
+      password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  application:
+    name: 禾冠平台
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    generate-ddl: true
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        format_sql: true
+        enable_lazy_load_no_trans: false     #支持全局实体的懒加载，但开销很大
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    password:
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+  freemarker:
+    request-context-attribute: req  #req访问request
+    suffix:   #后缀名
+    content-type: text/html
+    enabled: true
+    cache: false #缓存配置
+    template-loader-path: classpath:/ #模板加载路径 按需配置
+    charset: UTF-8 #编码格式
+    settings:
+      number_format: '0.##'   #数字格式化，无小数点
+eon:
+  hg:
+    async:
+      corePoolSize : 10
+      maxPoolSize : 200
+      queueCapacity : 10
+    db:
+      reset: true  #是否重置数据库
+    hessian:
+      login-url: http://localhost:8080/vcf/login?sysapp=900&uid=2529&sid=1&setyear=2018&roleid=73

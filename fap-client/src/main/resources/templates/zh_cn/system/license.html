@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>禾冠开发平台</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="/resource/style/common/images/logo.ico">
+    <link href="/resource/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/resource/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+
+    <link href="/resource/css/animate.min.css" rel="stylesheet">
+    <link href="/resource/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html"/>
+    <![endif]-->
+    <script>if (window.top !== window.self) {
+        window.top.location = window.location;
+    }
+
+    </script>
+    <style type="text/css">
+        .vcf_footer {
+            height: 50px;
+            position: fixed;
+            bottom: 0px;
+            left: 0px;
+            background-color: #2f5d8f;
+            width: 100%;
+            text-align: center;
+        }
+
+        .vcf_footer span {
+            color: #ffffff;
+            line-height: 50px;
+            font-size: 12px;
+        }
+
+        .line {
+            margin-bottom: 20px;
+        }
+
+        /* 复制提示 */
+        .copy-tips {
+            position: fixed;
+            z-index: 999;
+            bottom: 50%;
+            left: 51%;
+            margin: 0 0 -100px -80px;
+            background-color: rgba(0, 0, 0, 0.2);
+            filter: progid:DXImageTransform.Microsoft.Gradient(startColorstr=#30000000, endColorstr=#30000000);
+            padding: 6px;
+        }
+
+        .copy-tips-wrap {
+            padding: 10px 20px;
+            text-align: center;
+            border: 1px solid #F4D9A6;
+            background-color: #FFFDEE;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body class="gray-bg">
+<div class="row wrapper border-bottom white-bg" style="height:50px;background-color: #2f5d8f;">
+    <div class="col-sm-8">
+        <h2 style="color: #FFFFFF;font-family: PingFangSC-Medium, sans-serif;line-height: 10px;font-size: 18px;margin-top: 15px!important;">
+            <img src="/resource/style/system/manage/images/login/login_logo.png" style="height: 30px;margin-top: -5px;">江苏禾冠软件开发平台</h2>
+    </div>
+</div>
+<div class="wrapper wrapper-content" style="margin-top: 100px;">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="text-center animated fadeInRightBig">
+                <h3 class="font-bold">授权码:${licensecode}
+                </h3>
+                <input type="hidden" value="${licensecode}" id="licensecode">
+                <div class="error-desc text-left" style="max-width: 600px;margin-left: auto;margin-right: auto;">
+                    <p style="text-indent:2em;">
+                        请先下载授权申请模板,完成相关信息填写后,将授权申请文件发送到下面邮箱。我们将在2个工作日内通过邮件方式将授权文件发送至您的邮箱。
+                        如在填写过程中遇到任何疑问请与我们联系
+                    </p><br/><br/>
+                    <ul class="text-left" style="width: 400px;margin-left: auto;margin-right: auto;">
+                        <li>联 系 人:客服</li>
+                        <li>联系电话:17705190200</li>
+                        <li>联系邮箱:kefu@hcrown.com.cn</li>
+                    </ul>
+                    <div style="width:215px;margin-left: auto;margin-right: auto;">
+                        <a href="vcf.docx" class="btn btn-primary m-t">下载授权模板</a>&nbsp;
+                        <a href="javascript:void(0);" class="btn btn-primary m-t copy">复制授权码</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="vcf_footer">
+    <span>copyright 2018-2019 江苏禾冠信息技术有限公司 All rights reserved </span>
+</div>
+<script src="/resource/js/jquery.min.js?v=2.1.4"></script>
+<script src="/resource/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/resource/js/jquery-zclip/jquery.zclip.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".copy").zclip({
+            path: "/resource/js/jquery-zclip/ZeroClipboard.swf",
+            copy: function () {
+                return $("#licensecode").val();
+            },
+            beforeCopy: function () {/* 按住鼠标时的操作 */
+                $(this).css("color", "orange");
+            },
+            afterCopy: function () {/* 复制成功后的操作 */
+                var $copysuc = $("<div class='copy-tips'><div class='copy-tips-wrap'>☺ 复制成功</div></div>");
+                $("body").find(".copy-tips").remove().end().append($copysuc);
+                $(".copy-tips").fadeOut(3000);
+            }
+        });
+    });
+</script>
+</body>
+</html>

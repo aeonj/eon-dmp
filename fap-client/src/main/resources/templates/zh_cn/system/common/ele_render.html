@@ -1,0 +1,26 @@
+<script type="text/javascript">
+	#foreach($field in $fieldList)
+	function $!{field.getKey()}IdRender(value) {
+		#foreach($code in $!{field.getValue()})
+		if (value == '${code.id}') return '${code.name}';
+		#end 
+// 		var records = eval('$!{field.getValue()}');
+// 		for (var i=0; i<records.length; i++) {
+// 			#if($iscode)
+// 				if (value==records[i].code) return records[i].name;
+// 			#else
+// 				if (value==records[i].id) return records[i].name;
+// 			#end
+// 		} 
+		return value;
+	}
+	#if($iscode)
+	function $!{field.getKey()}CodeRender(value) {
+		#foreach($code in $!{field.getValue()})
+		if (value == '${code.code}') return '${code.name}';
+		#end 
+		return value;
+	}
+	#end
+	#end
+</script>

@@ -1,0 +1,10 @@
+<script type="text/javascript">
+	#foreach($field in $fieldList)
+	function $!{field.getKey()}Render(value) {
+		#foreach($code in $!{field.getValue()})
+		if (value == '${code.code}') return '${code.codedesc}';
+		#end 
+		return value;
+	}
+	#end
+</script>

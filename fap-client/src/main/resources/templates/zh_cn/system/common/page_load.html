@@ -1,0 +1,8 @@
+<script type="text/javascript">
+window.onload=function(){
+	  if(parent.userid != '$!{user.id}'){
+	     alert('这是一个非法请求或者您的会话连接由于在其它窗口上被注销而失效,系统将把您强制重定向到登录界面.');
+		 parent.window.location.href = '$!webPath/iaeon_logout.htm';
+	  }
+	};
+</script>

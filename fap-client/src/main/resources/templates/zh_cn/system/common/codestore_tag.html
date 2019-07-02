@@ -1,0 +1,17 @@
+<script type="text/javascript">
+<#list fieldList as field>
+var ${field}Store = new Ext.data.Store({
+  fields : ['value', 'text'],
+  data : [
+  <#assign enumlist = enumOP.getCodeList(field)>
+  <#assign size1 = enumlist?size>
+  <#list enumlist as code>
+    ['${code.code}', <#if showCode??>'${code.code} ${code.codedesc}'</#if> '${code.codedesc}']
+    <#if code_index != size1>
+      ,
+    </#if>
+  </#list>
+  ]
+});
+</#list>
+</script>

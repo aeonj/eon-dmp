@@ -1,0 +1,124 @@
+<script type="text/javascript">
+function uiGrantExt() {
+#foreach($grant in $grantList)
+
+    #if(${grant.cmptype} != "4")
+
+	if(Ext.getCmp('${grant.cmpid}')){
+	    #if(${grant.cmpname})
+	    #if(${grant.cmptype} == "1")
+	    Ext.getCmp('${grant.cmpid}').setText('${grant.cmpname}');
+	    #end
+	    #if(${grant.cmptype} == "3")
+	    Ext.getCmp('${grant.cmpid}').setTitle('${grant.cmpname}');
+	    #end
+	    #end
+	    #if(${grant.partauthtype} == "1")
+            Ext.getCmp('${grant.cmpid}').disable();
+            #if(${grant.cmptype} == "2")
+            Ext.getCmp('${grant.cmpid}').addClass('x-custom-field-disabled');
+            #end
+        #end 
+	    #if(${grant.partauthtype} == "2")
+	        Ext.getCmp('${grant.cmpid}').enable();
+	        #if(${grant.cmptype} == "2")
+            Ext.getCmp('${grant.cmpid}').removeClass('x-custom-field-disabled');
+            #end
+        #end 
+        #if(${grant.partauthtype} == "3")
+            #if(${grant.cmptype} == "2")
+              Ext.getCmp('${grant.cmpid}').setReadOnly(true);
+              Ext.getCmp('${grant.cmpid}').addClass('x-custom-field-disabled');
+            #end
+        #end 
+        #if(${grant.partauthtype} == "4")
+            #if(${grant.cmptype} == "2")
+              Ext.getCmp('${grant.cmpid}').setReadOnly(false);
+              Ext.getCmp('${grant.cmpid}').removeClass('x-custom-field-disabled');
+            #end
+        #end 
+        #if(${grant.partauthtype} == "5")
+            Ext.getCmp('${grant.cmpid}').show();
+            #if(${grant.cmptype} == "2")
+              Ext.getCmp('${grant.cmpid}').getEl().up('.x-form-item').setDisplayed(true);
+            #end
+        #end 
+        #if(${grant.partauthtype} == "6")
+            Ext.getCmp('${grant.cmpid}').hide();
+            #if(${grant.cmptype} == "2")
+              Ext.getCmp('${grant.cmpid}').getEl().up('.x-form-item').setDisplayed(false);
+            #end
+        #end
+	}
+	#end
+#end
+}
+function uiGrantHtml() {
+#foreach($grant in $grantList)
+    #if(${grant.cmptype} == "4")
+	    #if(${grant.cmpname})
+        $('${grant.cmpid}').text('${grant.cmpname}');
+        #end
+	    #if(${grant.partauthtype} == "1")
+	        $('${grant.cmpid}').attr({"disabled":"disabled"});
+        #end 
+	    #if(${grant.partauthtype} == "2")
+	        $('${grant.cmpid}').removeAttr("disabled");
+        #end 
+        #if(${grant.partauthtype} == "3")
+	        $('${grant.cmpid}').removeAttr("readonly");
+        #end 
+        #if(${grant.partauthtype} == "4")
+	        $('${grant.cmpid}').attr("readonly":"readonly");
+        #end 
+        #if(${grant.partauthtype} == "5")
+	        $('${grant.cmpid}').show();
+        #end 
+        #if(${grant.partauthtype} == "6")
+	        $('${grant.cmpid}').hide();
+        #end
+    #end
+#end
+}
+function uiGrantHtmlMap_moa(type) {
+    var map=[];
+    #foreach($grant in $grantList)
+    #if(${grant.cmptype} == "4")
+        if (type=="1") {
+	    #if(${grant.partauthtype} == "1")
+	        map.push('${grant.cmpid}');
+        #end 
+        }
+        if (type=="2") {
+	    #if(${grant.partauthtype} == "2")
+	        map.push('${grant.cmpid}');
+        #end 
+        }
+        if (type=="3") {
+        #if(${grant.partauthtype} == "3")
+	        map.push('${grant.cmpid}');
+        #end 
+        }
+        if (type=="4") {
+        #if(${grant.partauthtype} == "4")
+	        map.push('${grant.cmpid}');
+        #end
+        } 
+        if (type=="5") {
+        #if(${grant.partauthtype} == "5")
+	        map.push('${grant.cmpid}');
+        #end
+        } 
+        if (type=="6") {
+        #if(${grant.partauthtype} == "6")
+	        map.push('${grant.cmpid}');
+        #end
+        }
+    #end
+    #end
+    return map;
+}
+Ext.onReady(function() {
+    uiGrantExt();
+});
+</script>

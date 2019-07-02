@@ -1,0 +1,287 @@
+<!-- 由<Aeon:arm.Viewport/>标签生成的代码开始 -->
+<#list cardmgs as card>
+<div id="div_card_${card.id}" style="overflow: auto; height: 100%; width: 100%;"></div>
+</#list>
+<div id="themeTreeDiv" class="x-hidden"  ></div>
+
+<div id="layoutTreeDiv" class="x-hidden"  ></div>
+<div id="layout_previewDiv" class="x-hidden"  >
+	<img src="${webPath}/resource/style/system/manage/images/theme/layout/${uconfig.layout}.jpg" />
+</div>
+<script type="text/javascript">
+    var default_theme = '${uconfig.theme}';
+    var default_layout = '${uconfig.layout}';
+    var mainTabs;
+    Ext.onReady(function(){
+        mainTabs = Ext.create('Ext.tab.Panel', {
+            region:'center',
+            activeTab:0,
+            id:'mainTabs',
+            enableTabScroll:true,
+            height:550,
+            border:false,
+            //frame:true,
+            plugins: Ext.create('Ext.ux.TabCloseMenu', {
+                closeTabText : '关闭当前标签页',
+                closeOthersTabsText : '关闭其他标签页',
+                closeAllTabsText : '关闭所有标签页'
+            }),
+            items:[{
+                title:"<img align='top' class='IEPNG' src='${webPath}/resource/image/ext/user.png'/>我的工作台",
+                listeners: {
+                    activate: function(comp){
+                    	Ext.getCmp('centerPanel').setTitle('${viewporttag.centerTitle} -> 我的工作台');
+                    }
+                },
+                //html:"<iframe name='mainFrame'  src='${webPath}/manage/index_load.htm' scrolling='auto' frameborder='0' width='100%' height='100%' ></iframe>"
+            }],
+			listeners: {
+				tabchange: function(tabpanel, newcard, oldcard) {
+				    <#if (uconfig.f_user_id)??>
+					var menu_id =newcard.getItemId().replace("tab_id_","");
+                    Ext.Ajax.request({
+                        url : '/manage/vcf/change_menu_tab.htm',
+                        params : {menu_id:menu_id}
+					});
+					</#if>
+				}
+			}
+        });
+        var carditems = [];
+
+    <#list cardmgs as mg>
+        carditems.push({
+                scrollable:'y',
+                border:false,
+                contentEl: 'div_card_${mg.id}',
+            <#if (mg.icons)?? && (mg.icons)!="">
+				iconCls:'${mg.icons}',
+			</#if>
+				title:'${mg.name}'
+			});
+        var store_${mg.id?c} = Ext.create('Ext.data.TreeStore',{
+			data:${mg.menujson}
+        });
+        var treePanel_${mg.id?c} = Ext.create ('Ext.tree.Panel',{
+            autoHeight:false,
+            autoWidth:false,
+            autoScroll:false,
+            animate:false,
+            rootVisible:false,
+            useArrows:true,
+            title:'',
+            border: false,
+            containerScroll:true,
+            renderTo:'div_card_${mg.id?c}',
+            store:store_${mg.id?c},
+        listeners:{ itemclick : function(node,event) {
+            var menu=event.data;
+            if(menu.request){
+                addTab(menu.request+'?menu_id='+menu.id,menu.text,menu.id,'cxj',menu.icon);
+            }
+        } }
+    });
+    </#list>
+
+        var viewport = new Ext.Viewport({
+            layout:'border',
+            items:[
+                Ext.create('Ext.panel.Panel', {
+                    region:'north',
+                    contentEl:'north',
+                    //iconCls:'application_homeIcon',
+                    height:43,
+                    collapsible:true,
+                    //border:false,
+                    header: false,
+                    layout: 'fit'
+                }),
+                Ext.create('Ext.Component',{
+                    region:'south',
+                    contentEl: 'south',
+                    height:'2%',
+                    layout: 'fit',
+                    collapsible: true}),
+
+                {region:'center',
+                    id: 'centerPanel',
+                    iconCls:'',
+                    title:'${viewporttag.centerTitle}',
+                    autoScroll:false,
+                    layout: 'fit',
+                    border: false,
+                    header: false,
+                    items:[mainTabs]},
+                {region:'west',
+                    width: 310,
+                    collapsible: true,
+                    minSize: 200,
+                    maxSize: 350,
+                    split: true,
+                    //collapseMode:'mini',
+                    iconCls:'book_previousIcon',
+                    title: '${viewporttag.westTitle}',
+                    layout:'accordion',
+                    layoutConfig:{
+                        animate:true,
+                        activeOnTop : false
+                    },
+                    items: carditems
+                }
+            ]});
+
+    });
+    /**
+     * 响应树节点单击事件
+     */
+    function addTab(url,name,menuid,pathCh,icon){
+        if(Ext.isEmpty(icon)){
+            icon = 's.gif';
+        }
+        var id = "tab_id_" + menuid;
+        if(url == '#' || url == ''){
+            Ext.Msg.alert('提示', '此菜单还没有指定请求地址,无法为您打开页面.');
+            return;
+        }else{
+            var n = mainTabs.getComponent(id);
+            if (!n) {
+                // 如果对centerPanel进行遮罩,则可以出现阴影mainTabs
+                //Ext.getCmp('centerPanel').getEl().mask('<span style=font-size:12>正在加载页面,请稍等...</span>', 'x-mask-loading');
+                // document.getElementById('endIeStatus').click();//解决Iframe IE加载不完全的问题
+                // 兼容IE和FF触发.click()函数
+                var endIeStatus = document.getElementById("endIeStatus");
+                if(document.createEvent){
+                    var ev = document.createEvent('HTMLEvents');
+                    ev.initEvent('click', false, true);
+                    endIeStatus.dispatchEvent(ev);
+                }
+                else endIeStatus.click();
+                n = mainTabs.add({
+                    id:id,
+                    title:"<img align='top' class='IEPNG' src='${webPath}/resource/image/ext/" + icon + "'/>" + name,
+                    closable:true,
+                    layout:'fit',
+                    listeners: {activate: function(){Ext.getCmp('centerPanel').setTitle(pathCh)}},
+                    html:'<iframe scrolling="auto" frameborder="0" width="100%" height="100%" src='+url+'></iframe>'
+                    //如果功能页面使用中心区域阴影加载模式则使用下面的代码unmaskCenterPanel();页面加载完毕后取消阴影
+                    //html:'<iframe scrolling="auto" frameborder="0" onload="unmaskCenterPanel()" width="100%" height="100%" src='+url+'></iframe>'
+                });
+            }
+            mainTabs.setActiveTab(n);
+        }
+    }
+
+    // 解决Iframe IE加载不完全的问题
+    function endIeStatus(){}
+
+    Ext.EventManager.on(window, 'load', function(){
+        setTimeout(
+            function() {
+                Ext.get('loading').remove();
+                Ext.get('loading-mask').fadeOut({remove:true});
+            }, 200);
+    });
+
+    /**
+     * 取消阴影(当子页面加载完成后通过parent.XXXX来调用)
+     */
+    function unmaskCenterPanel(){
+        // 如果对centerPanel进行遮罩,则可以出现阴影
+        Ext.getCmp('centerPanel').getEl().unmask();
+    }
+</script>
+<style type="text/css">
+	#loading-mask {
+		Z-INDEX: 20000;
+		LEFT: 0px;
+		WIDTH: 100%;
+		POSITION: absolute;
+		TOP: 0px;
+		HEIGHT: 100%;
+		BACKGROUND-COLOR: white
+	}
+	#loading {
+		PADDING-RIGHT: 2px;
+		PADDING-LEFT: 2px;
+		Z-INDEX: 20001;
+		LEFT: 45%;
+		PADDING-BOTTOM: 2px;
+		PADDING-TOP: 2px;
+		POSITION: absolute;
+		TOP: 40%;
+		HEIGHT: auto
+	}
+	#loading IMG {
+		MARGIN-BOTTOM: 5px
+	}
+	#loading .loading-indicator {
+		PADDING-RIGHT: 10px;
+		PADDING-LEFT: 10px;
+		BACKGROUND: white;
+		PADDING-BOTTOM: 10px;
+		MARGIN: 0px;
+		FONT: 12px 宋体, arial, helvetica;
+		COLOR: #555;
+		PADDING-TOP: 10px;
+		HEIGHT: auto;
+		TEXT-ALIGN: center
+	}
+
+	.banner {
+		font-family: "宋体";
+		font-size: 12px;
+	color:$!{tplOp.getThemeColor()};
+	}
+</style>
+<!--显示loding区域-->
+<DIV id=loading-mask></DIV>
+<DIV id=loading>
+	<DIV class=loading-indicator><IMG style="MARGIN-RIGHT: 8px"
+									  height=32
+									  src="${webPath}/resource/style/common/images/ajax1.gif"
+									  width=36 align=absMiddle>正在初始化,请稍等...</DIV>
+</DIV>
+<div id="north">
+	<table border="0" cellpadding="0" cellspacing="0" width="100%"
+		   height="46" background="${webPath}/resource/image/banner_background/${uconfig.theme}.png">
+		<tr >
+			<#assign imgUrl=webPath+"/resource/style/system/manage/images/title_banner.png">
+			<#if (config.admin_manage_logo)??>
+			<#assign imgUrl=imageWebServer+"/"+(config.admin_manage_logo.path)+"/"+(config.admin_manage_logo.name)>
+		</#if>
+		<td style="padding-left:15px"><img class="IEPNG"
+										   src="${imgUrl}" />
+		</td>
+		<td style="padding-right:5px">
+			<table width="100%"   border="0" cellpadding="0" cellspacing="3" class="banner">
+				<tr align="right">
+					<td>
+						<table border="0" cellpadding="0" cellspacing="1">
+							<tr>
+								<td><div id = "queryDiv"></td>
+								<td>&nbsp;</td>
+								<td><div id = "themeDiv"></td>
+								<td>&nbsp;</td>
+								<td><div id = "configDiv"></td>
+								<td>&nbsp;</td>
+								<td><div id = "closeDiv"></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+		</tr>
+	</table>
+</div>
+<div id="south" align="left">
+	<table class="banner" width="100%">
+		<tr>
+			<td width="65%"><nobr>&nbsp;<img class="IEPNG" src="${webPath}/resource/image/ext/comments2.png" />&nbsp;${tplOp.getWelcomeMsg()},${user.trueName}!&nbsp;帐户:${user.username}&nbsp;今天是:${dateweek}</nobr></td>
+			<td width="35%"><div align="right"><nobr>禾冠</nobr></div></td>
+		</tr>
+	</table>
+</div>
+<a href="#" onclick="javascript:endIeStatus();" id="endIeStatus"
+   style="display: none;" />
+<!-- 由<Aeon:arm.Viewport/>标签生成的代码结束 -->
