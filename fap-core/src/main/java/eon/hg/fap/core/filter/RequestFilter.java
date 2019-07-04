@@ -29,7 +29,7 @@ public class RequestFilter implements Filter {
         String redirect_url = "";
             if (!config.isWebsiteState()) {
                 if (this.init_url(url)) {
-                    if (url.indexOf("/manage") < 0
+                    if (url.indexOf("/manage") < 0 && url.indexOf("/wap") < 0
                             && url.indexOf("/install.htm") <= 0
                             && url.indexOf("/close.htm") < 0
                             && url.indexOf("/jsload.htm") < 0
@@ -48,13 +48,15 @@ public class RequestFilter implements Filter {
             } else {
                 User user = SecurityUserHolder.getCurrentUser();
                 if (user != null) {
-                    if (url.indexOf("/login.htm") >= 0) {
-                        redirect = true;
-                        redirect_url = CommUtil.getURL(request) + "/index.htm";
-                    }
-                    if (url.indexOf("/register.htm") >= 0) {
-                        redirect = true;
-                        redirect_url = CommUtil.getURL(request) + "/index.htm";
+                    if (url.indexOf("/manage") < 0 && url.indexOf("/wap")<0) {
+                        if (url.indexOf("/login.htm") >= 0) {
+                            redirect = true;
+                            redirect_url = CommUtil.getURL(request) + "/index.htm";
+                        }
+                        if (url.indexOf("/register.htm") >= 0) {
+                            redirect = true;
+                            redirect_url = CommUtil.getURL(request) + "/index.htm";
+                        }
                     }
                 } else {
                     if (url.indexOf("/install") >= 0) {
