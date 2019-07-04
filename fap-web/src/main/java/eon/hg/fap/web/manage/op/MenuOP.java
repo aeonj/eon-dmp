@@ -178,6 +178,7 @@ public class MenuOP extends TreeSort {
 		dto.put("code", node.getMenuCode());
 		dto.put("name", node.getMenuName());
 		dto.put("text", node.getMenuName());
+		dto.put("iconcls",node.getIcon());
 		dto.put("leaf", false);
         dto.put("mgid", node.getMg().getId());
 		dto.put("children", node.getChild());

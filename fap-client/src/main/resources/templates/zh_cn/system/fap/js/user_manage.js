@@ -95,25 +95,28 @@ Ext.onReady(function () {
 
     var toolbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [{
+            id: 'user:insert',
             text: '新增',
             iconCls: 'x-fa fa-plus-square-o',
             handler: function () {
                 addInit();
             }
         }, {
+            id: 'user:update',
             text: '修改',
             iconCls: 'x-fa fa-pencil-square-o',
             handler: function () {
                 editInit();
             }
         }, {
+            id: 'user:delete',
             text: '删除',
             iconCls: 'x-fa fa-trash-o',
             handler: function () {
                 deleteUserItem();
             }
         }, {
-            id: 'f_user_set',
+            id: 'user:f_user_set',
             text: 'F3用户对照',
             iconCls: 'x-fa fa-',
             handler: function () {

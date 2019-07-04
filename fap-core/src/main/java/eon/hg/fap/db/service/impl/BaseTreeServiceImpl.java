@@ -224,9 +224,9 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                 if (System.getProperty("aeonDao.db").equals("oracle")) {
                     sql.append(" and e.parent_id is null");
                 } else if (System.getProperty("aeonDao.db").equals("sqlserver")) {
-                    sql.append(" and isnull(e.parent_id,'')=''");
+                    sql.append(" and isnull(e.parent_id,'0')='0'");
                 } else if (System.getProperty("aeonDao.db").equals("mysql")) {
-                    sql.append(" and ifnull(e.parent_id,'')=''");
+                    sql.append(" and ifnull(e.parent_id,'0')='0'");
                 }
             } else {
                 sql.append(" and e.parent_id='").append(dtoParam.getString("parent_id")).append("'");

@@ -7,6 +7,7 @@
 package eon.hg.fap.web.manage.op;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.convert.Convert;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
@@ -64,7 +65,7 @@ public class ElementOP {
 	 * @param value
 	 * @return
 	 */
-	public BaseData getBaseDataById(String source, String value) {
+	public BaseData getBaseDataById(String source, Long value) {
 		Element element = getEleSource(source);
 		try {
 			if (element!=null) {
@@ -75,8 +76,8 @@ public class ElementOP {
 					StringBuffer sql = new StringBuffer();
 					sql.append("SELECT e.* ");
 					sql.append(" from ").append(element.getEle_source()).append(" e ");
-					sql.append(" where e.id=").append(value);
-					List<BaseData> list = this.baseDataService.findBySql(sql.toString());
+					sql.append(" where e.id=?");
+					List<BaseData> list = this.baseDataService.findBySql(sql.toString(),new Object[]{value});
 					if (list!=null && list.size()>0) {
 						return list.get(0);
 					}
@@ -102,15 +103,16 @@ public class ElementOP {
 				StringBuffer sql = new StringBuffer();
 				sql.append("SELECT e.* ");
 				sql.append(" from ").append(element.getEle_source()).append(" e ");
-				sql.append(" where e.id='").append(value).append("'");
-				List<Dto> list = this.genericDao.findDtoBySql(sql.toString());
+				sql.append(" where e.id=?");
+				List<Dto> list = this.genericDao.findDtoBySql(sql.toString(),new Object[]{value});
 				if (list!=null && list.size()>0) {
 					return list.get(0);
 				}
 			} else {
-				BaseData bd = getBaseDataById(source,value);
+				BaseData bd = getBaseDataById(source, Convert.toLong(value,-1l));
 				Dto dto = new HashDto();
 				BeanUtil.beanToMap(bd,dto,true,(key) -> (key.toLowerCase()));
+				return dto;
 			}
 		}
 		return null;
@@ -133,8 +135,8 @@ public class ElementOP {
 			    	StringBuffer sql = new StringBuffer();
 					sql.append("SELECT e.* ");
 					sql.append(" from ").append(element.getEle_source()).append(" e ");
-					sql.append(" where e.code='").append(value).append("'");
-					List<BaseData> list = this.baseDataService.findBySql(sql.toString());
+					sql.append(" where e.code=?");
+					List<BaseData> list = this.baseDataService.findBySql(sql.toString(),new Object[]{value});
 					if (list!=null && list.size()>0) {
 						return list.get(0);
 					}
@@ -160,8 +162,8 @@ public class ElementOP {
 				StringBuffer sql = new StringBuffer();
 				sql.append("SELECT e.* ");
 				sql.append(" from ").append(element.getEle_source()).append(" e ");
-				sql.append(" where e.code='").append(value).append("'");
-				List<Dto> list = this.genericDao.findDtoBySql(sql.toString());
+				sql.append(" where e.code=?");
+				List<Dto> list = this.genericDao.findDtoBySql(sql.toString(),new Object[]{value});
 				if (list!=null && list.size()>0) {
 					return list.get(0);
 				}
@@ -170,6 +172,7 @@ public class ElementOP {
 			BaseData bd = getBaseDataByCode(source,value);
 			Dto dto = new HashDto();
 			BeanUtil.beanToMap(bd,dto,true,(key) -> (key.toLowerCase()));
+			return dto;
 		}
 		return null;
 	}
@@ -439,7 +442,7 @@ public class ElementOP {
 		return new ArrayList();
 	}
 
-	public String getBaseNameById(String source, String value) {
+	public String getBaseNameById(String source, Long value) {
 		BaseData bd = getBaseDataById(source, value);
 		if (bd==null) {
 			return "";

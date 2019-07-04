@@ -68,7 +68,6 @@ public class IndexAction extends BizAction {
             request.getSession(false).removeAttribute("verify_code");
             return mv;
         }
-        user = userService.getObjById(user.getId());
         ModelAndView mv = new JModelAndView("index.html",
                 configService.getSysConfig(),
                 this.userConfigService.getUserConfig(), 0, request, response);

@@ -92,18 +92,21 @@ Ext.onReady(function() {
 
     var toolbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [{
+            id: 'ui:insert',
             text : '新增',
             iconCls : 'page_addIcon',
             handler : function() {
                 addInit();
             }
         }, '-', {
+            id: 'ui:update',
             text : '修改',
             iconCls : 'page_edit_1Icon',
             handler : function() {
                 editInit();
             }
         }, '-', {
+            id: 'ui:delete',
             text : '删除',
             iconCls : 'page_delIcon',
             handler : function() {

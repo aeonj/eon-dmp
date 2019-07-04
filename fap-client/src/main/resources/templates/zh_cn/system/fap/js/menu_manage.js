@@ -26,18 +26,22 @@ function pageLoad() {
 
     var toolbar = Ext.create('Ext.toolbar.Toolbar', {
         items: [{
+            id: 'menu:insert',
             text: '新增菜单',
             iconCls: 'page_addIcon',
             handler: addInit
         }, '-', {
+            id: 'menu:update',
             text: '修改菜单',
             iconCls: 'page_edit_1Icon',
             handler: editInit
         }, '-', {
+            id: 'menu:delete',
             text: '删除菜单',
             iconCls: 'page_delIcon',
             handler: removeData
         }, '-', {
+            id: 'menu:group_do',
             text: '菜单组维护',
             iconCls: 'page_delIcon',
             handler: mgInit
@@ -194,8 +198,17 @@ function pageLoad() {
             name: 'request',
             anchor: '99%'
         },{
+            xtype: 'treefield',
             fieldLabel: '权限关键字',
+            isPermission: false,
+            source: 'PMS',
+            isCodeAsValue: true,
+            condition: 'code like \'%:view\'',
             name: 'authkey',
+            anchor: '99%'
+        },{
+            fieldLabel: '图标',
+            name: 'icon',
             anchor: '99%'
         },{
             fieldLabel: '排序号',

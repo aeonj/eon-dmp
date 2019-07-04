@@ -83,5 +83,6 @@ public interface IBaseDataService {
 	BaseData getObjByProperty(Class clz, String construct, String propertyName, Object value);
 	
 	List<BaseData> findBySql(String sql);
+	List<BaseData> findBySql(String sql, Object[] obj);
 
 }

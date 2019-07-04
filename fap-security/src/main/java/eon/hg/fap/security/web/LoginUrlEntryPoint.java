@@ -4,7 +4,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -18,11 +17,9 @@ import java.io.IOException;
 public class LoginUrlEntryPoint implements AuthenticationEntryPoint {
 
 	@Override
-	public void commence(HttpServletRequest req, HttpServletResponse res, AuthenticationException authException)
-			throws IOException, ServletException {
-		String targetUrl = null;
-		HttpServletRequest request = (HttpServletRequest) req;
-		HttpServletResponse response = (HttpServletResponse) res;
+	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
+			throws IOException {
+		String targetUrl;
 		String url = request.getRequestURI();
 		if (request.getQueryString() != null
 				&& !request.getQueryString().equals("")) {
@@ -38,7 +35,7 @@ public class LoginUrlEntryPoint implements AuthenticationEntryPoint {
 		} else if (url.indexOf("/wap/") >= 0) {//判断是否为wap请求
 			targetUrl = request.getContextPath() + "/wap/login.htm";
 		} else {
-			targetUrl = request.getContextPath() + "/manage/login.htm";
+			targetUrl = request.getContextPath() + "/login.htm";
 		}
 		response.sendRedirect(targetUrl);
 	}

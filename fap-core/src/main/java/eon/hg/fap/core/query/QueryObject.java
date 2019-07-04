@@ -134,7 +134,7 @@ public class QueryObject implements IQueryObject {
 	 * @param currPage 当前页
 	 * @param pageSize 每页记录数
 	 */
-	public QueryObject(String construct, String orderBy, String orderType, String currPage, String pageSize) {
+	public QueryObject(String construct, String orderBy, String orderType, Integer currPage, Integer pageSize) {
 		if (construct != null && !construct.equals("")) {
 			this.setConstruct(construct);
 		}

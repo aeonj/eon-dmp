@@ -1,5 +1,6 @@
 package eon.hg.fap.web.manage.action;
 
+import cn.hutool.core.bean.BeanUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.domain.virtual.SysMap;
@@ -7,7 +8,6 @@ import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.tools.JsonHandler;
-import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.model.primary.Menu;
 import eon.hg.fap.db.model.primary.MenuGroup;
 import eon.hg.fap.db.service.IMenuGroupService;
@@ -21,7 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -111,7 +114,7 @@ public class MenuManageAction extends BizAction {
                                        @RequestParam("menuCode") String code) {
         Menu vf = this.menuService.getObjByProperty(null, "menuCode", code);
         if (vf==null) {
-            Menu menu = WebHandler.toPo(mapPara, Menu.class);
+            Menu menu = BeanUtil.mapToBeanIgnoreCase(mapPara, Menu.class,true);
             MenuGroup menuGroup = this.menuGroupService.getObjById(menuGroupId);
             menu.setMg(menuGroup);
             menu.setType("MANAGE");
@@ -135,7 +138,7 @@ public class MenuManageAction extends BizAction {
             if (menu == null) {
                 return ErrTipMsg("数据修改失败：没有找到对应菜单！");
             }
-            menu = WebHandler.toPo(mapPara, menu);
+            menu = BeanUtil.fillBeanWithMapIgnoreCase(mapPara, menu,true);
             this.menuService.update(menu);
             return OkTipMsg("数据修改成功！");
         }

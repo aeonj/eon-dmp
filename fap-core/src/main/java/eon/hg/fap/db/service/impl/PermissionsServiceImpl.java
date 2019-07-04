@@ -1,5 +1,7 @@
 package eon.hg.fap.db.service.impl;
 
+import eon.hg.fap.core.query.QueryObject;
+import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.db.dao.primary.PermissionsDao;
 import eon.hg.fap.db.model.primary.Permissions;
 import eon.hg.fap.db.service.IPermissionsService;
@@ -45,5 +47,10 @@ public class PermissionsServiceImpl implements IPermissionsService {
     @Override
     public Permissions getObjByProperty(String construct, String propertyName, Object value) {
         return this.permissionsDAO.getBy(construct,propertyName,value);
+    }
+
+    @Override
+    public IPageList list(QueryObject qo) {
+        return this.permissionsDAO.list(qo);
     }
 }

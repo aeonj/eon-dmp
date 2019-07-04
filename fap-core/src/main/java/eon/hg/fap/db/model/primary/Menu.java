@@ -36,6 +36,8 @@ public class Menu extends IdEntity implements Comparable<Menu> {
 	private int sequence;// 排序
 	private Long parent_id;
 	private String request;
+	@Column(length=60)
+	private String icon;
 	@Transient
 	private List<Dto> child = new ArrayList<Dto>();
 	@ManyToOne

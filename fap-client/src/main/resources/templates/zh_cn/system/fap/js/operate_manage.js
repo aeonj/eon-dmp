@@ -46,7 +46,7 @@ function pageLoad() {
         layout: 'border',
         items: [{
             region: 'west',
-            title: '<span class="commoncss">操作列表</span>',
+            title: '<span class="commoncss">菜单列表</span>',
             tools: [{
                 id: 'refresh',
                 handler: function () {
@@ -85,6 +85,43 @@ function pageLoad() {
         //     treeMenu.selectNodeByValue(nodeid, true);
         // }
     }
+
+    var addChoosePanel = Ext.create('Ext.vcf.QueryPanel',{
+        id: 'add_choose_panel',
+        defaultType: 'textfield',
+        region : 'north',
+        userDefined: true,
+        height: 42
+    });
+
+    var addChooseGrid = Ext.create('Ext.vcf.TableGrid',{
+        id: 'add_choose_grid',
+        isChecked: true,
+        region: 'center',
+        margins: '3 3 3 3',
+        userDefined: true,
+        url: 'operate_permissions_list.htm'
+    });
+
+    var addChooseWindow = Ext.create('Ext.vcf.Window', {
+        width : 510,
+        height : 300,
+        pageY: 20,
+        items : [ addChoosePanel , addChooseGrid ],
+        buttons : [ {
+            text : '批量新增',
+            iconCls : 'acceptIcon',
+            handler : saveChooseData
+        }, {
+            text : '关闭',
+            iconCls : 'deleteIcon',
+            handler : function() {
+                addChooseWindow.hide();
+            }
+        } ]
+    });
+
+
 
     var addPanel = Ext.create('Ext.vcf.FormPanel',{
         id: 'add_panel',
@@ -209,6 +246,10 @@ function pageLoad() {
                 });
             }
         });
+    }
+
+    function saveChooseData() {
+
     }
 }
 Ext.onReady(pageLoad);

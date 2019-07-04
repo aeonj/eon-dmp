@@ -256,6 +256,7 @@ public class UserManageAction extends BizAction {
         return OkTipMsg("数据修改成功！");
     }
 
+    @SecurityMapping(title = "用户删除", value = "user:delete")
     @RequestMapping("/user_delete.htm")
     public Dto user_delete(Long user_id) {
         User user = this.userService.getObjById(user_id);

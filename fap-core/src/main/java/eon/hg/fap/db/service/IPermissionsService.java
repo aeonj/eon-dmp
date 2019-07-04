@@ -1,5 +1,7 @@
 package eon.hg.fap.db.service;
 
+import eon.hg.fap.core.query.QueryObject;
+import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.db.model.primary.Permissions;
 
 import java.util.List;
@@ -19,4 +21,5 @@ public interface IPermissionsService {
 
 	Permissions getObjByProperty(String construct, String propertyName, Object value);
 
+    IPageList list(QueryObject qo);
 }

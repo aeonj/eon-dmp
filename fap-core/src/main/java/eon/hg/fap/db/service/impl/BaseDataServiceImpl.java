@@ -154,4 +154,9 @@ public class BaseDataServiceImpl implements IBaseDataService {
 		return this.basedataDao.findBySql(sql);
 	}
 
+    @Override
+    public List<BaseData> findBySql(String sql, Object[] obj) {
+        return this.basedataDao.findBySql(sql,obj);
+    }
+
 }
