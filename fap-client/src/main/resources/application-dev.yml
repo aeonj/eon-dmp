@@ -55,4 +55,5 @@ eon:
     db:
       reset: true  #是否重置数据库
     hessian:
-      login-url: http://localhost:8080/vcf/login?sysapp=900&uid=2529&sid=1&setyear=2018&roleid=73
+      server-url: http://127.0.0.1:8080/vcf/remote/
+

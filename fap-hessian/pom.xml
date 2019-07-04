@@ -8,6 +8,7 @@
         <groupId>eon.hg.fap</groupId>
         <artifactId>fap-project</artifactId>
         <version>2.0-RELEASE</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>eon.hg.fap</groupId>
@@ -27,16 +28,7 @@
         <dependency>
             <groupId>com.caucho</groupId>
             <artifactId>hessian</artifactId>
-            <version>4.0.51</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/repository/hessian-3.0.13.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/repository/ojdbc6.jar</systemPath>
+            <version>3.0.13</version>
         </dependency>
     </dependencies>
 

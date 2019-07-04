@@ -74,7 +74,7 @@ function pageLoad() {
         }, {
             header: '权限关键字',
             dataIndex: 'authkey',
-            width: 60
+            width: 160
         }, {
             header: '排序',
             dataIndex: 'sequence',

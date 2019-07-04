@@ -21,13 +21,31 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
-	<!--阿里云仓库-->
+	<!--nexus仓库-->
 	<repositories>
 		<repository>
-			<id>nexus-aliyun</id>
-			<url>http://maven.aliyun.com/nexus/content/groups/public</url>
+			<id>nexus-public</id>
+			<name>Nexus Public</name>
+			<url>http://47.101.154.11:8081/repository/maven-public/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
 	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<url>http://47.101.154.11:8081/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshots</id>
+			<url>http://47.101.154.11:8081/repository/maven-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<dependencies>
 		<dependency>
@@ -152,7 +170,7 @@
 		<module>fap-security</module>
 		<module>fap-web</module>
 		<module>fap-hessian</module>
-		<module>fap-client</module>
+		<module>fap-webservice</module>
 	</modules>
 
 </project>
