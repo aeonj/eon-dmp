@@ -228,15 +228,16 @@ function addUIByServer(comp, ray, pos) {
                         items: [items]
                     });
                     if (initcol == 0) {
-                        pnl = Ext.create('Ext.panel.Panel', {
-                            border: false,
-                            layout: 'column'
-                        });
+                        // pnl = Ext.create('Ext.panel.Panel', {
+                        //     border: false,
+                        //     layout: 'column'
+                        // });
+                        comp.setLayout('column');
                     }
-                    pnl.add(pnlCol);
+                    comp.add(pnlCol);
                     if (initcol + ray_detail[i].cols >= ray_detail[i].total_column || i == ray_detail.length - 1) {
                         initcol = 0;
-                        comp.add(pnl);
+                        //comp.add(pnl);
                     } else {
                         initcol = initcol + ray_detail[i].cols;
                     }
