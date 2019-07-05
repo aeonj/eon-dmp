@@ -45,6 +45,10 @@ function pageLoad() {
             text: '菜单组维护',
             iconCls: 'page_delIcon',
             handler: mgInit
+        }, '-', {
+            text: 'F3功能对照',
+            iconCls: 'page_delIcon',
+            handler: linkFModule
         }]
     });
 
@@ -499,5 +503,84 @@ function pageLoad() {
             mgwindow.hide();
         }
     }
+
+    function linkFModule() {
+        var selected = mainGrid.getSelectionModel().getSelected();
+        var record = selected.items[0];
+        if (Ext.isEmpty(record)) {
+            Ext.MessageBox.alert('提示', '请先选择要设置功能对照的菜单信息!');
+            return;
+        }
+        if (selected.items.length > 1) {
+            Ext.MessageBox.alert('提示', '只能选择一项进行设置!');
+            return;
+        }
+        var linkPanel = Ext.create('Ext.vcf.FormPanel',{
+            layout : 'form',
+            items : [{
+                fieldLabel: 'F3功能ID',
+                name: 'f_module_id',
+                afterLabelTextTpl: [
+                    '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
+                ],
+                allowBlank: false,
+                anchor: '99%'
+            } , {
+                name: 'id',
+                hidden: true
+            }],
+            defaultType: 'textfield',
+            frame: false,
+            autoHeight: true,
+            bodyStyle: 'padding:15 15 0'
+        });
+        linkPanel.getForm().loadRecord(record);
+        var linkwindow = Ext.create('Ext.vcf.Window', {
+            width : 460,
+            height : 300,
+            title : "F3功能对照",
+            items: linkPanel,
+            tbar : [{
+                text: '退出',
+                iconCls: 'page_addIcon',
+                handler: function () {
+                    linkwindow.hide();
+                }
+            }, '-', {
+                text: '保存',
+                iconCls: 'page_addIcon',
+                handler: function () {
+                    save_F3Link();
+                }
+            }]
+        });
+        linkwindow.show();
+
+        function save_F3Link() {
+            if (!linkPanel.form.isValid()) {
+                Ext.MessageBox.alert('提示', '请检查需要填写的录入项！');
+                return;
+            }
+            linkPanel.submit({
+                url: 'vcf/save_f_module.htm',
+                waitTitle: '提示',
+                method: 'POST',
+                waitMsg: '正在处理数据,请稍候...',
+                success: function (form, action) {
+                    linkwindow.hide();
+                },
+                failure: function (form, action) {
+                    switch (action.failureType) {
+                        case Ext.form.action.Action.SERVER_INVALID:
+                            Ext.Msg.alert('提示', '数据保存失败:<br>'+action.result.msg);
+                            break;
+                        default:
+                            Ext.Msg.alert('错误', '数据保存失败:<br>'+action.responseText);
+                    }
+                }
+            });
+        }
+    }
+
 }
 Ext.onReady(pageLoad);

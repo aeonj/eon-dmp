@@ -957,7 +957,7 @@ Ext.onReady(function () {
             bodyStyle: 'padding:15 15 0'
         });
         linkPanel.form.load({
-            url: 'pay/query_f_user_role.htm',
+            url: 'vcf/query_f_user_role.htm',
             params: {user_id: selectNode.id},
             waitMsg: '请稍后......',
             success: function (form, result, data) {
@@ -990,7 +990,7 @@ Ext.onReady(function () {
                 return;
             }
             linkPanel.submit({
-                url: 'pay/save_f_user_role.htm',
+                url: 'vcf/save_f_user_role.htm',
                 waitTitle: '提示',
                 method: 'POST',
                 params : {user_id:selectNode.id},
