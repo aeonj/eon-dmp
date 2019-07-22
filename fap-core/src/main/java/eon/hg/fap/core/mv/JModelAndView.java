@@ -174,8 +174,7 @@ public class JModelAndView extends ModelAndView {
 		super.addObject("second_domain_view", second_domain_view);
 	}
 
-	public JModelAndView(String viewName, int type, HttpServletRequest request,
-                         HttpServletResponse response) {
+	public JModelAndView(String viewName, int type) {
 		if (type == 0) {
 			super.setViewName(Globals.SYSTEM_MANAGE_PAGE_PATH
 					+ viewName);
