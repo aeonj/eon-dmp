@@ -6,7 +6,6 @@ import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.common.util.tools.ContainerList;
 import eon.hg.fap.common.util.tools.Md5Encrypt;
 import eon.hg.fap.common.util.tools.StringUtils;
-import org.apache.commons.beanutils.BeanUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.safety.Whitelist;
 
@@ -1279,24 +1278,6 @@ public class CommUtil {
 		num = Pattern.compile("[-.!@#$%^&*()+?><]").matcher(str).find() ? num + 1
 				: num;
 		return num;
-	}
-
-	/**
-	 * JavaBean之间对象属性值拷贝
-	 * 
-	 * @param pFromObj
-	 *            Bean源对象
-	 * @param pToObj
-	 *            Bean目标对象
-	 */
-	public static void copyPropBetweenBeans(Object pFromObj, Object pToObj) {
-		if (pToObj != null) {
-			try {
-				BeanUtils.copyProperties(pToObj, pFromObj);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
     public static String escapeEntities(String s) {
