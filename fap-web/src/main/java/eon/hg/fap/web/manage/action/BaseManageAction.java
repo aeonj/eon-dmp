@@ -45,7 +45,11 @@ public class BaseManageAction extends BizAction{
 
 	@RequestMapping("/")
     public String index() {
-		return "redirect:manage/index.htm";
+		if (Globals.DEFAULT_SYS_TYPE) {
+			return "redirect:manage/index.htm";
+		} else {
+			return "redirect:index.htm";
+		}
     }
 
 	/**
@@ -87,8 +91,8 @@ public class BaseManageAction extends BizAction{
 				url = CommUtil.null2String(request.getSession(false)
 						.getAttribute("refererUrl"));
 			}
-			//String login_role = (String) session.getAttribute("login_role");
-			String login_role = user.getUserRole();
+			String login_role = (String) session.getAttribute("login_role");
+			//String login_role = user.getUserRole();
 			boolean ajax_login = CommUtil.null2Boolean(session
 					.getAttribute("ajax_login"));
 			if (ajax_login) {
@@ -270,14 +274,10 @@ public class BaseManageAction extends BizAction{
 	/**
 	 * 管理员退出，清除管理员权限数据,退出后，管理员可以作为普通登录用户进行任意操作，该请求在前台将不再使用，保留以供二次开发使用
 	 * 
-	 * @param request
-	 * @param response
 	 * @return
 	 */
 	@RequestMapping("/manage/logout.htm")
-	public String logout(HttpServletRequest request,
-			HttpServletResponse response) {
-
+	public String logout() {
 		return "redirect:login.htm";
 	}
 
