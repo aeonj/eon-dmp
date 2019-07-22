@@ -100,7 +100,7 @@ public class UserConfigServiceImpl implements IUserConfigService {
 				config = user.getConfig();
 				if (config==null) {
 					config = new UserConfig();
-					config.setUser(user);
+					config.setUser_id(user.getId());
 					config.setAddTime(new Date());
 					config.setTheme(Globals.DEFAULT_THEME);
 					config.setLayout(AeonConstants.APP_LAYOUT_CLASSIC);
