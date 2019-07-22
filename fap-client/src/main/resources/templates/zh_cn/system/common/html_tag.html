@@ -12,18 +12,31 @@
 <link rel="stylesheet" type="text/css" href="/resource/css/ext_icon.css"/>
 <link rel="stylesheet" type="text/css" href="/resource/css/all.css"/>
 
-  <#if extMode == "debug">
-<script type="text/javascript" src="${webPath}/extjs6.2/include-ext.js?theme=${uconfig.theme}&debug=true"></script>
-  <#else>
-<script type="text/javascript" src="${webPath}/extjs6.2/include-ext.js?theme=${uconfig.theme}"></script>
-	</#if>
-<script type="text/javascript" src="${webPath}/extjs6.2/classic/locale/locale-zh_CN.js"></script>
+<#if extMode == "debug">
+<link rel="stylesheet" type="text/css" href="/webjars/extjs/6.2.0/build/packages/ux/classic/${uconfig.theme}/resources/ux-all-debug.css"/>
+<link rel="stylesheet" type="text/css" href="/webjars/extjs/6.2.0/build/packages/charts/classic/${uconfig.theme}/resources/charts-all-debug.css"/>
+<link rel="stylesheet" type="text/css" href="/webjars/extjs/6.2.0/build/classic/theme-${uconfig.theme}/resources/theme-${uconfig.theme}-all-debug.css"/>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/ext-all.js"></script>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/packages/ux/classic/ux-debug.js"></script>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/packages/charts/classic/charts-debug.js"></script>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/classic/theme-${uconfig.theme}/theme-${uconfig.theme}-debug.js"></script>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/classic/locale/locale-zh_CN-debug.js"></script>
+<#else>
+<link rel="stylesheet" type="text/css" href="/webjars/extjs/6.2.0/build/packages/ux/classic/${uconfig.theme}/resources/ux-all.css"/>
+<link rel="stylesheet" type="text/css" href="/webjars/extjs/6.2.0/build/packages/charts/classic/${uconfig.theme}/resources/charts-all.css"/>
+<link rel="stylesheet" type="text/css" href="/webjars/extjs/6.2.0/build/classic/theme-${uconfig.theme}/resources/theme-${uconfig.theme}-all.css"/>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/ext-all.js"></script>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/packages/ux/classic/ux.js"></script>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/packages/charts/classic/charts.js"></script>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/classic/theme-${uconfig.theme}/theme-${uconfig.theme}.js"></script>
+<script type="text/javascript" src="/webjars/extjs/6.2.0/build/classic/locale/locale-zh_CN.js"></script>
+</#if>
 </#if>
 <#if htmltag.jqueryEnabled == "true">
   <#if extMode == "debug">
-<script type="text/javascript" src="${webPath}/resource/js/jquery/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="/webjars/jquery/1.11.1/jquery.js"></script>
   <#else>
-<script type="text/javascript" src="${webPath}/resource/js/jquery/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="/webjars/jquery/1.11.1/jquery.min.js"></script>
 	</#if>
 </#if>
 
