@@ -23,8 +23,7 @@ import javax.persistence.*;
 public class UserConfig extends IdEntity {
 	private static final long serialVersionUID = -6619413529532587073L;
 	
-	@OneToOne(fetch = FetchType.LAZY)
-	private User user;
+	private long user_id;
 	@Column(columnDefinition = "varchar(20)")
 	private String theme;     //后台业务平台EXT默认样式
 	@Column(columnDefinition = "varchar(5)")

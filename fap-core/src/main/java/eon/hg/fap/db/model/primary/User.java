@@ -7,7 +7,7 @@
 package eon.hg.fap.db.model.primary;
 
 import cn.hutool.core.util.ArrayUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.alibaba.fastjson.annotation.JSONField;
 import eon.hg.fap.core.annotation.Lock;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.constant.Globals;
@@ -37,8 +37,9 @@ public class User extends IdEntity implements UserDetails {
 	private String userName;// 用户名
 	private String nickName;// 昵称
 	private String trueName;// 真实姓名
+
 	@Lock
-	@JsonIgnore
+	@JSONField(serialize = false)
 	private String password;// 密码
 	private String userRole;// 用户角色，登录时根据不同用户角色导向不同的管理页面,MANAGE是后台管理类,可用于纯业务系统,PUBLIC是指公众用户，一般指注册用户，对于需要入驻的用户再按照类别扩展
 	private Date birthday;// 出生日期
@@ -71,7 +72,7 @@ public class User extends IdEntity implements UserDetails {
 	private String lastLoginIp;// 上次登录IP
 	private String loginIp;// 登陆Ip
 	private int loginCount;// 登录次数
-	@OneToOne(mappedBy = "user")
+	@OneToOne
 	private UserConfig config;
 	@Transient
 	private Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
