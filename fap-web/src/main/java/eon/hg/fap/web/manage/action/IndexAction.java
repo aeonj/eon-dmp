@@ -1,12 +1,6 @@
 package eon.hg.fap.web.manage.action;
 
-import cn.hutool.core.convert.Convert;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.symmetric.DESede;
 import eon.hg.fap.common.CommUtil;
-import eon.hg.fap.common.ip.ListNets;
-import eon.hg.fap.core.constant.AeonConstants;
-import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.db.model.primary.User;
@@ -21,8 +15,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
 @Controller
 @RequestMapping("/manage")
@@ -44,22 +36,7 @@ public class IndexAction extends BizAction {
      */
     @RequestMapping("/index.htm")
     public ModelAndView index(HttpServletRequest request,
-                              HttpServletResponse response) throws SocketException, UnknownHostException {
-        if (!AeonConstants.VLicense.isinstall()) {
-            String mac = ListNets.getLocalMacAddress(request.getRemoteAddr());
-            if (CommUtil.isEmpty(mac)) {
-                mac = ListNets.getLocalMacAddress();
-            }
-            if (CommUtil.isEmpty(mac)) {
-                //未能获取到网卡Mac地址
-            }
-            DESede desede = SecureUtil.desede(Convert.hexToBytes(Globals.DEFAULT_3DES_KEY));
-            ModelAndView mv = new JModelAndView("license.html",
-                    configService.getSysConfig(),
-                    this.userConfigService.getUserConfig(), 0, request, response);
-            mv.addObject("licensecode", desede.encryptHex(mac).toUpperCase());
-            return mv;
-        }
+                              HttpServletResponse response) {
         User user = SecurityUserHolder.getCurrentUser();
         if (user==null) {
             ModelAndView mv = new JModelAndView("login.html",
