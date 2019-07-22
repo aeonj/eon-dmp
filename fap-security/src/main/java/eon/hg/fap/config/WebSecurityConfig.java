@@ -1,12 +1,13 @@
 package eon.hg.fap.config;
 
-import eon.hg.fap.security.web.DnsSecurityExceptionFilter;
-import eon.hg.fap.security.web.LoginAuthenticationFilter;
-import eon.hg.fap.security.web.LoginUrlEntryPoint;
 import eon.hg.fap.security.access.EonAccessDecisionManager;
 import eon.hg.fap.security.access.EonAccessDeniedHandler;
 import eon.hg.fap.security.interceptor.SecureResourceFilterMetadataSource;
-import eon.hg.fap.security.support.*;
+import eon.hg.fap.security.support.EonAuthenticationProvider;
+import eon.hg.fap.security.support.SecurityUserSupport;
+import eon.hg.fap.security.web.DnsSecurityExceptionFilter;
+import eon.hg.fap.security.web.LoginAuthenticationFilter;
+import eon.hg.fap.security.web.LoginUrlEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -83,20 +84,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * @throws Exception
      */
     @Override
-    public void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(authenticationProvider());
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+        //auth.authenticationProvider(authenticationProvider());
     }
 
 
     //在这里配置哪些页面不需要认证
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/", "/login.htm*","/domain_error.htm*","/manage/*tag.htm*","/resource/**","/extjs6.2/**");
+        web.ignoring().antMatchers("/","/webjars/**", "/login.htm*","/domain_error.htm*","/manage/*tag.htm*","/resource/**","/extjs6.2/**");
     }
 
     /**定义安全策略*/
     @Override
     public void configure(HttpSecurity http) throws Exception {
+        http.authenticationProvider(authenticationProvider());
         http.headers().frameOptions().sameOrigin();
         http
                 .authorizeRequests()     //配置安全策略
