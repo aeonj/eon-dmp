@@ -43,6 +43,6 @@ public class Globals {
 	public final static String DEFAULT_BIND_DOMAIN_CODE = "75A520E9FBE608E91D6CCDEC0E05740C97B9DCE99C5934CD589CFE4E769668CBA";// 绑定的域名加密字符串
 	public final static String DEFAULT_3DES_KEY = "F68E28ADC899FD210FE69B90C6BD1EF9ADDE11D2A9BA6AA9";  //3DES密钥
 
-	public final static Boolean MUST_LOGIN_FLAG=false;   //是否必须登陆
-	public final static Boolean DEFAULT_SYS_TYPE=true;   //默认只使用业务系统类别
+	public static Boolean MUST_LOGIN_FLAG=false;   //是否必须登陆
+	public static Boolean DEFAULT_SYS_TYPE=true;   //默认只使用业务系统类别
 }
