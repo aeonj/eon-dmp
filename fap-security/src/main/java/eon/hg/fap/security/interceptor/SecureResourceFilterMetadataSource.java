@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
@@ -45,13 +44,13 @@ public class SecureResourceFilterMetadataSource implements
 	private boolean reset_flag = false;
 	
 	@Override
-	public void afterPropertiesSet() throws FileNotFoundException {
+	public void afterPropertiesSet() {
 		loadUrlAuthorities();
 	}
 	
 	@Override
 	public Collection<ConfigAttribute> getAllConfigAttributes() {
-		Set<ConfigAttribute> attributes = new HashSet<ConfigAttribute>();
+		Set<ConfigAttribute> attributes = new HashSet<>();
         for (Map.Entry<String, Collection<ConfigAttribute>> entry : urlAuthorities.entrySet()) {
             attributes.addAll(entry.getValue());  
         }  
@@ -91,7 +90,7 @@ public class SecureResourceFilterMetadataSource implements
 					if (confs.size()>0) {
 						return urlAuthorities.get(url);
 					} else {
-						return SecurityConfig.createListFromCommaDelimitedString("online_error");
+						return SecurityConfig.createList("online_error");
 					}
 				}
 			}
@@ -99,7 +98,7 @@ public class SecureResourceFilterMetadataSource implements
 			if (requestURI.indexOf("login.htm") < 0) {
 				filterInvocation.getHttpRequest().getSession()
 						.setAttribute("domain_error", true);
-				return SecurityConfig.createListFromCommaDelimitedString("domain_error");
+				return SecurityConfig.createList("domain_error");
 			}
 		}
 
@@ -109,7 +108,7 @@ public class SecureResourceFilterMetadataSource implements
 	public void loadUrlAuthorities() {
 		setResetAuthorities(false);
 		urlAuthorities.clear();
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("type", "URL");
 		List<Res> urlResources = this.resService.query(
 				"select obj from Res obj where obj.type = :type", params, -1,
@@ -127,25 +126,24 @@ public class SecureResourceFilterMetadataSource implements
      * @return Collection<ConfigAttribute> 
      */  
     private Collection<ConfigAttribute> list2Collection(List<Role> roles) {
-        List<ConfigAttribute> list = new ArrayList<ConfigAttribute>();
+        List<ConfigAttribute> list = new ArrayList<>();
         for (Role role : roles)  
             list.add(new SecurityConfig(role.getAuthCode()));
         return list;  
     }
 
     private Collection<ConfigAttribute> list2Collection(String[] permissions) {
-        List<ConfigAttribute> list = new ArrayList<ConfigAttribute>();
+        List<ConfigAttribute> list = new ArrayList<>();
         if (permissions!=null) {
             for (String permission : permissions) {
-                Map<String, Object> params = new HashMap<String, Object>();
+                Map<String, Object> params = new HashMap<>();
                 String[] keys = StrUtil.split(permission, ":");
-                params.put("mkey", keys[0]);
+                params.put("auth_key", permission);
                 List<Role> roles;
-                if (keys.length<=1) {
-					roles = this.roleService.query("select role from Role as role join fetch role.menus as menu where menu.authkey=:mkey", params, -1, -1);
-				} else {
-					params.put("okey", StrUtil.blankToDefault(keys[1],""));
-					roles = this.roleService.query("select role from Role as role join fetch role.menus as menu join fetch menu.operates as operate where menu.authkey=:mkey and operate.authkey=:okey", params, -1, -1);
+                if (keys.length<=1 || "view".equals(keys[1])) {
+					roles = this.roleService.query("select role from Role as role join fetch role.menus as menu where menu.authkey=:auth_key", params, -1, -1);
+                } else {
+					roles = this.roleService.query("select role from Role as role join fetch role.operates as r_operate join fetch r_operate.operate as operate where operate.authkey=:auth_key", params, -1, -1);
 				}
                 for (Role role : roles) {
                     list.add(new SecurityConfig(role.getAuthCode()));
