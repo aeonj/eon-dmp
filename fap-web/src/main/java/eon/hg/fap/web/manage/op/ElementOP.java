@@ -177,7 +177,10 @@ public class ElementOP {
 		return null;
 	}
 
-	public List<Dto> getObject(Dto dto) {
+	public List<Dto> getObject(Dto dto) throws Exception {
+		if (!AeonConstants.VLicense.verify()) {
+			throw new Exception("未经许可的认证，证书验证失败！");
+		}
 		if (CommUtil.isNotEmpty(dto.getString("source"))) {
 			Element element = getEleSource(dto.getString("source"));
 			dto.put("table_name",element.getEle_source());

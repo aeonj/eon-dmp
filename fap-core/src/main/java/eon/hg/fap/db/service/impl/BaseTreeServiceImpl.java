@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.core.cache.AbstractCacheOperator;
+import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.dao.primary.ElementDao;
@@ -61,6 +62,9 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
 
     @Override
     public List<Dto> getObject(Object... params) throws Exception {
+        if (!AeonConstants.VLicense.verify()) {
+            throw new Exception("未经许可的认证，证书验证失败！");
+        }
         if (params != null && params.length > 0) {
             try {
                 Dto dto = (Dto) params[0];

@@ -86,7 +86,6 @@ public class DictionaryAction extends BizAction {
 
 	@RequestMapping("/eleinfo_ajax_id.htm")
 	public String eleinfo_ajax_id(String source, String value) {
-		Element ele = eleOp.getEleSource(source);
 		Dto bd = this.eleOp.getBaseDtoById(source,value);
 		return JsonHandler.toJson(bd);
 	}
