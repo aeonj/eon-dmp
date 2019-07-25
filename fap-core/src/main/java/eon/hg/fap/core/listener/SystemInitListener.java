@@ -17,6 +17,7 @@ public class SystemInitListener implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         try {
+            //String path = FileHandler.getLicenseFilePath();
             String path = ResourceUtils.getURL("classpath:").getPath();
             AeonConstants.VLicense.install(path);
         }catch (Exception e) {

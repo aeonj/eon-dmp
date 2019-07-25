@@ -1,9 +1,22 @@
 package eon.hg.fap.common.util.tools;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.*;
+import eon.hg.fap.common.util.metatype.Dto;
+import eon.hg.fap.common.util.metatype.impl.HashDto;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 系统文件处理类
@@ -11,207 +24,249 @@ import java.io.*;
  *
  */
 public class FileHandler {
-	/**
-	 * 将字符串写入指定文件(当指定的父路径中文件夹不存在时，会最大限度去创建，以保证保存成功！)
-	 * 
-	 * @param res
-	 *            原字符串
-	 * @param filePath
-	 *            文件路径
-	 * @return 成功标记
-	 */
-	public static boolean string2File(String res, String filePath) {
-		boolean flag = true;
-		BufferedReader bufferedReader = null;
-		BufferedWriter bufferedWriter = null;
-		try {
-			File distFile = new File(filePath);
-			if (!distFile.getParentFile().exists())
-				distFile.getParentFile().mkdirs();
-			bufferedReader = new BufferedReader(new StringReader(res));
-			bufferedWriter = new BufferedWriter(new FileWriter(distFile));
-			char buf[] = new char[1024]; // 字符缓冲区
-			int len;
-			while ((len = bufferedReader.read(buf)) != -1) {
-				bufferedWriter.write(buf, 0, len);
-			}
-			bufferedWriter.flush();
-			bufferedReader.close();
-			bufferedWriter.close();
-		} catch (IOException e) {
-			flag = false;
-			e.printStackTrace();
-		}
-		return flag;
-	}
-	
-    /**
-     * 将文本文件中的内容读入到buffer中
-     * @param buffer buffer
-     * @param filePath 文件路径
-     * @throws IOException 异常
-     * @author cn.outofmemory
-     * @date 2013-1-7
-     */
-    public static void readToBuffer(StringBuffer buffer, String filePath) throws IOException {
-        InputStream is = new FileInputStream(filePath);
-        String line; // 用来保存每行读取的内容
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        line = reader.readLine(); // 读取第一行
-        while (line != null) { // 如果 line 为空说明读完了
-            buffer.append(line); // 将读到的内容添加到 buffer 中
-            buffer.append("\n"); // 添加换行符
-            line = reader.readLine(); // 读取下一行
-        }
-        reader.close();
-        is.close();
-    }
-
-    /**
-     * 读取文本文件内容
-     * @param filePath 文件所在路径
-     * @return 文本内容
-     * @throws IOException 异常
-     * @author cn.outofmemory
-     * @date 2013-1-7
-     */
-    public static String fileToString(String filePath) throws IOException {
-        StringBuffer sb = new StringBuffer();
-        FileHandler.readToBuffer(sb, filePath);
-        return sb.toString();
-    }
-
+	@Value("${eon.hg.file.upload_folder}")
+	private static String UPLOAD_FOLDER = "E://temp//";
 
 	/**
-	 * 复制文件或者目录,复制前后文件完全一样。
-	 * 
-	 * @param resFilePath
-	 *            源文件路径
-	 * @param distFolder
-	 *            目标文件夹
-	 * @IOException 当操作发生异常时抛出
-	 */
-	public static void copyFile(String resFilePath, String distFolder)
-			throws IOException {
-		File resFile = new File(resFilePath);
-		File distFile = new File(distFolder);
-		if (resFile.isDirectory()) {
-			FileUtils.copyDirectoryToDirectory(resFile, distFile);
-		} else if (resFile.isFile()) {
-			FileUtils.copyFileToDirectory(resFile, distFile, true);
-		}
-	}
-
-	/**
-	 * 复制单个文件
+	 * saveFileToServer 上传文件保存到服务器
 	 *
-	 * @param oldPath
-	 *            String 原文件路径 如：c:/fqf.txt
-	 * @param newPath
-	 *            String 复制后路径 如：f:/fqf.txt
-	 * @return boolean
+	 * @param file 为上传文件
+	 * @param saveFilePathName 为文件保存的相对路径，基于UPLOAD_FOLDER
+	 * @param saveFileName 为保存的文件
+	 * @param extendes 为允许的文件扩展名
+	 * @return 返回一个map，map中有4个值，第一个为保存的文件名fileName,第二个为保存的文件大小fileSize,,
+	 *         第三个为保存文件时错误信息errors,如果生成缩略图则map中保存smallFileName，表示缩略图的全路径
 	 */
-	public static void copyFile2(String oldPath, String newPath) {
-		try {
-			int bytesum = 0;
-			int byteread = 0;
-			File oldfile = new File(oldPath);
-			if (oldfile.exists()) { // 文件存在时
-				InputStream inStream = new FileInputStream(oldPath); // 读入原文件
-				FileOutputStream fs = new FileOutputStream(newPath);
-				byte[] buffer = new byte[1444];
-				int length;
-				while ((byteread = inStream.read(buffer)) != -1) {
-					bytesum += byteread; // 字节数 文件大小
-					fs.write(buffer, 0, byteread);
-				}
-				inStream.close();
+	public static Dto saveFileToServer(MultipartFile file, String saveFilePathName, String saveFileName,
+									   String... extendes) throws IOException {
+		Dto map = new HashDto();
+		if (file != null && !file.isEmpty()) {
+			if (saveFilePathName==null) {
+				saveFilePathName = "";
 			}
+			// System.out.println("文件名为：" + file.getOriginalFilename());
+			String extend = file.getOriginalFilename()
+					.substring(file.getOriginalFilename().lastIndexOf(".") + 1)
+					.toLowerCase();
+			if (saveFileName == null || saveFileName.trim().equals("")) {
+				saveFileName = UUID.randomUUID().toString() + "." + extend;
+			}
+			if (saveFileName.lastIndexOf(".") < 0) {
+				saveFileName = saveFileName + "." + extend;
+			}
+			float fileSize = Float.valueOf(file.getSize());// 返回文件大小，单位为k
+			List<String> errors = new java.util.ArrayList<>();
+			boolean flag = false;
+			if (extendes == null) {
+				extendes = new String[] { "jpg", "jpeg", "gif", "bmp", "tbi",
+						"png" };
+			}
+			for (String s : extendes) {
+				if (extend.toLowerCase().equals(s))
+					flag = true;
+			}
+			if (flag) {
+				byte[] bytes = file.getBytes();
+				Path paths = Paths.get(UPLOAD_FOLDER + saveFilePathName
+						+ saveFileName);
+				Files.write(paths, bytes);
+
+				if (isImg(extend)) {
+					File img = new File(UPLOAD_FOLDER + saveFilePathName
+							+ saveFileName);
+					try {
+						BufferedImage bis = ImageIO.read(img);
+						int w = bis.getWidth();
+						int h = bis.getHeight();
+						map.put("width", w);
+						map.put("height", h);
+					} catch (Exception e) {
+						// map.put("width", 200);
+						// map.put("heigh", 100);
+					}
+				}
+				map.put("mime", extend);
+				map.put("fileName", saveFileName);
+				map.put("filePath", UPLOAD_FOLDER + saveFilePathName);
+				map.put("fileSize", fileSize);
+				map.put("error", errors);
+				map.put("oldName", file.getOriginalFilename());
+				// System.out.println("上传结束，生成的文件名为:" + fileName);
+			} else {
+				// System.out.println("不允许的扩展名");
+				errors.add("不允许的扩展名");
+			}
+		} else {
+			map.put("width", 0);
+			map.put("height", 0);
+			map.put("mime", "");
+			map.put("fileName", "");
+			map.put("filePath", "");
+			map.put("fileSize", 0.0f);
+			map.put("oldName", "");
+		}
+		return map;
+	}
+
+	public static boolean isImg(String extend) {
+		boolean ret = false;
+		List<String> list = new java.util.ArrayList<>();
+		list.add("jpg");
+		list.add("jpeg");
+		list.add("bmp");
+		list.add("gif");
+		list.add("png");
+		list.add("tif");
+		list.add("tbi");
+		for (String s : list) {
+			if (s.equals(extend))
+				ret = true;
+		}
+		return ret;
+	}
+
+	public static String getLicenseFilePath() {
+		return UPLOAD_FOLDER;
+	}
+
+	/**
+	 * 图片水印，一般使用gif png格式，其中png质量较好
+	 *
+	 * @param pressImg
+	 *            水印文件
+	 * @param targetImg
+	 *            目标文件
+	 * @param pos
+	 *            水印位置，使用九宫格控制
+	 * @param alpha
+	 *            水印图片透明度
+	 */
+	public final static void waterMarkWithImage(String pressImg,
+												String targetImg, int pos, float alpha) {
+		try {
+			// 目标文件
+			Image theImg = Toolkit.getDefaultToolkit().getImage(targetImg);
+			theImg.flush();
+			BufferedImage bis = toBufferedImage(theImg);
+			int width = theImg.getWidth(null);
+			int height = theImg.getHeight(null);
+			bis = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			Graphics2D g = bis.createGraphics();
+			g.drawImage(theImg, 0, 0, width, height, null);
+
+			// 水印文件
+			File _filebiao = new File(pressImg);
+			Image src_biao = ImageIO.read(_filebiao);
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
+					alpha / 100));
+			int width_biao = src_biao.getWidth(null);
+			int height_biao = src_biao.getHeight(null);
+			int x = 0;
+			int y = 0;
+			if (pos == 1) {
+
+			}
+			if (pos == 2) {
+				x = (width - width_biao) / 2;
+				y = 0;
+			}
+			if (pos == 3) {
+				x = width - width_biao;
+				y = 0;
+			}
+			if (pos == 4) {
+				x = width - width_biao;
+				y = (height - height_biao) / 2;
+			}
+			if (pos == 5) {
+				x = width - width_biao;
+				y = height - height_biao;
+			}
+			if (pos == 6) {
+				x = (width - width_biao) / 2;
+				y = height - height_biao;
+			}
+			if (pos == 7) {
+				x = 0;
+				y = height - height_biao;
+			}
+			if (pos == 8) {
+				x = 0;
+				y = (height - height_biao) / 2;
+			}
+			if (pos == 9) {
+				x = (width - width_biao) / 2;
+				y = (height - height_biao) / 2;
+			}
+			g.drawImage(src_biao, x, y, width_biao, height_biao, null);
+			// 水印文件结束
+			g.dispose();
+			FileOutputStream out = new FileOutputStream(targetImg);
+			ImageIO.write(bis, "JPEG", out);
+			out.close();
 		} catch (Exception e) {
-			System.out.println("复制单个文件操作出错 ");
 			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * 删除一个文件或者目录
-	 * 
-	 * @param targetPath
-	 *            文件或者目录路径
-	 * @IOException 当操作发生异常时抛出
+	 * 读取图片为bufferedimage,修正图片读取ICC信息丢失而导致出现红色遮罩
+	 *
+	 * @param image
+	 * @return
 	 */
-	public static void deleteFile(String targetPath) throws IOException {
-		File targetFile = new File(targetPath);
-		if (targetFile.isDirectory()) {
-			FileUtils.deleteDirectory(targetFile);
-		} else if (targetFile.isFile()) {
-			targetFile.delete();
+	public static BufferedImage toBufferedImage(Image image) {
+		if (image instanceof BufferedImage) {
+			return (BufferedImage) image;
 		}
-	}
 
-	/**
-	 * 移动文件或者目录,移动前后文件完全一样,如果目标文件夹不存在则创建。
-	 * 
-	 * @param resFilePath
-	 *            源文件路径
-	 * @param distFolder
-	 *            目标文件夹
-	 * @IOException 当操作发生异常时抛出
-	 */
-	public static void moveFile(String resFilePath, String distFolder)
-			throws IOException {
-		File resFile = new File(resFilePath);
-		File distFile = new File(distFolder);
-		if (resFile.isDirectory()) {
-			FileUtils.copyDirectory(resFile, distFile, true);
-		} else if (resFile.isFile()) {
-			FileUtils.copyDirectory(resFile, distFile, true);
+		// This code ensures that all the pixels in the image are loaded
+		image = new ImageIcon(image).getImage();
+
+		// Determine if the image has transparent pixels; for this method's
+		// implementation, see e661 Determining If an Image Has Transparent
+		// Pixels
+		// boolean hasAlpha = hasAlpha(image);
+
+		// Create a buffered image with a format that's compatible with the
+		// screen
+		BufferedImage bimage = null;
+		GraphicsEnvironment ge = GraphicsEnvironment
+				.getLocalGraphicsEnvironment();
+		try {
+			// Determine the type of transparency of the new buffered image
+			int transparency = Transparency.OPAQUE;
+			/*
+			 * if (hasAlpha) { transparency = Transparency.BITMASK; }
+			 */
+
+			// Create the buffered image
+			GraphicsDevice gs = ge.getDefaultScreenDevice();
+			GraphicsConfiguration gc = gs.getDefaultConfiguration();
+			bimage = gc.createCompatibleImage(image.getWidth(null),
+					image.getHeight(null), transparency);
+		} catch (HeadlessException e) {
+			// The system does not have a screen
 		}
-	}
 
-	/**
-	 * 读取文件或者目录的大小
-	 * 
-	 * @param distFilePath
-	 *            目标文件或者文件夹
-	 * @return 文件或者目录的大小，如果获取失败，则返回-1
-	 */
-	public static long genFileSize(String distFilePath) {
-		File distFile = new File(distFilePath);
-		if (distFile.isFile()) {
-			return distFile.length();
-		} else if (distFile.isDirectory()) {
-			return FileUtils.sizeOfDirectory(distFile);
+		if (bimage == null) {
+			// Create a buffered image using the default color model
+			int type = BufferedImage.TYPE_INT_RGB;
+			// int type = BufferedImage.TYPE_3BYTE_BGR;//by wang
+			/*
+			 * if (hasAlpha) { type = BufferedImage.TYPE_INT_ARGB; }
+			 */
+			bimage = new BufferedImage(image.getWidth(null),
+					image.getHeight(null), type);
 		}
-		return -1L;
-	}
 
-	/**
-	 * 判断一个文件是否存在
-	 * 
-	 * @param filePath
-	 *            文件路径
-	 * @return 存在返回true，否则返回false
-	 */
-	public static boolean isExist(String filePath) {
-		return new File(filePath).exists();
-	}
+		// Copy image to buffered image
+		Graphics g = bimage.createGraphics();
 
-	/**
-	 * 本地某个目录下的文件列表（不递归）
-	 * 
-	 * @param folder
-	 *            ftp上的某个目录
-	 * @param suffix
-	 *            文件的后缀名（比如.mov.xml)
-	 * @return 文件名称列表
-	 */
-	public static String[] listFilebySuffix(String folder, String suffix) {
-		IOFileFilter fileFilter1 = new SuffixFileFilter(suffix);
-		IOFileFilter fileFilter2 = new NotFileFilter(
-				DirectoryFileFilter.INSTANCE);
-		FilenameFilter filenameFilter = new AndFileFilter(fileFilter1,
-				fileFilter2);
-		return new File(folder).list(filenameFilter);
+		// Paint the image onto the buffered image
+		g.drawImage(image, 0, 0, null);
+		g.dispose();
+
+		return bimage;
 	}
 }
