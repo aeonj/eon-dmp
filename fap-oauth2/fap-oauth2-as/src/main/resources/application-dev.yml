@@ -1,0 +1,59 @@
+server:
+  port: 8100
+spring:
+  datasource:
+    primary:
+      jdbc-url: jdbc:mysql://localhost:3306/eon?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      username: root
+      password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    secondary:
+      jdbc-url: jdbc:mysql://localhost:3306/eon_2?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      username: root
+      password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  application:
+    name: 禾冠平台
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    generate-ddl: true
+    properties:
+      hibernate:
+        hbm2ddl:
+          auto: update
+        format_sql: true
+        enable_lazy_load_no_trans: false     #支持全局实体的懒加载，但开销很大
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    password:
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+security:
+  oauth2:
+    authorization:
+      check-token-access: true
+eon:
+  hg:
+    security:
+      authType: token
+      oauth2:
+        storeType: jdbc
+    async:
+      corePoolSize : 10
+      maxPoolSize : 200
+      queueCapacity : 10
+    db:
+      reset: true  #是否重置数据库
+    hessian:
+      server-url: http://127.0.0.1:8080/vcf/remote/
+    file:
+      upload_folder: /Users/aeon/Documents/uploadfile/
+
