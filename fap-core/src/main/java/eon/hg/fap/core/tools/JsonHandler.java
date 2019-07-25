@@ -1,5 +1,6 @@
 package eon.hg.fap.core.tools;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -9,6 +10,7 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.tools.json.JsonIncludePreFilter;
+import eon.hg.fap.common.util.ResultBody;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.query.support.IPageList;
@@ -223,6 +225,39 @@ public class JsonHandler {
 		String jsonString = "{success:"
 				+ (success ? "true" : "false") + ",data:"
 				+ sunJsonString + "}";
+		if (log.isInfoEnabled()) {
+			log.info("序列化后的JSON资料输出:\n" + jsonString);
+		}
+		return jsonString;
+	}
+
+	public static String toResultJson(Object obj, SerializeFilter... serializeFilters) {
+		if (obj==null) {
+			return toJson(ResultBody.success());
+		}
+
+		String jsonString = toJson(ResultBody.success().addObject(obj),serializeFilters);
+		if (log.isInfoEnabled()) {
+			log.info("序列化后的JSON资料输出:\n" + jsonString);
+		}
+		return jsonString;
+	}
+
+	public static Dto getPageResultObj(IPageList pList) {
+		if (pList==null) {
+			return new HashDto(BeanUtil.beanToMap(ResultBody.success()));
+		}
+		Dto dto = new HashDto();
+		dto.put("pages",pList.getPages());
+		dto.put("totals",pList.getRowCount());
+		dto.put("pageIndex",pList.getCurrentPage());
+		dto.putAll(BeanUtil.beanToMap(ResultBody.success().addObject(pList.getResult())));
+		return dto;
+	}
+
+	public static String toResultJson(IPageList pList, SerializeFilter... serializeFilters) {
+		Dto dto = getPageResultObj(pList);
+		String jsonString = toJson(dto,serializeFilters);
 		if (log.isInfoEnabled()) {
 			log.info("序列化后的JSON资料输出:\n" + jsonString);
 		}

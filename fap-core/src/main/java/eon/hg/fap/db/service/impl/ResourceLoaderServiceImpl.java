@@ -10,11 +10,12 @@ import eon.hg.fap.core.tools.WebForm;
 import eon.hg.fap.db.dao.primary.*;
 import eon.hg.fap.db.model.primary.*;
 import eon.hg.fap.db.service.IResourceLoaderService;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import javax.annotation.Resource;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
@@ -46,7 +47,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         //初始化界面视图
         String path = ResourceUtils.getURL("classpath:").getPath();
         uiConfDAO.deleteAll();
-        impTableJsonData(path + "static/data/json/sys_uiconf.json", (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("static/data/json/sys_uiconf.json"), (Map<String, Object> mapRecord) -> {
             UIConf uiConf = new UIConf();
             WebForm.Map2Obj(mapRecord, uiConf);
             uiConfDAO.save(uiConf);
@@ -56,12 +57,12 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         uiConfMainDAO.deleteAll();
         uiManageDAO.deleteAll();
         List<UIManager> uiManagerList = new ArrayList<>();
-        impTableJsonData(path + "static/data/json/sys_uimanager.json", (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("static/data/json/sys_uimanager.json"), (Map<String, Object> mapRecord) -> {
             UIManager uiManager = BeanUtil.mapToBeanIgnoreCase(mapRecord, UIManager.class, true);
-            impTableJsonData(path + "static/data/json/sys_uidetail.json", (Map<String, Object> mapDetail) -> {
+            impTableJsonData(getClassPathStream("static/data/json/sys_uidetail.json"), (Map<String, Object> mapDetail) -> {
                 if (mapDetail.get("ui_id").equals(mapRecord.get("id"))) {
                     UIDetail uiDetail = BeanUtil.mapToBeanIgnoreCase(mapDetail, UIDetail.class, true);
-                    impTableJsonData(path + "static/data/json/sys_uiconf_detail.json", (Map<String, Object> mapConfDetail) -> {
+                    impTableJsonData(getClassPathStream("static/data/json/sys_uiconf_detail.json"), (Map<String, Object> mapConfDetail) -> {
                         UIConfDetail uiConfDetail = BeanUtil.mapToBeanIgnoreCase(mapConfDetail, UIConfDetail.class, true);
                         if (mapConfDetail.get("ui_detail_id").equals(mapDetail.get("id"))) {
                             uiDetail.getConfs().add(uiConfDetail);
@@ -101,10 +102,10 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         //初始化菜单
         menuDAO.deleteAll();
         menuGroupDAO.deleteAll();
-        impTableJsonData(path + "static/data/json/sys_menugroup.json", (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("static/data/json/sys_menugroup.json"), (Map<String, Object> mapRecord) -> {
             MenuGroup menuGroup = BeanUtil.mapToBeanIgnoreCase(mapRecord, MenuGroup.class, true);
             Stack<Menu> stack = new Stack();
-            impTableJsonData(path + "static/data/json/sys_menu.json", (Map<String, Object> mapMenu) -> {
+            impTableJsonData(getClassPathStream("static/data/json/sys_menu.json"), (Map<String, Object> mapMenu) -> {
                 if (mapMenu.get("mg_id").equals(mapRecord.get("id"))) {
                     Menu menu = BeanUtil.mapToBeanIgnoreCase(mapMenu, Menu.class, true);
                     menu.setMg(menuGroup);
@@ -138,7 +139,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
 
         //初始化要素
         elementDAO.deleteAll();
-        impTableJsonData(path + "static/data/json/sys_element.json", (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("static/data/json/sys_element.json"), (Map<String, Object> mapRecord) -> {
             Element obj = BeanUtil.mapToBeanIgnoreCase(mapRecord, Element.class, true);
             obj.setId(null);
             elementDAO.save(obj);
@@ -146,7 +147,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
 
         //初始化枚举值
         enumerateDAO.deleteAll();
-        impTableJsonData(path + "static/data/json/sys_enumerate.json", (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("static/data/json/sys_enumerate.json"), (Map<String, Object> mapRecord) -> {
             Enumerate obj = BeanUtil.mapToBeanIgnoreCase(mapRecord, Enumerate.class, true);
             obj.setId(null);
             enumerateDAO.save(obj);
@@ -155,14 +156,13 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
 
     }
 
-    private void impTableJsonData(String filepath, ImpJsonData impJsonData) throws Exception {
-        InputStream in = new FileInputStream(filepath);
+    private void impTableJsonData(InputStream in, ImpJsonData impJsonData) throws Exception {
         //读取文件上的数据。  
         // 将字节流向字符流的转换。  
         InputStreamReader isr = new InputStreamReader(in, "UTF-8");//读取  
         JSONReader reader = new JSONReader(isr);
         reader.startObject();
-        System.out.println("开始解析JSON文件" + filepath);
+        System.out.println("开始解析JSON文件");
         while (reader.hasNext()) {
             String key = reader.readString();
             System.out.println("开始解析关键字：" + key);
@@ -190,7 +190,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
             }
         }
         reader.endObject();
-        System.out.println("结束解析JSON文件" + filepath);
+        System.out.println("结束解析JSON文件");
     }
 
     public Map<String, Object> getInsertSql(String table_name, Map inMap) {
@@ -236,5 +236,10 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
     private class SqlAndParams {
         String sql;
         Object[] objs;
+    }
+
+    private InputStream getClassPathStream(String filestr) throws IOException {
+        ClassPathResource classPathResource = new ClassPathResource(filestr);
+        return classPathResource.getInputStream();
     }
 }

@@ -9,8 +9,9 @@
     <title>禾冠开发平台</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
+    <#assign websiteLogo="${imageWebServer}/${config.websiteLogo.path}/${config.websiteLogo.name}">
 
-    <link rel="shortcut icon" href="/resource/style/common/images/logo.ico">
+    <link rel="shortcut icon" href="${websiteLogo}">
     <link href="/resource/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
     <link href="/resource/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
 
@@ -91,9 +92,9 @@
                         <li>联系电话:17705190200</li>
                         <li>联系邮箱:kefu@hcrown.com.cn</li>
                     </ul>
-                    <div style="width:215px;margin-left: auto;margin-right: auto;">
+                    <div style="width:255px;margin-left: auto;margin-right: auto;">
                         <a href="vcf.docx" class="btn btn-primary m-t">下载授权模板</a>&nbsp;
-                        <a href="javascript:void(0);" class="btn btn-primary m-t copy">复制授权码</a>
+                        <a href="javascript:doUpload();" class="btn btn-primary m-t">导入授权文件</a>
                     </div>
                 </div>
             </div>
@@ -107,22 +108,9 @@
 <script src="/resource/js/bootstrap.min.js?v=3.3.6"></script>
 <script src="/resource/js/jquery-zclip/jquery.zclip.js"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        $(".copy").zclip({
-            path: "/resource/js/jquery-zclip/ZeroClipboard.swf",
-            copy: function () {
-                return $("#licensecode").val();
-            },
-            beforeCopy: function () {/* 按住鼠标时的操作 */
-                $(this).css("color", "orange");
-            },
-            afterCopy: function () {/* 复制成功后的操作 */
-                var $copysuc = $("<div class='copy-tips'><div class='copy-tips-wrap'>☺ 复制成功</div></div>");
-                $("body").find(".copy-tips").remove().end().append($copysuc);
-                $(".copy-tips").fadeOut(3000);
-            }
-        });
-    });
+    function doUpload() {
+        //$.ajax();
+    }
 </script>
 </body>
 </html>

@@ -3,6 +3,7 @@ package eon.hg.fap.security.support;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.db.model.primary.Role;
 import eon.hg.fap.db.model.primary.User;
+import eon.hg.fap.db.model.virtual.OnlineUser;
 import eon.hg.fap.db.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -42,7 +43,8 @@ public class SecurityUserSupport implements UserDetailsService {
                 add(new SimpleGrantedAuthority("ROLE_ADMIN_SUPER"));
             }};
             user.setAuthorities(authorities);
-            return user;
+            OnlineUser onlineUser = new OnlineUser(String.valueOf(user.getId()),user.getUsername(),user.getPassword(),user.getAuthorities());
+            return onlineUser;
         } else {
             Map params = new HashMap();
             params.put("userName", userName);
@@ -81,7 +83,8 @@ public class SecurityUserSupport implements UserDetailsService {
                 }
             }
             user.setAuthorities(authorities);
-            return user;
+            OnlineUser onlineUser = new OnlineUser(String.valueOf(user.getId()),user.getUsername(),user.getPassword(),user.getAuthorities());
+            return onlineUser;
         }
 	}
 

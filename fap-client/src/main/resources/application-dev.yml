@@ -48,6 +48,10 @@ spring:
       number_format: '0.##'   #数字格式化，无小数点
 eon:
   hg:
+    security:
+      authType: token
+      oauth2:
+        storeType: jdbc    #jdbc，redis，jwt几种模式，需要与授权服务器一致
     async:
       corePoolSize : 10
       maxPoolSize : 200
@@ -56,4 +60,6 @@ eon:
       reset: true  #是否重置数据库
     hessian:
       server-url: http://127.0.0.1:8080/vcf/remote/
+    file:
+      upload_folder: /Users/aeon/Documents/uploadfile/
 
