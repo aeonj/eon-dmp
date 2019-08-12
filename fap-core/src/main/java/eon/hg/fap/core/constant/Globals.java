@@ -45,4 +45,5 @@ public class Globals {
 
 	public static Boolean MUST_LOGIN_FLAG=false;   //是否必须登陆
 	public static Boolean DEFAULT_SYS_TYPE=true;   //默认只使用业务系统类别
+	public static String AUTH_TYPE="session";
 }

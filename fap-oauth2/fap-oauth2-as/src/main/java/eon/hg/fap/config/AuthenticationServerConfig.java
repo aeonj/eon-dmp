@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.provider.client.JdbcClientDetailsServ
 import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -35,6 +36,9 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
 
     @Autowired(required = false)
     TokenStore tokenStore;
+
+    @Autowired(required = false)
+    JwtAccessTokenConverter jwtAccessTokenConverter;
 
     @Resource(name= BeanIds.AUTHENTICATION_MANAGER)
     AuthenticationManager authenticationManager;
@@ -67,6 +71,9 @@ public class AuthenticationServerConfig extends AuthorizationServerConfigurerAda
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        if (jwtAccessTokenConverter!=null) {
+            endpoints.accessTokenConverter(jwtAccessTokenConverter);
+        }
         endpoints
                 .authenticationManager(authenticationManager)
                 .userDetailsService(userService)

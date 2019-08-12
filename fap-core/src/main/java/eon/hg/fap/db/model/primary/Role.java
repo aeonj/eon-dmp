@@ -32,6 +32,9 @@ public class Role extends IdEntity implements Comparable<Role>{
 	@ManyToMany(targetEntity = Menu.class, fetch = FetchType.LAZY)
 	@JoinTable(name = Globals.SYS_TABLE_SUFFIX + "role_menu", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "menu_id"))
 	private Set<Menu> menus = new TreeSet<Menu>();
+	@ManyToMany(targetEntity = Res.class, fetch = FetchType.LAZY)
+	@JoinTable(name = Globals.SYS_TABLE_SUFFIX + "role_res", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "res_id"))
+	private Set<Res> ress = new TreeSet<Res>();
 	@Lock
 	@Column(columnDefinition = "varchar(42) default '000000'",nullable = false)
 	private String rg_code; //用户域
@@ -181,6 +184,14 @@ public class Role extends IdEntity implements Comparable<Role>{
 	 */
 	public void setUsers(List<User> users) {
 		this.users = users;
+	}
+
+	public Set<Res> getRess() {
+		return ress;
+	}
+
+	public void setRess(Set<Res> ress) {
+		this.ress = ress;
 	}
 
 	@Override

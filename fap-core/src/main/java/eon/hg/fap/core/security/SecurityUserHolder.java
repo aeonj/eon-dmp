@@ -2,9 +2,14 @@ package eon.hg.fap.core.security;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
+import eon.hg.fap.core.beans.SpringUtils;
 import eon.hg.fap.core.constant.AeonConstants;
+import eon.hg.fap.db.dao.primary.UserDao;
 import eon.hg.fap.db.model.primary.User;
+import eon.hg.fap.db.model.virtual.OnlineUser;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -17,18 +22,39 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class SecurityUserHolder {
 
+	public static OnlineUser getOnlineUser() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null
+				&& authentication.getPrincipal() instanceof OnlineUser) {
+			return (OnlineUser)authentication.getPrincipal();
+		}
+		return null;
+	}
+
 	/**
 	 * Returns the current user
 	 * 
 	 * @return
 	 */
 	public static User getCurrentUser() {
-		if (SecurityContextHolder.getContext().getAuthentication() != null
-				&& SecurityContextHolder.getContext().getAuthentication()
-						.getPrincipal() instanceof User) {
-
-			return (User) SecurityContextHolder.getContext()
-					.getAuthentication().getPrincipal();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null
+				&& authentication.getPrincipal() instanceof User) {
+			return (User) authentication.getPrincipal();
+		} else if (authentication != null
+				&& authentication.getPrincipal() instanceof OnlineUser) {
+			OnlineUser token_user = (OnlineUser) authentication.getPrincipal();
+			UserDao userDao = SpringUtils.getBean("userDao",UserDao.class);
+			User user = userDao.get(Long.valueOf(token_user.getUserid()));
+			return user;
+		} else if (authentication != null
+				&& authentication.getPrincipal() instanceof String) {
+			String username = (String) authentication.getPrincipal();
+			if ("anonymousUser".equals(username))
+			    return null;
+			UserDetailsService userService = SpringUtils.getBean("securityUserSupport",UserDetailsService.class);
+			User user = (User) userService.loadUserByUsername(username);
+			return user;
 		} else {
 			User user = null;
 			if (RequestContextHolder.getRequestAttributes() != null) {

@@ -139,6 +139,7 @@ public class SysConfigServiceImpl implements ISysConfigService {
 			sc.setBigWidth(Globals.DEFAULT_IMAGE_BIG_WIDTH);
 			sc.setImageSuffix(Globals.DEFAULT_IMAGE_SUFFIX);
 			sc.setSmsURL(Globals.DEFAULT_SMS_URL);
+			sc.setDb_reset(true);
 			this.save(sc);
 			return sc;
 		}

@@ -1,4 +1,4 @@
-package eon.hg.fap.config;
+package eon.hg.fap.config.tokenstore;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;

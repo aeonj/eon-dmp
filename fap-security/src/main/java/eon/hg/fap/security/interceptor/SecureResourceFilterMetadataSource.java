@@ -1,15 +1,12 @@
 package eon.hg.fap.security.interceptor;
 
 import cn.hutool.core.util.StrUtil;
-import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.db.model.primary.Res;
 import eon.hg.fap.db.model.primary.Role;
 import eon.hg.fap.db.service.IResService;
 import eon.hg.fap.db.service.IRoleService;
 import eon.hg.fap.security.SecurityManager;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.ConfigAttribute;
@@ -37,9 +34,7 @@ public class SecureResourceFilterMetadataSource implements
 	@Autowired
 	private IRoleService roleService;
 
-	protected final Log logger = LogFactory.getLog(getClass());
-
-	private Map<String, Collection<ConfigAttribute>> urlAuthorities = new HashMap<String, Collection<ConfigAttribute>>();
+	private Map<String, Collection<ConfigAttribute>> urlAuthorities = new HashMap<>();
 
 	private boolean reset_flag = false;
 	
@@ -66,39 +61,18 @@ public class SecureResourceFilterMetadataSource implements
 	public Collection<ConfigAttribute> getAttributes(Object filter) {
 		FilterInvocation filterInvocation = (FilterInvocation) filter;
 		final HttpServletRequest request = filterInvocation.getHttpRequest();
-		String requestURI = filterInvocation.getRequestUrl();
-		boolean verify = true;
-		// 这里绑定域名
-		String serverName = filterInvocation.getHttpRequest().getServerName();
-		if (!serverName.trim().equals("localhost")&&!CommUtil.isIp(serverName)) {
-			if (!(serverName.indexOf(".") == serverName.lastIndexOf("."))) {
-				serverName = serverName.substring(serverName.indexOf(".") + 1);
-			}
-			verify = CommUtil.cal_domain(serverName).equals(
-					Globals.DEFAULT_BIND_DOMAIN_CODE);
-		}
-		verify = true;
-		if (verify && requestURI.indexOf("login.htm") < 0) {
-			//System.out.println("当前用户为:" + SecurityUserHolder.getCurrentUser());
-			
-			Iterator<String> iterator = urlAuthorities.keySet().iterator();
-			while (iterator.hasNext()) {
-				String url = iterator.next();
-				RequestMatcher requestMatcher = new AntPathRequestMatcher(url, request.getMethod(), true);
-				if (requestMatcher.matches(request)) {
-					Collection<ConfigAttribute> confs = urlAuthorities.get(url);
-					if (confs.size()>0) {
-						return urlAuthorities.get(url);
-					} else {
-						return SecurityConfig.createList("online_error");
-					}
+
+		Iterator<String> iterator = urlAuthorities.keySet().iterator();
+		while (iterator.hasNext()) {
+			String url = iterator.next();
+			RequestMatcher requestMatcher = new AntPathRequestMatcher(url, request.getMethod(), true);
+			if (requestMatcher.matches(request)) {
+				Collection<ConfigAttribute> confs = urlAuthorities.get(url);
+				if (confs.size() > 0) {
+					return urlAuthorities.get(url);
+				} else {
+					return SecurityConfig.createList("online_error");
 				}
-			}
-		} else {
-			if (requestURI.indexOf("login.htm") < 0) {
-				filterInvocation.getHttpRequest().getSession()
-						.setAttribute("domain_error", true);
-				return SecurityConfig.createList("domain_error");
 			}
 		}
 
@@ -109,13 +83,24 @@ public class SecureResourceFilterMetadataSource implements
 		setResetAuthorities(false);
 		urlAuthorities.clear();
 		Map<String, Object> params = new HashMap<>();
-		params.put("type", "URL");
-		List<Res> urlResources = this.resService.query(
-				"select obj from Res obj where obj.type = :type", params, -1,
-				-1);
-		for (Res res : urlResources) {
-            String[] permissions = StrUtil.split(res.getPermission(),",");
-            urlAuthorities.put(res.getValue(), list2Collection(permissions));
+		//session和token方式加载资源角色权限暂时分开 2019.8.11
+		if (Globals.AUTH_TYPE.equals("session")) {
+			params.put("type", "URL");
+			List<Res> urlResources = this.resService.query(
+					"select obj from Res obj where obj.type = :type", params, -1,
+					-1);
+			for (Res res : urlResources) {
+				String[] permissions = StrUtil.split(res.getPermission(), ",");
+				urlAuthorities.put(res.getValue(), list2Collection(permissions));
+			}
+		} else {
+			params.put("type", "ANY");
+			List<Res> urlResources = this.resService.query(
+					"select obj from Res obj where obj.type = :type", params, -1,
+					-1);
+			for (Res res : urlResources) {
+				urlAuthorities.put(res.getValue(), list2Collection(res.getRoles()));
+			}
 		}
 	}
 

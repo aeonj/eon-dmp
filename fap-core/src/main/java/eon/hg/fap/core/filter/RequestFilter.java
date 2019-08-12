@@ -4,7 +4,6 @@ import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.db.model.primary.SysConfig;
-import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,8 +47,7 @@ public class RequestFilter implements Filter {
                     }
                 }
             } else {
-                User user = SecurityUserHolder.getCurrentUser();
-                if (user != null) {
+                if (SecurityUserHolder.getOnlineUser() != null) {
                     if (url.indexOf("/manage") < 0 && url.indexOf("/wap") < 0) {
                         if (url.indexOf("/login.htm") >= 0) {
                             redirect = true;

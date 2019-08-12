@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 
 @Configuration
-public class JsonConfig {
+public class JsonConvertsConfig {
 
     @Bean
     public HttpMessageConverters fastJsonHttpMessageConverts() {

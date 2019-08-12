@@ -6,6 +6,7 @@
 
 package eon.hg.fap.db.model.primary;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
@@ -40,6 +41,7 @@ public class UIManager extends IdEntity {
 	@Column(precision=2)
 	private Byte total_column; 
 	private Long parent_id;
+	@JSONField(serialize = false)
 	@OneToMany(mappedBy = "ui", fetch = FetchType.LAZY, cascade={CascadeType.ALL}, orphanRemoval=true)
 	private List<UIDetail> details = new ArrayList<>();
 	@OneToMany(mappedBy = "ui_main", fetch = FetchType.LAZY, cascade={CascadeType.ALL}, orphanRemoval=true)

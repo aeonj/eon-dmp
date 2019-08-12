@@ -1,5 +1,6 @@
 package eon.hg.fap.config;
 
+import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.security.access.EonAccessDecisionManager;
 import eon.hg.fap.security.access.EonAccessDeniedHandler;
 import eon.hg.fap.security.interceptor.SecureResourceFilterMetadataSource;
@@ -97,6 +98,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     /**定义安全策略*/
     @Override
     public void configure(HttpSecurity http) throws Exception {
+        Globals.AUTH_TYPE = "session";
         http.authenticationProvider(authenticationProvider());
         http.headers().frameOptions().sameOrigin();
         http

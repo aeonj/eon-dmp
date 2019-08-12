@@ -1,17 +1,17 @@
 server:
-  port: 8100
+  port: 8180
 spring:
   datasource:
     primary:
-      jdbc-url: jdbc:oracle:thin:@10.64.125.38:1521:orcl
-      username: cxj_new_vcf
-      password: 1
-      driver-class-name: oracle.jdbc.driver.OracleDriver
+      jdbc-url: jdbc:mysql://192.168.10.253:3306/cruise?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
     secondary:
-      jdbc-url: jdbc:oracle:thin:@10.64.125.38:1521:orcl
-      username: gi_mis_yz
-      password: 1
-      driver-class-name: oracle.jdbc.driver.OracleDriver
+      jdbc-url: jdbc:oracle:thin:@192.168.10.252:1521:orcl
+      username: cruise
+      password: 123
+      driver-class-name: oracle.jdbc.OracleDriver
   application:
     name: 禾冠平台
   jpa:
@@ -46,11 +46,35 @@ spring:
     charset: UTF-8 #编码格式
     settings:
       number_format: '0.##'   #数字格式化，无小数点
+security:
+  oauth2:
+    client:
+      clientId: cxj
+      clientSecret: user
+      userAuthorizationUri: http://localhost:8100/oauth/authorize
+      grant-type: password
+      scope: read
+      access-token-uri: http://localhost:8100/oauth/token
+    resource:
+      token-info-uri: http://localhost:8100/oauth/check_token
+      user-info-uri: http://localhost:8100/user
+      #jwt:
+      #  key-uri: http://localhost:8100/oauth/token_key
+    authorization:
+      check-token-access: http://localhost:8100/oauth/check_token
 eon:
   hg:
+    security:
+      authType: token    #认证方式，session，token
+      oauth2:
+        storeType: jdbc    #jdbc，redis，jwt几种模式，需要与授权服务器一致
+        resourceId: oauth2-resource
     async:
       corePoolSize : 10
       maxPoolSize : 200
       queueCapacity : 10
-    db:
-      reset: true  #是否重置数据库
+    hessian:
+      server-url: http://127.0.0.1:8080/vcf/remote/
+    file:
+      upload_folder: /Users/aeon/Documents/uploadfile/
+
