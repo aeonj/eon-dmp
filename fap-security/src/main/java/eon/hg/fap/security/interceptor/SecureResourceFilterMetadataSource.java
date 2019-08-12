@@ -1,7 +1,6 @@
 package eon.hg.fap.security.interceptor;
 
 import cn.hutool.core.util.StrUtil;
-import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.db.model.primary.Res;
 import eon.hg.fap.db.model.primary.Role;
 import eon.hg.fap.db.service.IResService;
@@ -9,6 +8,7 @@ import eon.hg.fap.db.service.IRoleService;
 import eon.hg.fap.security.SecurityManager;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
@@ -29,6 +29,8 @@ import java.util.*;
 @Component
 public class SecureResourceFilterMetadataSource implements
         FilterInvocationSecurityMetadataSource, InitializingBean, SecurityManager {
+	@Value("${eon.hg.security.authType}")
+	public String AUTH_TYPE;
 	@Autowired
 	private IResService resService;
 	@Autowired
@@ -84,7 +86,7 @@ public class SecureResourceFilterMetadataSource implements
 		urlAuthorities.clear();
 		Map<String, Object> params = new HashMap<>();
 		//session和token方式加载资源角色权限暂时分开 2019.8.11
-		if (Globals.AUTH_TYPE.equals("session")) {
+		if ("session".equals(AUTH_TYPE)) {
 			params.put("type", "URL");
 			List<Res> urlResources = this.resService.query(
 					"select obj from Res obj where obj.type = :type", params, -1,
@@ -96,7 +98,7 @@ public class SecureResourceFilterMetadataSource implements
 		} else {
 			params.put("type", "ANY");
 			List<Res> urlResources = this.resService.query(
-					"select obj from Res obj where obj.type = :type", params, -1,
+					"select obj from Res obj join fetch obj.roles where obj.type = :type", params, -1,
 					-1);
 			for (Res res : urlResources) {
 				urlAuthorities.put(res.getValue(), list2Collection(res.getRoles()));

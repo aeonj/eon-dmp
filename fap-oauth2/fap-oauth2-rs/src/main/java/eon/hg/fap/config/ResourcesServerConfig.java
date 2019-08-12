@@ -1,6 +1,5 @@
 package eon.hg.fap.config;
 
-import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.security.access.EonAccessDecisionManager;
 import eon.hg.fap.security.interceptor.SecureResourceFilterMetadataSource;
 import eon.hg.fap.security.support.SecurityUserSupport;
@@ -52,7 +51,6 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        Globals.AUTH_TYPE = "token";
         http.userDetailsService(userService);
         http.headers().frameOptions().sameOrigin();
         http
