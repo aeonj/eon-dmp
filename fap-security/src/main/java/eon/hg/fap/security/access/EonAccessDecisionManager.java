@@ -43,6 +43,10 @@ public class EonAccessDecisionManager implements AccessDecisionManager {
 			if (AeonConstants.SUPER_USER.equals(userDetails.getUsername())) {
 				return;
 			}
+		} else if (authentication.getPrincipal() instanceof String){
+			if (AeonConstants.SUPER_USER.equals(authentication.getPrincipal())) {
+				return;
+			}
 		}
 		//迭代器遍历目标url的权限列表
         for (ConfigAttribute attribute : configAttributes) {
