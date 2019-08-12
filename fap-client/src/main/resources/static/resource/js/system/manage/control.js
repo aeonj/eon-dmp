@@ -454,7 +454,6 @@ Ext.define('Ext.vcf.ComboField',{
     isCodeAsValue : false,
     isDirect : false,
     forceSelection : true,
-    typeAhead : true,
     triggerAction : 'all',
     initComponent : function() {
         //if (Ext.isDefined(this.name)){
@@ -1301,7 +1300,7 @@ Ext.define('Ext.vcf.RadioField' , {
 Ext.define('Ext.vcf.FormPanel', {
     extend: 'Ext.form.Panel',
     xtype: 'inputpanel',
-    layout: 'form',
+    layout: 'column',
     userDefined: false,
     fieldDefaults: {
         labelAlign: 'left',
@@ -1437,7 +1436,6 @@ Ext.define('Ext.vcf.TableGrid', {
         if (grid.isPaged) {
             var pagesize_combo = Ext.create('Ext.form.field.ComboBox',{
                 name: 'pagesize',
-                typeAhead: true,
                 triggerAction: 'all',
                 lazyRender: true,
                 mode: 'local',

@@ -128,12 +128,28 @@ Ext.override(Ext.vcf.TableGrid, {
 
 function addUIByServer(comp, ray, pos) {
     var initcol = 0,
+        initrow = 0,
         pnl,
         isonecol = false,
         relations = [],
         elenames = [];
     if (typeof ray.detail != 'undefined') {
         var ray_detail = ray.detail;
+        var downcol=0,lastcol = 0;
+        //计算最后一行控件，用以设置padding底间距
+        if (typeof comp.lastitems == 'undefined') {
+            for (var k = ray_detail.length - 1; k >= 0; k--) {
+                if (ray_detail[k].field_type != 'hidden') {
+                    downcol = downcol + ray_detail[k].cols;
+                }
+                if (downcol > ray_detail[k].total_column) {
+                    lastcol = k;
+                    break;
+                }
+            }
+        } else {
+            lastcol = 99;
+        }
         for (var i = 0; i < ray_detail.length; i++) {
             var items = {};
             //新版本中labelWidth需要手动添加或者父容器中默认配置
@@ -212,32 +228,39 @@ function addUIByServer(comp, ray, pos) {
                         items.labelStyle = micolor;
                     }
                 }
-                if (ray_detail[i].total_column == 1) {
+                if (comp.getLayout().type=='form') {
                     comp.add(Ext.create(items));
                     isonecol = true;
                 } else if (ray_detail[i].field_type == 'hidden') {
                     comp.add(Ext.create(items));
                 } else {
                     var colWidth = (initcol + ray_detail[i].cols >= ray_detail[i].total_column) ? ((ray_detail[i].total_column - initcol) / ray_detail[i].total_column) : ray_detail[i].cols / ray_detail[i].total_column;
-                    var pnlCol = Ext.create('Ext.panel.Panel', {
+                    var pnlCol,padding;
+                    if (i>lastcol) {
+                        if (initrow==0) {
+                            padding = "10 12 10 12";
+                        } else {
+                            padding = "3 12 10 12";
+                        }
+                    } else {
+                        if (initrow==0) {
+                            padding = "10 12 3 12";
+                        } else {
+                            padding = "3 12 3 12";
+                        }
+                    }
+                    pnlCol= Ext.create('Ext.panel.Panel', {
                         columnWidth: colWidth,
                         layout: 'fit',
-                        padding : '4 10 4 10',
+                        padding : padding,
                         labelWidth: comp.labelWidth,
                         border: false,
                         items: [items]
                     });
-                    if (initcol == 0) {
-                        // pnl = Ext.create('Ext.panel.Panel', {
-                        //     border: false,
-                        //     layout: 'column'
-                        // });
-                        comp.setLayout('column');
-                    }
                     comp.add(pnlCol);
                     if (initcol + ray_detail[i].cols >= ray_detail[i].total_column || i == ray_detail.length - 1) {
                         initcol = 0;
-                        //comp.add(pnl);
+                        initrow++;
                     } else {
                         initcol = initcol + ray_detail[i].cols;
                     }
@@ -249,10 +272,10 @@ function addUIByServer(comp, ray, pos) {
     if (typeof comp.lastitems != 'undefined') {
         for (var i = 0; i < comp.lastitems.length; i++) {
             if (isonecol) {
-                pnl.add(Ext.create(comp.lastitems[i]));
+                comp.add(Ext.create(comp.lastitems[i]));
             } else {
                 var pnlCol = new Ext.Panel(comp.lastitems[i]);
-                pnl.add(pnlCol);
+                comp.add(pnlCol);
             }
         }
     }
