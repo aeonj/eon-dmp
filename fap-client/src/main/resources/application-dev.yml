@@ -46,6 +46,9 @@ spring:
     charset: UTF-8 #编码格式
     settings:
       number_format: '0.##'   #数字格式化，无小数点
+  http:
+    converters:
+      preferred-json-mapper: fastjson
 security:
 #  oauth2:
 #    client:
@@ -69,7 +72,7 @@ logging:
 eon:
   hg:
     security:
-      authType: token    #认证方式，session，token
+      authType: session    #认证方式，session，token
       oauth2:
         storeType: jdbc    #jdbc，redis，jwt几种模式，需要与授权服务器一致
         resourceId: oauth2-resource
