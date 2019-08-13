@@ -3,6 +3,7 @@ package eon.hg.fap.config;
 import eon.hg.fap.core.jpa.support.BaseRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,7 @@ import javax.sql.DataSource;
 import java.util.Map;
 
 @Configuration
+@ConditionalOnProperty(prefix = "spring.datasource.secondary", name = "jdbc-url")
 @EnableTransactionManagement
 @EnableJpaRepositories(
         entityManagerFactoryRef="entityManagerFactorySecondary",
