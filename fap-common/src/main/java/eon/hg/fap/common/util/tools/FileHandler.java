@@ -1,8 +1,8 @@
 package eon.hg.fap.common.util.tools;
 
+import eon.hg.fap.common.properties.PropertiesBean;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
@@ -24,8 +24,7 @@ import java.util.UUID;
  *
  */
 public class FileHandler {
-	@Value("${eon.hg.file.upload_folder}")
-	private static String UPLOAD_FOLDER = "E://temp//";
+
 
 	/**
 	 * saveFileToServer 上传文件保存到服务器
@@ -67,12 +66,12 @@ public class FileHandler {
 			}
 			if (flag) {
 				byte[] bytes = file.getBytes();
-				Path paths = Paths.get(UPLOAD_FOLDER + saveFilePathName
+				Path paths = Paths.get(PropertiesBean.UPLOAD_FOLDER + saveFilePathName
 						+ saveFileName);
 				Files.write(paths, bytes);
 
 				if (isImg(extend)) {
-					File img = new File(UPLOAD_FOLDER + saveFilePathName
+					File img = new File(PropertiesBean.UPLOAD_FOLDER + saveFilePathName
 							+ saveFileName);
 					try {
 						BufferedImage bis = ImageIO.read(img);
@@ -87,7 +86,7 @@ public class FileHandler {
 				}
 				map.put("mime", extend);
 				map.put("fileName", saveFileName);
-				map.put("filePath", UPLOAD_FOLDER + saveFilePathName);
+				map.put("filePath", PropertiesBean.UPLOAD_FOLDER + saveFilePathName);
 				map.put("fileSize", fileSize);
 				map.put("error", errors);
 				map.put("oldName", file.getOriginalFilename());
@@ -126,7 +125,7 @@ public class FileHandler {
 	}
 
 	public static String getLicenseFilePath() {
-		return UPLOAD_FOLDER;
+		return PropertiesBean.UPLOAD_FOLDER;
 	}
 
 	/**

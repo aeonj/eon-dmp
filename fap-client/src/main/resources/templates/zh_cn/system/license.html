@@ -17,6 +17,8 @@
 
     <link href="/resource/css/animate.min.css" rel="stylesheet">
     <link href="/resource/css/style.min862f.css?v=4.1.0" rel="stylesheet">
+    <link rel="stylesheet" href="/resource/layui/css/layui.css">
+    <script src="/resource/layui/layui.all.js"></script>
     <!--[if lt IE 9]>
     <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
@@ -94,7 +96,7 @@
                     </ul>
                     <div style="width:255px;margin-left: auto;margin-right: auto;">
                         <a href="vcf.docx" class="btn btn-primary m-t">下载授权模板</a>&nbsp;
-                        <a href="javascript:doUpload();" class="btn btn-primary m-t">导入授权文件</a>
+                        <a id="upload_lic" href="javascript:doUpload();" class="btn btn-primary m-t">导入授权文件</a>
                     </div>
                 </div>
             </div>
@@ -108,9 +110,22 @@
 <script src="/resource/js/bootstrap.min.js?v=3.3.6"></script>
 <script src="/resource/js/jquery-zclip/jquery.zclip.js"></script>
 <script type="text/javascript">
-    function doUpload() {
-        //$.ajax();
-    }
+    layui.use('upload', function() {
+        var $ = layui.jquery
+            , upload = layui.upload;
+        upload.render({
+            elem: '#upload_lic'
+            , url: '/manage/license_upload.htm'
+            , accept: 'file' //普通文件
+            , done: function (res) {
+                if (res.code=='success') {
+                    window.location.href = res.data.redirect;
+                } else {
+                    layer.msg(res.msg);
+                }
+            }
+        });
+    });
 </script>
 </body>
 </html>

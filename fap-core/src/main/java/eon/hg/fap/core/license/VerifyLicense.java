@@ -46,6 +46,7 @@ public class VerifyLicense {
         } catch (Exception e) {
             log.error(e.getMessage());
             log.error("客户端证书安装失败!");
+            isinstall = false;
             return false;
         }
         isinstall = true;
