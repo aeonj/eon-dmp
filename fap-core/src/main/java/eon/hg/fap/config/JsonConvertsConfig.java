@@ -25,8 +25,7 @@ import java.util.List;
 @ConditionalOnClass({FastJsonHttpMessageConverter.class})
 @ConditionalOnProperty(
         name = {"spring.http.converters.preferred-json-mapper"},
-        havingValue = "fastjson",
-        matchIfMissing = true
+        havingValue = "fastjson"
 )
 public class JsonConvertsConfig {
 
