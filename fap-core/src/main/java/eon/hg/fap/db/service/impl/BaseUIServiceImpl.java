@@ -10,14 +10,12 @@ import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.dao.primary.GenericDao;
 import eon.hg.fap.db.service.IBaseUIService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
 @Service
-@Transactional
 public class BaseUIServiceImpl extends AbstractCacheOperator implements IBaseUIService {
 
     @Resource

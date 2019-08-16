@@ -167,8 +167,8 @@ public class UserOP {
 	}
 	
 	private void addEleTree(List<Dto> lst, BaseData node) {
-		if (node.getParent()!=null) {
-			BaseData parent = node.getParent();
+		BaseData parent = node.getParent();
+		if (parent!=null) {
 			if (!ContainsNode(parent.getChild(),node)) {
 				parent.getChild().add(BaseData2Dto(node));
 			}

@@ -418,9 +418,9 @@ function columnWrapRender(value, cellmeta, record){
  */
 function columnTooltipRender(value, cellmeta, record) {
 	if (value!=null) {
-		return '<span ext:qtip="'+value+'">'+value+'</span>';
+		//return '<span ext:qtip="'+value+'">'+value+'</span>';
 		//适用于Ext4.x
-		//return '<span data-qtip="'+value+'">'+value+'</span>';
+		return '<span data-qtip="'+value+'">'+value+'</span>';
 	}
 	return value;
 }

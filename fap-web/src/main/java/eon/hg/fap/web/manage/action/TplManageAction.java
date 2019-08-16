@@ -1,18 +1,26 @@
 package eon.hg.fap.web.manage.action;
 
 import cn.hutool.core.date.DateUtil;
+import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.properties.PropertiesFactory;
 import eon.hg.fap.common.properties.PropertiesFile;
 import eon.hg.fap.common.properties.PropertiesHelper;
+import eon.hg.fap.common.util.metatype.Dto;
+import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.constant.AeonConstants;
+import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.tools.WebForm;
+import eon.hg.fap.db.model.primary.Element;
+import eon.hg.fap.db.service.IBaseTreeService;
 import eon.hg.fap.db.service.ISysConfigService;
 import eon.hg.fap.db.service.IUserConfigService;
 import eon.hg.fap.db.service.IUserService;
 import eon.hg.fap.web.manage.dto.CodeStoreTagDto;
+import eon.hg.fap.web.manage.dto.EleRenderTagDto;
 import eon.hg.fap.web.manage.dto.HtmlTagDto;
 import eon.hg.fap.web.manage.dto.ViewPortTagDto;
+import eon.hg.fap.web.manage.op.ElementOP;
 import eon.hg.fap.web.manage.op.EnumerateOP;
 import eon.hg.fap.web.manage.op.MenuOP;
 import eon.hg.fap.web.manage.op.TplManageOp;
@@ -41,7 +49,11 @@ public class TplManageAction {
 	@Autowired
 	private IUserService userService;
 	@Autowired
+	private IBaseTreeService baseTreeService;
+	@Autowired
 	private EnumerateOP enumOP;
+	@Autowired
+	private ElementOP eleOP;
 	@Autowired
 	private TplManageOp tplOp;
 	@Autowired
@@ -81,6 +93,76 @@ public class TplManageAction {
 		mv.addObject("showCode", dto.getShowCode());
 		mv.addObject("fieldList", fieldList);
 		return mv;
+	}
+
+	@RequestMapping("/code_render.htm")
+	public ModelAndView code_render(HttpServletRequest request,
+									HttpServletResponse response) {
+		ModelAndView mv = new JModelAndView("common/code_render.html",
+				configService.getSysConfig(),
+				this.userConfigService.getUserConfig(), 0, request, response);
+		String fields = (String) request.getAttribute("fields");
+		String[] arrayFields = fields.split(",");
+		List<SysMap> fieldList = new ArrayList<SysMap>();
+		for (String field : arrayFields) {
+			SysMap map = new SysMap(field,this.enumOP.getCodeList(field));
+			fieldList.add(map);
+		}
+		mv.addObject("fieldList", fieldList);
+		return mv;
+	}
+
+	@RequestMapping("/ele_render.htm")
+	public ModelAndView ele_render(HttpServletRequest request,
+								   HttpServletResponse response) throws Exception {
+		ModelAndView mv = new JModelAndView("common/ele_render.html",
+				configService.getSysConfig(),
+				this.userConfigService.getUserConfig(), 0, request, response);
+		EleRenderTagDto eleDto=WebForm.toAPo(request, EleRenderTagDto.class);
+		String[] arrayFields = eleDto.getFields().split(",");
+		List<SysMap> fieldList = new ArrayList<SysMap>();
+		for (int i = 0; i < arrayFields.length; i++) {
+			Element ele = eleOP.getEleSource(arrayFields[i]);
+			if (ele==null) {
+				continue;
+			}
+			//只要要素设置了类名，必须使用类方式获取树
+			boolean istable = false;
+			Dto dtoTemp = new HashDto();
+			if (CommUtil.isEmpty(ele.getClass_name())) {
+				istable = true;
+			} else {
+				dtoTemp.put("class_name",ele.getClass_name());
+			}
+			dtoTemp.put("table_name",ele.getEle_source());
+
+			dtoTemp.put("source", arrayFields[i]);
+			List lstEle;
+			if (istable) {
+				lstEle = baseTreeService.getCache(dtoTemp);
+			} else {
+
+				lstEle = eleOP.getObject(dtoTemp);
+			}
+			SysMap fields = new SysMap(arrayFields[i],getRenderShowList(lstEle));
+			fieldList.add(fields);
+		}
+		mv.addObject("iscode", eleDto.getIscode());
+		mv.addObject("fieldList", fieldList);
+		return mv;
+	}
+
+	private List getRenderShowList(List lstEle) {
+		List lstV = new ArrayList();
+		for(int i=0; lstEle!=null && i<lstEle.size(); i++){
+			Dto rn = (Dto) lstEle.get(i);
+			List innerList = (List)rn.get("children");
+			lstV.add(rn);
+			if (innerList.size()>=0) {
+				lstV.addAll(getRenderShowList((List)rn.get("children")));
+			}
+		}
+		return lstV;
 	}
 
 	@RequestMapping("/ui_grant_tag.htm")

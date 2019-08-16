@@ -7,7 +7,7 @@ import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.ip.ListNets;
 import eon.hg.fap.common.properties.PropertiesFactory;
 import eon.hg.fap.common.properties.PropertiesHelper;
-import eon.hg.fap.common.util.ResultBody;
+import eon.hg.fap.core.body.ResultBody;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.common.util.tools.FileHandler;
@@ -77,7 +77,7 @@ public class LicenseAction {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return new ResponseEntity(ResultBody.error("500","上传文件失败！"), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity(ResultBody.failed(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

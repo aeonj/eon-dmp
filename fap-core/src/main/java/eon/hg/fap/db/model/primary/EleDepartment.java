@@ -12,8 +12,6 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -24,32 +22,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = Globals.ELE_TABLE_SUFFIX + "department")
 public class EleDepartment extends BaseData {
-	
-	private static final long serialVersionUID = -4690054724830150725L;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	private EleDepartment parent;
 
-	/**
-	 * @return the parent
-	 */
-	public EleDepartment getParent() {
-		return parent;
-	}
-
-	/**
-	 * @param parent the parent to set
-	 */
-	public void setParent(EleDepartment parent) {
-		this.parent = parent;
-	}
-
-	/**
-	 * @return the serialversionuid
-	 */
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
 
 
 }

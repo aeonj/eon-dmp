@@ -8,11 +8,13 @@ import eon.hg.fap.core.query.PageObject;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
@@ -242,8 +244,8 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
                 CommUtil.invokeSetMethod(entity, "rg_code", SecurityUserHolder.getRgCode());
             }
         }
-        if (SecurityUserHolder.getCurrentUser()!=null) {
-            CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getCurrentUser().getUsername());
+        if (SecurityUserHolder.getOnlineUser()!=null) {
+            CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getOnlineUser().getUsername());
         }
         CommUtil.invokeSetMethod(entity, "addTime", new Date());
         CommUtil.invokeSetMethod(entity, "lastTime", new Date());
@@ -253,22 +255,34 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
 
     @Transactional
     public <S extends T> S update(S entity) {
-        if (SecurityUserHolder.getCurrentUser()!=null) {
-            CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getCurrentUser().getUsername());
+        if (SecurityUserHolder.getOnlineUser()!=null) {
+            CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getOnlineUser().getUsername());
         }
         CommUtil.invokeSetMethod(entity, "lastTime", new Date());
         entityManager.merge(entity);
         return entity;
     }
 
-    @Override
+    @Transactional
     public void remove(ID id) {
-        deleteById(id);
+        remove(findById(id).orElseThrow(() -> new EmptyResultDataAccessException(
+                String.format("No %s entity with id %s exists!", getDomainClass(), id), 1)));
     }
 
-    @Override
+    @Transactional
     public void remove(T entity) {
-        delete(entity);
+        Assert.notNull(entity, "Entity must not be null!");
+
+        if (entityInformation.isNew(entity)) {
+            return;
+        }
+
+        T existing = entityManager.find(getDomainClass(), entityInformation.getId(entity));
+        // if the entity to be deleted doesn't exist, delete is a NOOP
+        if (existing == null) {
+            return;
+        }
+        entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
     }
 
     @Override

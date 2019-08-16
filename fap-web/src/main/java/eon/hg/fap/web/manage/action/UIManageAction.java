@@ -642,7 +642,7 @@ public class UIManageAction extends BizAction {
     public @ResponseBody String ui_ele_designer(String source) throws Exception {
         if (CommUtil.isNotEmpty(source)) {
             Element ele = elementService.getObjByProperty(null, "ele_code", source);
-            if (ele!=null) {
+            if (ele!=null && CommUtil.isNotEmpty(ele.getUi_id())) {
                 Map map = new HashMap();
                 map.put("ui_id",ele.getUi_id());
                 return baseUIService.getCache(new Object[]{map});

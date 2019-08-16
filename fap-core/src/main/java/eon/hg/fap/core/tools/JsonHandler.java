@@ -10,7 +10,7 @@ import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.tools.json.JsonIncludePreFilter;
-import eon.hg.fap.common.util.ResultBody;
+import eon.hg.fap.core.body.ResultBody;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.query.support.IPageList;
@@ -108,7 +108,7 @@ public class JsonHandler {
 	 * @return 返回合并后的字符串
 	 */
 	private static String joinPageJson(String jsonString, Integer totalCount) {
-		jsonString = "{\"records\":" + totalCount + ", \"rows\":" + jsonString + "}";
+		jsonString = "{\"total\":" + totalCount + ", \"data\":" + jsonString + "}";
 		if (log.isInfoEnabled()) {
 			log.info("合并后的JSON资料输出:\n" + jsonString);
 		}
@@ -202,7 +202,7 @@ public class JsonHandler {
 	 */
 	public static final String toPageJson(IPageList pList, SerializeFilter... serializeFilters) {
 		String subJsonString = toJson(pList.getResult(), serializeFilters);
-		String jsonString = "{\"page\":" + pList.getCurrentPage() + ", \"total\":" + pList.getPages() + ", \"records\":" + pList.getRowCount() + ", \"rows\":" + subJsonString + "}";
+		String jsonString = "{\"page\":" + pList.getCurrentPage() + ", \"total\":" + pList.getRowCount() + ", \"data\":" + subJsonString + "}";
 		if (log.isInfoEnabled()) {
 			log.info("序列化后的JSON资料输出:\n" + jsonString);
 		}

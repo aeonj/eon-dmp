@@ -15,14 +15,12 @@ import eon.hg.fap.db.service.IBaseTreeService;
 import eon.hg.fap.db.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@Transactional
 public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseTreeService {
 
     @Autowired
@@ -153,7 +151,7 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                 }
             }
         } else {
-            sql +=" and 1=0 ";
+            sql +=" and 0=0 ";
         }
         return sql;
     }

@@ -295,8 +295,8 @@ public class ElementOP {
 	}
 	
 	private void addNodeChild(List<Dto> lst, BaseData node, boolean onlyname,boolean isfulldata) {
-		if (node.getParent()!=null) {
-			BaseData parent = node.getParent();
+		BaseData parent = node.getParent();
+		if (parent!=null) {
 			int idx = ContainsNode(node);
 			if (idx!=-1) {
 				parent.getChild().add(idx,BaseData2Dto(node,onlyname,isfulldata));

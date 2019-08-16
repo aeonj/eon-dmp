@@ -1,9 +1,9 @@
 <script type="text/javascript">
-	#foreach($field in $fieldList)
-	function $!{field.getKey()}IdRender(value) {
-		#foreach($code in $!{field.getValue()})
+    <#list fieldList as field>
+	function ${field.getKey()}IdRender(value) {
+        <#list field.getValue() as code>
 		if (value == '${code.id}') return '${code.name}';
-		#end 
+		</#list>
 // 		var records = eval('$!{field.getValue()}');
 // 		for (var i=0; i<records.length; i++) {
 // 			#if($iscode)
@@ -14,13 +14,13 @@
 // 		} 
 		return value;
 	}
-	#if($iscode)
-	function $!{field.getKey()}CodeRender(value) {
-		#foreach($code in $!{field.getValue()})
+	<#if (iscode)??>
+	function ${field.getKey()}CodeRender(value) {
+        <#list field.getValue() as code>
 		if (value == '${code.code}') return '${code.name}';
-		#end 
+		</#list>
 		return value;
 	}
-	#end
-	#end
+	</#if>
+	</#list>
 </script>

@@ -14,7 +14,7 @@ public interface IBaseDataService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(BaseData instance);
+	BaseData save(BaseData instance);
 	
 	/**
 	 * 根据一个ID得到BaseData
@@ -30,7 +30,7 @@ public interface IBaseDataService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Class clz, Long id);
+	void delete(Class clz, Long id);
 	
 	/**
 	 * 批量删除BaseData
@@ -38,7 +38,7 @@ public interface IBaseDataService {
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
+	void batchDelete(Class clz, List<Long> ids);
 	
 	/**
 	 * 通过一个查询对象得到BaseData
@@ -54,7 +54,7 @@ public interface IBaseDataService {
 	 * @param instance
 	 *            需要更新的BaseData
 	 */
-	boolean update(BaseData instance);
+	BaseData update(BaseData instance);
 
 	/**
 	 *

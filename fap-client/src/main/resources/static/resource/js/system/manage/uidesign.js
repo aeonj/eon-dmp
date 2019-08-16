@@ -454,8 +454,8 @@ function addGridByServer(comp, ray) {
                     },
                     reader: {
                         type: 'json',
-                        totalProperty: 'records',
-                        rootProperty: 'rows',
+                        totalProperty: 'total',
+                        rootProperty: 'data',
                         implicitIncludes: false
                     }
                 }

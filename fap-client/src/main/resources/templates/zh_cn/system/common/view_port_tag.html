@@ -77,7 +77,11 @@
         listeners:{ itemclick : function(node,event) {
             var menu=event.data;
             if(menu.request){
-                addTab(menu.request+'?menu_id='+menu.id,menu.text,menu.id,'cxj',menu.icon);
+				var menurequest = menu.request+'?menu_id='+menu.id;
+				if (menu.params) {
+					menurequest = menurequest+'&'+menu.params;
+				}
+                addTab(menurequest,menu.text,menu.id,'cxj',menu.icon);
             }
         } }
     });

@@ -36,6 +36,7 @@ public class Menu extends IdEntity implements Comparable<Menu> {
 	private int sequence;// 排序
 	private Long parent_id;
 	private String request;
+	private String params;
 	@Column(length=60)
 	private String icon;
 	@Transient

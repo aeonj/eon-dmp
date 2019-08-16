@@ -1,10 +1,10 @@
 <script type="text/javascript">
-	#foreach($field in $fieldList)
-	function $!{field.getKey()}Render(value) {
-		#foreach($code in $!{field.getValue()})
+	<#list fieldList as field>
+	function ${field.getKey()}Render(value) {
+        <#list field.getValue() as code>
 		if (value == '${code.code}') return '${code.codedesc}';
-		#end 
+		</#list>
 		return value;
 	}
-	#end
+	</#list>
 </script>

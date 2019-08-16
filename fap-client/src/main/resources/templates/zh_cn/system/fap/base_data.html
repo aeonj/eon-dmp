@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    ${httpInclude.include("html_tag.htm?showLoading=false&isSubPage=true&exportExceptionWindow=true")}
+    ${httpInclude.include("code_render.htm?fields=ENABLED,YESNO")}
+    <script type="text/javascript">
+        <#if (req_params["elecode"])??>
+            var elecode = '${req_params["elecode"]}';
+            var eletitle = '${req_params["eletitle"]}';
+        </#if>
+        ${httpInclude.includejs("fap:base_data.js")}
+    </script>
+</head>
+<body>
+    <div id="baseDiv"></div>
+</body>
+</html>

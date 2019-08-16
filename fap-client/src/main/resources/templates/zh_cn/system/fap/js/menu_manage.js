@@ -65,20 +65,27 @@ function pageLoad() {
             header: '编码',
             dataIndex: 'menuCode',
             sortable: true,
-            width: 100
+            width: 80
         }, {
             header: '菜单名称',
             dataIndex: 'menuName',
             sortable: true,
-            width: 150
+            width: 135
         }, {
             header: '请求地址',
             dataIndex: 'request',
-            width: 260
+            width: 220,
+            renderer: columnTooltipRender
+        }, {
+            header: '请求参数',
+            dataIndex: 'params',
+            width: 160,
+            renderer: columnTooltipRender
         }, {
             header: '权限关键字',
             dataIndex: 'authkey',
-            width: 160
+            width: 130,
+            renderer: columnTooltipRender
         }, {
             header: '排序',
             dataIndex: 'sequence',
@@ -94,6 +101,10 @@ function pageLoad() {
             name: 'menuName'
         }, {
             name: 'request'
+        }, {
+            name: 'params'
+        }, {
+            name: 'authkey'
         }, {
             name: 'sequence'
         }, {
@@ -200,6 +211,10 @@ function pageLoad() {
         },{
             fieldLabel: '请求地址',
             name: 'request',
+            anchor: '99%'
+        },{
+            fieldLabel: '请求参数',
+            name: 'params',
             anchor: '99%'
         },{
             xtype: 'treefield',
