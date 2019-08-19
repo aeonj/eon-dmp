@@ -291,7 +291,7 @@ Ext.onReady(function() {
                                 success : function(response) {
                                     var array = Ext.util.JSON
                                         .decode(response.responseText);
-                                    var resultArray = array['rows'];
+                                    var resultArray = array['data'];
                                     //editUIGrid.stopEditing();
                                     var storeAttr = editUIGrid.store;
                                     storeAttr.removeAll();
@@ -325,14 +325,17 @@ Ext.onReady(function() {
                                 editColPanel.form.findField('width').show();
                                 editColPanel.form.findField('cols').hide();
                                 editColPanel.form.findField('field_logic').hide();
+                                editColPanel.form.findField('data_type').hide();
                             } else if (combo.getValue()=='inputpanel') {
                                 editColPanel.form.findField('width').hide();
                                 editColPanel.form.findField('cols').show();
                                 editColPanel.form.findField('field_logic').hide();
+                                editColPanel.form.findField('data_type').hide();
                             } else if (combo.getValue()=='querypanel') {
                                 editColPanel.form.findField('width').hide();
                                 editColPanel.form.findField('cols').show();
                                 editColPanel.form.findField('field_logic').show();
+                                editColPanel.form.findField('data_type').show();
                             }
                         }
                     },
@@ -676,7 +679,7 @@ Ext.onReady(function() {
             success: function (response) {
                 var array = Ext.util.JSON
                     .decode(response.responseText);
-                var resultArray = array['rows'];
+                var resultArray = array['data'];
                 // editColGrid.stopEditing();
                 var storeAttr = editColGrid.store;
                 storeAttr.removeAll();
@@ -752,7 +755,7 @@ Ext.onReady(function() {
                         success: function (response) {
                             var array = Ext.util.JSON
                                 .decode(response.responseText);
-                            var resultArray = array['rows'];
+                            var resultArray = array['data'];
                             //editColGrid.stopEditing();
                             var storeAttr = editColGrid.store;
                             storeAttr.removeAll();
@@ -791,6 +794,13 @@ Ext.onReady(function() {
             fieldLabel: "逻辑关系",
             //allowBlank: false,
             store: LOGICOPStore,
+            anchor: '99%'
+        }, {
+            name: "data_type",
+            xtype: "combofield",
+            fieldLabel: "数据类型",
+            //allowBlank: false,
+            enumData: '1#字符型+2#数字型+3#整型+4#日期型+5#布尔型',
             anchor: '99%'
         }, {
             name: "width",
@@ -896,7 +906,7 @@ Ext.onReady(function() {
     //                             success : function(response) {
     //                                 var array = Ext.util.JSON
     //                                     .decode(response.responseText);
-    //                                 var resultArray = array['rows'];
+    //                                 var resultArray = array['data'];
     //                                 //editColGrid.stopEditing();
     //                                 var storeAttr = editColGrid.store;
     //                                 storeAttr.removeAll();
@@ -1341,7 +1351,7 @@ Ext.onReady(function() {
                     success : function(response) {
                         var array = Ext.util.JSON
                             .decode(response.responseText);
-                        var resultArray = array['rows'];
+                        var resultArray = array['data'];
                         //editUIGrid.stopEditing();
                         var storeAttr = editUIGrid.store;
                         storeAttr.removeAll();
@@ -1372,14 +1382,17 @@ Ext.onReady(function() {
                     editColPanel.form.findField('width').show();
                     editColPanel.form.findField('cols').hide();
                     editColPanel.form.findField('field_logic').hide();
+                    editColPanel.form.findField('data_type').hide();
                 } else if (resultData.xtype=='inputpanel') {
                     editColPanel.form.findField('width').hide();
                     editColPanel.form.findField('cols').show();
                     editColPanel.form.findField('field_logic').hide();
+                    editColPanel.form.findField('data_type').hide();
                 } else if (resultData.xtype=='querypanel') {
                     editColPanel.form.findField('width').hide();
                     editColPanel.form.findField('cols').show();
                     editColPanel.form.findField('field_logic').show();
+                    editColPanel.form.findField('data_type').show();
                 }
             }
         });
