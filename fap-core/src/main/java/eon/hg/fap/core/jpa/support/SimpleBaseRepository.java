@@ -1,5 +1,6 @@
 package eon.hg.fap.core.jpa.support;
 
+import cn.hutool.core.convert.Convert;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.jpa.BaseRepository;
@@ -8,6 +9,7 @@ import eon.hg.fap.core.query.PageObject;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
+import org.hibernate.query.internal.QueryImpl;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -156,7 +158,9 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
         Query query = this.entityManager.createQuery(queryStr);
         if (params != null && params.size() > 0) {
             for (Object key : params.keySet()) {
-                query.setParameter(key.toString(), params.get(key));
+                //通过转换，解决querypanel查询视图自定义查询类型转换问题
+                Object val = Convert.convert(query.getParameter(key.toString()).getParameterType(),params.get(key));
+                query.setParameter(key.toString(), val);
             }
         }
         if (begin >= 0 && max > 0) {
