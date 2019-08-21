@@ -610,7 +610,7 @@ public class CommUtil {
 	}
 
 	public static Long null2Long(Object s) {
-		return Convert.toLong(s,-1l).longValue();
+		return Convert.toLong(s,-1l);
 	}
 
 	public static String getTimeInfo(long time) {
