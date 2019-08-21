@@ -46,7 +46,7 @@ public class JsonConvertsConfig {
         FastJsonConfig fastJsonConfig = new FastJsonConfig();
         PropertyFilter proFilter = new FastJsonPropertyFilter();
         fastJsonConfig.setDateFormat("yyyy-MM-dd HH:mm:ss");
-        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat);
+        fastJsonConfig.setSerializerFeatures(SerializerFeature.PrettyFormat,SerializerFeature.DisableCircularReferenceDetect);
         fastJsonConfig.setSerializeFilters(proFilter);
         fastJsonConfig.setCharset(Charset.forName("UTF-8"));
 

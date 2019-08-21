@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import com.alibaba.fastjson.serializer.SerializeConfig;
 import com.alibaba.fastjson.serializer.SerializeFilter;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.tools.json.JsonIncludePreFilter;
 import eon.hg.fap.core.body.ResultBody;
@@ -89,9 +90,9 @@ public class JsonHandler {
 			}
 
 			if (pObject instanceof ArrayList) {
-				jsonString = JSONArray.toJSONString(pObject, SerializeConfig.globalInstance, serializeFilters,"yyyy-MM-dd HH:mm:ss", JSON.DEFAULT_GENERATE_FEATURE);
+				jsonString = JSONArray.toJSONString(pObject, SerializeConfig.globalInstance, serializeFilters,"yyyy-MM-dd HH:mm:ss", JSON.DEFAULT_GENERATE_FEATURE, SerializerFeature.PrettyFormat,SerializerFeature.DisableCircularReferenceDetect);
 			} else {
-                jsonString = JSONObject.toJSONString(pObject, SerializeConfig.globalInstance, serializeFilters, "yyyy-MM-dd HH:mm:ss", JSON.DEFAULT_GENERATE_FEATURE);
+                jsonString = JSONObject.toJSONString(pObject, SerializeConfig.globalInstance, serializeFilters, "yyyy-MM-dd HH:mm:ss", JSON.DEFAULT_GENERATE_FEATURE, SerializerFeature.PrettyFormat,SerializerFeature.DisableCircularReferenceDetect);
 			}
 		}
 		if (log.isInfoEnabled()) {

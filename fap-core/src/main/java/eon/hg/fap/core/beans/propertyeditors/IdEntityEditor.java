@@ -1,20 +1,19 @@
 package eon.hg.fap.core.beans.propertyeditors;
 
 import cn.hutool.core.convert.Convert;
-import eon.hg.fap.common.util.tools.StringUtils;
+import cn.hutool.core.util.StrUtil;
+import eon.hg.fap.core.beans.SpringUtils;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import eon.hg.fap.core.jpa.EonDao;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import java.beans.PropertyEditorSupport;
 
 public class IdEntityEditor extends PropertyEditorSupport {
 
-	@Autowired
-	private EonDao geDao;
+	private EonDao eonDao = SpringUtils.getBean("eonDao",EonDao.class);;
 	
 	private Class idClass;
 	
@@ -45,7 +44,7 @@ public class IdEntityEditor extends PropertyEditorSupport {
 	}
 
 	public void setAsText(String text) throws IllegalArgumentException {
-		if (!StringUtils.hasText(text)) {
+		if (StrUtil.isBlank(text)) {
 			// Treat empty String as null value.
 			setValue(null);
 		}
@@ -69,8 +68,8 @@ public class IdEntityEditor extends PropertyEditorSupport {
 		Assert.notNull(text, "Text must not be null");
 		Assert.notNull(targetClass, "Target class must not be null");
 		
-		Object propertyValue = Convert.toLong(text.trim());
-		Object obj = this.geDao.get(targetClass, (Long) propertyValue);
+		Long propertyValue = Convert.toLong(text.trim());
+		Object obj = this.eonDao.get(targetClass, propertyValue);
 		if (obj!=null) {
 			return obj;
 		} else {
@@ -93,7 +92,7 @@ public class IdEntityEditor extends PropertyEditorSupport {
 				if ("id".equals(propertys[i].getName())) {
 					Object propertyValue = null;
 					try {
-						propertyValue = Convert.convert(propertys[i].getPropertyType(),text);
+						propertyValue = Convert.convert(propertys[i].getPropertyType(),trimmed);
 					} catch (Exception e) {
 						if (propertys[i].getPropertyType().toString()
 								.equals("int")) {

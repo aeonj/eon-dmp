@@ -47,7 +47,7 @@ public class UIManagerOP {
         for(UIDetail uidetail : uidetails){
             Dto rn = new HashDto();
             uidetail.setUi_detail_id(CommUtil.null2String(uidetail.getId()));
-            WebHandler.Obj2Map(uidetail, rn);
+            WebHandler.toMap(uidetail, rn);
             rn.put("text", uidetail.getField_name()+" "+uidetail.getField_title());
             dto.put("parent_id", rn.getString("id"));
             rn.put("level_num", level_num);

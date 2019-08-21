@@ -39,7 +39,7 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
             String sResult ="#eleset=";
             if (CommUtil.isNotEmpty(parameters.get("source"))) {
                 sResult += parameters.getString("source");
-                sResult += "|"+ SecurityUserHolder.getCurrentUser().getId();
+                sResult += "|"+ SecurityUserHolder.getOnlineUser().getUserid();
                 if (CommUtil.isNotEmpty(parameters.get("isfulldata"))) {
                     sResult += "|"+parameters.getString("isfulldata");
                 }

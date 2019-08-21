@@ -1,25 +1,25 @@
 <script type="text/javascript">
     <#list fieldList as field>
 	function ${field.getKey()}IdRender(value) {
+        if (value['id']) {
+            return value['name'];
+        } else {
         <#list field.getValue() as code>
-		if (value == '${code.id}') return '${code.name}';
-		</#list>
-// 		var records = eval('$!{field.getValue()}');
-// 		for (var i=0; i<records.length; i++) {
-// 			#if($iscode)
-// 				if (value==records[i].code) return records[i].name;
-// 			#else
-// 				if (value==records[i].id) return records[i].name;
-// 			#end
-// 		} 
-		return value;
+            if (value == '${code.id}') return '${code.name}';
+        </#list>
+            return value;
+        }
 	}
 	<#if (iscode)??>
 	function ${field.getKey()}CodeRender(value) {
+        if (value['code']) {
+            return value['name'];
+        } else {
         <#list field.getValue() as code>
-		if (value == '${code.code}') return '${code.name}';
-		</#list>
-		return value;
+            if (value == '${code.code}') return '${code.name}';
+        </#list>
+            return value;
+        }
 	}
 	</#if>
 	</#list>

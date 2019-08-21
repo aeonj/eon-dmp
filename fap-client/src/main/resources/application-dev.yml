@@ -49,22 +49,22 @@ spring:
   http:
     converters:
       preferred-json-mapper: fastjson
-security:
-  oauth2:
-    client:
-      clientId: cxj
-      clientSecret: user
-      userAuthorizationUri: http://localhost:8100/oauth/authorize
-      grant-type: password
-      scope: read
-      access-token-uri: http://localhost:8100/oauth/token
-    resource:
-      token-info-uri: http://localhost:8100/oauth/check_token
-      user-info-uri: http://localhost:8100/user
-      #jwt:
-      #  key-uri: http://localhost:8100/oauth/token_key
-    authorization:
-      check-token-access: http://localhost:8100/oauth/check_token
+#security:
+#  oauth2:
+#    client:
+#      clientId: cxj
+#      clientSecret: user
+#      userAuthorizationUri: http://localhost:8100/oauth/authorize
+#      grant-type: password
+#      scope: read
+#      access-token-uri: http://localhost:8100/oauth/token
+#    resource:
+#      token-info-uri: http://localhost:8100/oauth/check_token
+#      user-info-uri: http://localhost:8100/user
+#      #jwt:
+#      #  key-uri: http://localhost:8100/oauth/token_key
+#    authorization:
+#      check-token-access: http://localhost:8100/oauth/check_token
 logging:
   level:
     root: error
@@ -74,7 +74,7 @@ eon:
     security:
       authType: session    #认证方式，session，token
       oauth2:
-        storeType: redis    #jdbc，redis，jwt几种模式，需要与授权服务器一致
+        storeType: jwt    #jdbc，redis，jwt几种模式，需要与授权服务器一致
         resourceId: oauth2-resource
     async:
       corePoolSize : 10

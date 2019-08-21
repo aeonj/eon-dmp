@@ -4,7 +4,7 @@ import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.HttpInclude;
-import eon.hg.fap.core.tools.WebForm;
+import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.model.primary.SysConfig;
 import eon.hg.fap.db.model.primary.UserConfig;
 import org.springframework.web.servlet.ModelAndView;
@@ -172,7 +172,7 @@ public class JModelAndView extends ModelAndView {
 			second_domain_view = true;// 使用二级域名访问，相关js url需要处理，避免跨域
 			super.addObject("secondDomain", secondDomain);
 		}
-		super.addObject("req_params", WebForm.toDto(request));
+		super.addObject("req_params", WebHandler.toDto(request));
 		super.addObject("second_domain_view", second_domain_view);
 	}
 

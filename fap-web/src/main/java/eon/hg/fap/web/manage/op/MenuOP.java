@@ -63,7 +63,7 @@ public class MenuOP extends TreeSort {
 	}
 
     public List<MenuGroup> getCardMgs() {
-		if (AeonConstants.SUPER_USER.equals(SecurityUserHolder.getCurrentUser().getUsername())) {
+		if (AeonConstants.SUPER_USER.equals(SecurityUserHolder.getOnlineUser().getUsername())) {
 			List<MenuGroup> menuGroups = this.menuGroupService.query("select obj from MenuGroup obj order by obj.sequence",null,-1,-1);
 			for (MenuGroup menuGroup : menuGroups) {
 				String menuListJson = JsonHandler.toJson(getCardMenuList(menuGroup.getMenus()));
@@ -72,7 +72,7 @@ public class MenuOP extends TreeSort {
 			return menuGroups;
 		} else {
 			List<User> list = this.userService.query("select user from User as user join fetch user.roles as role join fetch role.menus as menu where user.id=:id", new HashMap() {{
-				put("id", SecurityUserHolder.getCurrentUser().getId());
+				put("id", CommUtil.null2Long(SecurityUserHolder.getOnlineUser().getUserid()));
 			}}, -1, -1);
 			if (list != null && list.size() > 0) {
 				User user = list.get(0);

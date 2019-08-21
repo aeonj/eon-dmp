@@ -1,12 +1,12 @@
 package eon.hg.fap.web.manage.action;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.core.body.PageBody;
 import eon.hg.fap.core.body.ResultBody;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.query.support.IPageList;
+import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.model.mapper.BaseData;
 import eon.hg.fap.db.model.primary.Element;
 import eon.hg.fap.db.service.IBaseDataService;
@@ -45,6 +45,7 @@ public class BaseDataAction {
         ModelAndView mv = new JModelAndView("fap/base_data.html",
                 configService.getSysConfig(),
                 this.userConfigService.getUserConfig(), 0, request, response);
+        mv.addObject("ele_op",elementOP);
         return mv;
     }
 
@@ -53,9 +54,13 @@ public class BaseDataAction {
     public PageBody basedata_list(String source, int page, int limit) throws ClassNotFoundException {
         if (StrUtil.isNotBlank(source)) {
             Element ele = elementOP.getEleSource(source);
-            QueryObject qo = new QueryObject(null, "code", "asc", page, limit);
-            IPageList pageList = this.baseDataService.list(Class.forName(ele.getClass_name()), qo);
-            return PageBody.success().addPageInfo(pageList);
+            if (StrUtil.isNotBlank(ele.getClass_name())) {
+                QueryObject qo = new QueryObject(null, "code", "asc", page, limit);
+                IPageList pageList = this.baseDataService.list(Class.forName(ele.getClass_name()), qo);
+                return PageBody.success().addPageInfo(pageList);
+            } else {
+                return PageBody.failed("数据源实体类未定义");
+            }
         } else {
             return PageBody.failed("数据源未定义");
         }
@@ -68,7 +73,7 @@ public class BaseDataAction {
         try {
             Class<BaseData> clz = (Class<BaseData>) Class.forName(ele.getClass_name());
 
-            BaseData baseData = BeanUtil.mapToBeanIgnoreCase(mapPara, clz, true);
+            BaseData baseData = WebHandler.toPo(mapPara,clz);
             BaseData vf = this.baseDataService.getObjByProperty(baseData.getClass(), null, "code", baseData.getCode());
             if (vf != null) {
                 return ResultBody.failed("编码不能重复");
@@ -95,7 +100,7 @@ public class BaseDataAction {
                 return ResultBody.failed("编码不能重复");
             } else {
                 BaseData baseData = this.baseDataService.getObjById(clz, id);
-                BaseData obj = BeanUtil.fillBeanWithMapIgnoreCase(mapPara, baseData, true);
+                BaseData obj = WebHandler.toPo(mapPara, baseData);
                 this.baseDataService.update(obj);
                 return ResultBody.success();
             }

@@ -397,6 +397,13 @@ function unionObj(o1,o2){
     }
     return o;
 }
+
+function objEntityRender(value) {
+    if (value!=null && typeof v == "object") {
+        return '<span data-qtip="'+value.code+' '+value.name+'">'+value.name+'</span>';
+    }
+    return value.name;
+}
 /**
  * 
  * 表格列自适应

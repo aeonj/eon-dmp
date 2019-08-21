@@ -9,6 +9,7 @@ import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.model.primary.UserConfig;
+import eon.hg.fap.db.model.virtual.OnlineUser;
 import eon.hg.fap.db.service.ISysConfigService;
 import eon.hg.fap.db.service.IUserConfigService;
 import eon.hg.fap.db.service.IUserService;
@@ -63,9 +64,9 @@ public class BaseManageAction extends BizAction{
 	@RequestMapping("/login_success.htm")
 	public void login_success(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		if (SecurityUserHolder.getCurrentUser() != null) {
-			User user = this.userService.getObjById(SecurityUserHolder
-					.getCurrentUser().getId());
+		if (SecurityUserHolder.getOnlineUser() != null) {
+			User user = this.userService.getObjById(CommUtil.null2Long(SecurityUserHolder
+					.getOnlineUser().getUserid()));
 			user.setLoginDate(new Date());
 			user.setLoginIp(CommUtil.getIpAddr(request));
 			user.setLoginCount(user.getLoginCount() + 1);
@@ -230,7 +231,7 @@ public class BaseManageAction extends BizAction{
 	@RequestMapping("/third_login.htm")
 	public void third_login(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		if (SecurityUserHolder.getCurrentUser()==null) {
+		if (SecurityUserHolder.getOnlineUser()==null) {
 			request.getSession(false).removeAttribute("verify_code");
 			request.getSession(false).removeAttribute("bind");
 			response.sendRedirect(CommUtil.getURL(request)+"/iaeon_login.htm?username="
@@ -242,7 +243,7 @@ public class BaseManageAction extends BizAction{
 	@RequestMapping("/third_logout.htm")
 	public void third_logout(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
-		if (SecurityUserHolder.getCurrentUser()!=null) {
+		if (SecurityUserHolder.getOnlineUser()!=null) {
 			response.sendRedirect(CommUtil.getURL(request)+"/ixingyun_logout.htm?synclogout=0");
 		}
 	}
@@ -250,7 +251,7 @@ public class BaseManageAction extends BizAction{
 	@RequestMapping("/manage/switch_elecode.htm")
 	public void switch_elecode(HttpServletRequest request,
 			HttpServletResponse response) {
-		User user = SecurityUserHolder.getCurrentUser();
+		OnlineUser user = SecurityUserHolder.getOnlineUser();
 		if (user!=null) {
 			UserConfig uconfig = this.userConfigService.getUserConfig();
 			if (CommUtil.null2String(uconfig.getElecode_type()).equals("standard")) {
@@ -320,17 +321,11 @@ public class BaseManageAction extends BizAction{
 	@RequestMapping("/error.htm")
 	public ModelAndView error(HttpServletRequest request,
                               HttpServletResponse response) {
-		User user = SecurityUserHolder.getCurrentUser();
 		ModelAndView mv = new JModelAndView("error.html",
-				configService.getSysConfig(),
-				this.userConfigService.getUserConfig(), 1, request, response);
-		//if (user != null && user.getUserRole().equalsIgnoreCase("MANAGE")) {
-			mv = new JModelAndView("error.html",
 					configService.getSysConfig(),
 					this.userConfigService.getUserConfig(), 0, request,
 					response);
 
-		//}
 		mv.addObject("op_title",
 				request.getSession(false).getAttribute("op_title"));
 		mv.addObject("list_url", request.getSession(false).getAttribute("url"));

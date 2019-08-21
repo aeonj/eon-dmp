@@ -33,7 +33,7 @@ public class IndexViewAction {
 		} else {
 			//默认跳转到登录页面 modify by aeon 2015.6.2
 			if (Globals.MUST_LOGIN_FLAG) {
-				if (SecurityUserHolder.getCurrentUser()==null) {
+				if (SecurityUserHolder.getOnlineUser()==null) {
 					ModelAndView mv = new JModelAndView("login.html",
 							configService.getSysConfig(),
 							this.userConfigService.getUserConfig(), 1, request, response);

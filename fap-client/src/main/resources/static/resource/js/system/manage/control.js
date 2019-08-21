@@ -1065,7 +1065,15 @@ Ext.define('Ext.vcf.treefield', {
             }
         } else {
             if (typeof v == "object") {
-                me.node = v;
+                if (v['data']) {
+                    me.node = v;
+                } else {
+                    v = v['id'];
+                    if (me.picker) {
+                        me.node = me.getNodeById(v);
+                    }
+                }
+
             } else {
                 if (v!='') {
                     if (me.picker) {

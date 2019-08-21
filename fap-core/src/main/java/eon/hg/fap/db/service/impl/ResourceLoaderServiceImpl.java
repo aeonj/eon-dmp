@@ -6,7 +6,7 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONReader;
 import eon.hg.fap.common.CommUtil;
-import eon.hg.fap.core.tools.WebForm;
+import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.dao.primary.*;
 import eon.hg.fap.db.model.primary.*;
 import eon.hg.fap.db.service.IResourceLoaderService;
@@ -49,7 +49,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         uiConfDAO.deleteAll();
         impTableJsonData(getClassPathStream("static/data/json/sys_uiconf.json"), (Map<String, Object> mapRecord) -> {
             UIConf uiConf = new UIConf();
-            WebForm.Map2Obj(mapRecord, uiConf);
+            WebHandler.toPo(mapRecord, uiConf);
             uiConfDAO.save(uiConf);
         });
         uiConfDetailDAO.deleteAll();

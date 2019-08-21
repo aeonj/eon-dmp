@@ -14,7 +14,7 @@ import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.common.util.tools.StringUtils;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.security.SecurityUserHolder;
-import eon.hg.fap.core.tools.WebForm;
+import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.dao.primary.GenericDao;
 import eon.hg.fap.db.model.mapper.BaseData;
 import eon.hg.fap.db.model.primary.Area;
@@ -359,7 +359,7 @@ public class ElementOP {
 		}
 		dto.put("children", bd.getChild());
 		if (isfulldata) {
-			WebForm.Obj2Map(bd, dto);
+			WebHandler.toMap(bd, dto);
 		}
 		dto.put("leaf", bd.isLeaf());
 		dto.put("level", bd.getLevel());
@@ -419,7 +419,7 @@ public class ElementOP {
 			dto.put("name", bd.getName());
 			dto.put("text", bd.getCode()+" "+bd.getName());
 			if (dto.getString("isfulldata").equals("true")) {
-				WebForm.Obj2Map(bd, dto);
+				WebHandler.toMap(bd, dto);
 			}
 			lst.add(dto);
 		}

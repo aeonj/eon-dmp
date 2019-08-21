@@ -407,10 +407,10 @@ function addGridByServer(comp, ray) {
                                 if (children[j].uiconf_field == 'source') {
                                     if (findIsCodeAsValue(children)) {
                                         newField.renderer = eval('typeof ' + children[j].uiconf_value + 'CodeRender!=\'undefined\' ? '
-                                            + children[j].uiconf_value + 'CodeRender : null');
+                                            + children[j].uiconf_value + 'CodeRender : objEntityRender');
                                     } else {
                                         newField.renderer = eval('typeof ' + children[j].uiconf_value + 'IdRender!=\'undefined\' ? '
-                                            + children[j].uiconf_value + 'IdRender : null');
+                                            + children[j].uiconf_value + 'IdRender : objEntityRender');
                                     }
                                 } else if (children[j].uiconf_field == 'store') {
                                     newField.renderer = eval('typeof ' + children[j].uiconf_value.replace('Store', 'Render') + '!=\'undefined\' ? ' + children[j].uiconf_value.replace('Store', 'Render') + ' : null');

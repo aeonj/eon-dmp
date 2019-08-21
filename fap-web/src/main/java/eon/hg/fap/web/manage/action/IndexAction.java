@@ -3,7 +3,7 @@ package eon.hg.fap.web.manage.action;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.security.SecurityUserHolder;
-import eon.hg.fap.db.model.primary.User;
+import eon.hg.fap.db.model.virtual.OnlineUser;
 import eon.hg.fap.db.service.IMenuService;
 import eon.hg.fap.db.service.ISysConfigService;
 import eon.hg.fap.db.service.IUserConfigService;
@@ -37,7 +37,7 @@ public class IndexAction extends BizAction {
     @RequestMapping("/index.htm")
     public ModelAndView index(HttpServletRequest request,
                               HttpServletResponse response) {
-        User user = SecurityUserHolder.getCurrentUser();
+        OnlineUser user = SecurityUserHolder.getOnlineUser();
         if (user==null) {
             ModelAndView mv = new JModelAndView("login.html",
                     configService.getSysConfig(),

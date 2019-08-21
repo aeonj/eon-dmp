@@ -6,7 +6,6 @@ import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.db.dao.primary.AccessoryDao;
 import eon.hg.fap.db.model.primary.Accessory;
-import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.service.IAccessoryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,10 +89,9 @@ public class AccessoryServiceImpl implements IAccessoryService {
 
 	@Override
 	public boolean deleteFile(Accessory accessory,HttpServletRequest request) {
-		User current_user = SecurityUserHolder.getCurrentUser();
 		accessory.setIs_deleted(true);
 		accessory.setLastTime(new Date());
-		accessory.setLastUser(current_user.getTrueName());
+		accessory.setLastUser(SecurityUserHolder.getOnlineUser().getUsername());
 		this.accessoryDao.update( accessory);
 		String saveFilePathName = request.getSession().getServletContext()
 				.getRealPath("/");

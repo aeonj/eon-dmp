@@ -1,5 +1,6 @@
 package eon.hg.fap.db.service.impl;
 
+import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.query.support.IPageList;
@@ -9,6 +10,7 @@ import eon.hg.fap.db.dao.primary.UserConfigDao;
 import eon.hg.fap.db.dao.primary.UserDao;
 import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.model.primary.UserConfig;
+import eon.hg.fap.db.model.virtual.OnlineUser;
 import eon.hg.fap.db.service.IUserConfigService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,10 +94,10 @@ public class UserConfigServiceImpl implements IUserConfigService {
 
 	@Override
 	public UserConfig getUserConfig() {
-		User u = SecurityUserHolder.getCurrentUser();
+		OnlineUser u = SecurityUserHolder.getOnlineUser();
 		UserConfig config = null;
 		if (u != null) {
-			User user = this.userDAO.get(u.getId());
+			User user = this.userDAO.get(CommUtil.null2Long(u.getUserid()));
 			if (user != null) {
 				config = user.getConfig();
 				if (config==null) {

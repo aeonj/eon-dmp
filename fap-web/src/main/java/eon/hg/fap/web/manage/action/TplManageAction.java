@@ -10,7 +10,7 @@ import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
-import eon.hg.fap.core.tools.WebForm;
+import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.model.primary.Element;
 import eon.hg.fap.db.service.IBaseTreeService;
 import eon.hg.fap.db.service.ISysConfigService;
@@ -65,7 +65,7 @@ public class TplManageAction {
 		ModelAndView mv = new JModelAndView("common/html_tag.html",
 				configService.getSysConfig(),
 				this.userConfigService.getUserConfig(), 0, request, response);
-		HtmlTagDto dto= WebForm.toAPo(request, HtmlTagDto.class);
+		HtmlTagDto dto= WebHandler.toAPo(request, HtmlTagDto.class);
 		mv.addObject("htmltag",dto);
 		PropertiesHelper pHelper = PropertiesFactory.getPropertiesHelper(PropertiesFile.MANAGE);
 		mv.addObject("extMode", pHelper.getValue("extMode","run"));
@@ -83,7 +83,7 @@ public class TplManageAction {
 		ModelAndView mv = new JModelAndView("common/codestore_tag.html",
 				configService.getSysConfig(),
 				this.userConfigService.getUserConfig(), 0, request, response);
-		CodeStoreTagDto dto=WebForm.toAPo(request, CodeStoreTagDto.class);
+		CodeStoreTagDto dto=WebHandler.toAPo(request, CodeStoreTagDto.class);
 		String[] arrayFields = dto.getFields().split(",");
 		List<String> fieldList = new ArrayList<String>();
 		for (int i = 0; i < arrayFields.length; i++) {
@@ -118,7 +118,7 @@ public class TplManageAction {
 		ModelAndView mv = new JModelAndView("common/ele_render.html",
 				configService.getSysConfig(),
 				this.userConfigService.getUserConfig(), 0, request, response);
-		EleRenderTagDto eleDto=WebForm.toAPo(request, EleRenderTagDto.class);
+		EleRenderTagDto eleDto=WebHandler.toAPo(request, EleRenderTagDto.class);
 		String[] arrayFields = eleDto.getFields().split(",");
 		List<SysMap> fieldList = new ArrayList<SysMap>();
 		for (int i = 0; i < arrayFields.length; i++) {
@@ -182,7 +182,7 @@ public class TplManageAction {
 		ModelAndView mv = new JModelAndView("common/view_port_tag.html",
 				configService.getSysConfig(),
 				this.userConfigService.getUserConfig(), 0, request, response);
-		ViewPortTagDto dto=WebForm.toAPo(request, ViewPortTagDto.class);
+		ViewPortTagDto dto=WebHandler.toAPo(request, ViewPortTagDto.class);
 		mv.addObject("viewporttag",dto);
 		mv.addObject("tplOp",tplOp);
 		String currDate = DateUtil.today();

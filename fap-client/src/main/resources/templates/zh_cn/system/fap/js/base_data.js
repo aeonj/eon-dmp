@@ -225,14 +225,15 @@ Ext.onReady(function () {
                 for (var j = 0; j < children.length; j++) {
                     if (children[j].uiconf_field == 'source') {
                         if (findIsCodeAsValue(children)) {
-                            newField.renderer = eval(children[j].uiconf_value
-                                + 'CodeRender');
+                            newField.renderer = eval('typeof ' + children[j].uiconf_value + 'CodeRender!=\'undefined\' ? '
+                                + children[j].uiconf_value + 'CodeRender : objEntityRender');
                         } else {
-                            newField.renderer = eval(children[j].uiconf_value
-                                + 'IdRender');
+                            newField.renderer = eval('typeof ' + children[j].uiconf_value + 'IdRender!=\'undefined\' ? '
+                                + children[j].uiconf_value + 'IdRender : objEntityRender');
                         }
                     } else if (children[j].uiconf_field == 'enumData') {
-                        // newField.renderer = EnumDataRender;
+                        eval('function ' + newField.dataIndex + 'EnumData() {return "' + children[j].uiconf_value + '"};');
+                        newField.renderer = eval('typeof ' + newField.dataIndex + 'EnumRender!=\'undefined\' ? ' + newField.dataIndex + 'EnumRender : null');
                     } else if (children[j].uiconf_field == 'xtype') {
                         if (children[j].uiconf_value == 'checkbox'
                             || children[j].uiconf_value == 'chkfield') {
