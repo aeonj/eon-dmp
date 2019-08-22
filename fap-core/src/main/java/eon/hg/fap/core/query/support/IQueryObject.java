@@ -104,4 +104,11 @@ public interface IQueryObject {
 
 	String getFetchs();
 
+
+	/**
+	 * 获取原生sql语句
+	 * @return
+	 */
+	String getNativeSql();
+
 }

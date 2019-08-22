@@ -22,10 +22,10 @@ public interface IQuery {
 	/**
 	 * 根据查询条件返回记录总数
 	 * 
-	 * @param hql
+	 * @param sql
 	 * @return 查询记录结果总数
 	 */
-	int getRows(String hql);
+	int getRows(String sql);
 
 	/**
 	 * 根据查询条件返回符合条件的结果数
@@ -40,11 +40,11 @@ public interface IQuery {
 	/**
 	 * 根据查询条件返回符合条件的结果数
 	 * 
-	 * @param hql
+	 * @param sql
 	 *            查询语句
 	 * @return 根据条件获得查询结果集
 	 */
-	List getResult(String hql);
+	List getResult(String sql);
 
 	/**
 	 * 设置有效结果记录的开始位置

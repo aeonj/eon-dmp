@@ -4,12 +4,11 @@ import cn.hutool.core.convert.Convert;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.jpa.BaseRepository;
-import eon.hg.fap.core.query.GenericPageList;
+import eon.hg.fap.core.query.query.BasePageList;
 import eon.hg.fap.core.query.PageObject;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
-import org.hibernate.query.internal.QueryImpl;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -187,7 +186,7 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
         if (properties == null) {
             return null;
         }
-        GenericPageList pList = new GenericPageList(getDomainClass(), properties, this);
+        BasePageList pList = new BasePageList(getDomainClass(), properties, this);
         if (properties != null) {
             PageObject pageObj = properties.getPageObj();
             if (pageObj != null)

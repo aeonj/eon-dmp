@@ -7,6 +7,7 @@ import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.tools.WebHandler;
+import eon.hg.fap.db.dao.primary.GenericDao;
 import eon.hg.fap.db.model.mapper.BaseData;
 import eon.hg.fap.db.model.primary.Element;
 import eon.hg.fap.db.service.IBaseDataService;
@@ -37,6 +38,8 @@ public class BaseDataAction {
     private IBaseDataService baseDataService;
     @Autowired
     private ElementOP elementOP;
+    @Autowired
+    private GenericDao genericDao;
 
     @SecurityMapping(title = "通用基础数据管理", value = "base_data:view")
     @RequestMapping("/base_data.htm")
@@ -51,7 +54,7 @@ public class BaseDataAction {
 
     @SecurityMapping("base_data:view")
     @RequestMapping("/basedata_list.htm")
-    public PageBody basedata_list(String source, int page, int limit) throws ClassNotFoundException {
+    public PageBody basedata_list(String source, String code, int page, int limit) throws ClassNotFoundException {
         if (StrUtil.isNotBlank(source)) {
             Element ele = elementOP.getEleSource(source);
             if (StrUtil.isNotBlank(ele.getClass_name())) {
@@ -59,8 +62,12 @@ public class BaseDataAction {
                 IPageList pageList = this.baseDataService.list(Class.forName(ele.getClass_name()), qo);
                 return PageBody.success().addPageInfo(pageList);
             } else {
-                return PageBody.failed("数据源实体类未定义");
+                QueryObject qo = QueryObject.SqlCreate("SELECT obj.* from "+ele.getEle_source()+" obj where code= "+code);
+                //qo.addQuery("code",new SysMap("code",code),"like");
+                IPageList pageList = this.genericDao.list(qo);
+                return PageBody.success().addPageInfo(pageList);
             }
+
         } else {
             return PageBody.failed("数据源未定义");
         }

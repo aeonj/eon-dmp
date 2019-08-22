@@ -1,6 +1,7 @@
 package eon.hg.fap.web.manage.action;
 
 import cn.hutool.core.bean.BeanUtil;
+import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.domain.virtual.SysMap;
@@ -112,6 +113,9 @@ public class MenuManageAction extends BizAction {
     public Dto menu_save(@RequestParam Map<String,Object> mapPara,
                                        @RequestParam("mg_id") Long menuGroupId,
                                        @RequestParam("menuCode") String code) {
+        if (CommUtil.isEmpty(menuGroupId)) {
+            return ErrTipMsg("请指定菜单组");
+        }
         Menu vf = this.menuService.getObjByProperty(null, "menuCode", code);
         if (vf==null) {
             Menu menu = BeanUtil.mapToBeanIgnoreCase(mapPara, Menu.class,true);

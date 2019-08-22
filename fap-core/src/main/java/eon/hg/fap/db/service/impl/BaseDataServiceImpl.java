@@ -10,6 +10,7 @@ package eon.hg.fap.db.service.impl;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.db.dao.primary.BaseDataDao;
+import eon.hg.fap.db.dao.primary.GenericDao;
 import eon.hg.fap.db.model.mapper.BaseData;
 import eon.hg.fap.db.service.IBaseDataService;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,8 @@ import java.util.Map;
 public class BaseDataServiceImpl implements IBaseDataService {
     @Resource
     private BaseDataDao basedataDao;
+    @Resource
+    private GenericDao genericDao;
 
     /* (non-Javadoc)
      * @see com.aeon.foundation.service.IBaseDataService#save(com.aeon.foundation.table.mapper.BaseData)
@@ -79,8 +82,12 @@ public class BaseDataServiceImpl implements IBaseDataService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
     public IPageList list(Class clz, IQueryObject properties) {
-        this.basedataDao.setEntityClass(clz);
-        return basedataDao.list(properties);
+        if (clz!=null) {
+            this.basedataDao.setEntityClass(clz);
+            return basedataDao.list(properties);
+        } else {
+            return genericDao.list(properties);
+        }
     }
 
     /* (non-Javadoc)

@@ -1,7 +1,8 @@
-package eon.hg.fap.core.query;
+package eon.hg.fap.core.query.query;
 
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.jpa.BaseRepository;
+import eon.hg.fap.core.query.PageList;
 import eon.hg.fap.core.query.support.IQuery;
 import eon.hg.fap.core.query.support.IQueryObject;
 
@@ -12,7 +13,7 @@ import java.util.Map;
  * @author aeon
  * 
  */
-public class GenericPageList extends PageList {
+public class BasePageList extends PageList {
 	/**
 	 * 
 	 */
@@ -23,13 +24,13 @@ public class GenericPageList extends PageList {
 	
 	protected String fetchs;
 
-	public GenericPageList(Class cls, IQueryObject queryObject, BaseRepository dao) {
+	public BasePageList(Class cls, IQueryObject queryObject, BaseRepository dao) {
 		this(cls, queryObject.getConstruct(), queryObject.getFetchs(), queryObject.getQuery(),
 				queryObject.getParameters(), dao);
 	}
 
-	public GenericPageList(Class cls, String construct, String scope,
-			Map paras, BaseRepository dao) {
+	public BasePageList(Class cls, String construct, String scope,
+						Map paras, BaseRepository dao) {
 		this(cls,construct, "", scope, paras, dao);
 	}
 
@@ -47,13 +48,13 @@ public class GenericPageList extends PageList {
 	 * @param dao
 	 *            对应的dao
 	 */
-	public GenericPageList(Class cls, String construct, String fetchs, String scope,
-			Map paras, BaseRepository dao) {
+	public BasePageList(Class cls, String construct, String fetchs, String scope,
+						Map paras, BaseRepository dao) {
 		this.cls = cls;
 		this.scope = scope;
 		this.construct = construct;
 		this.fetchs = fetchs;
-		IQuery query = new GenericQuery(dao);
+		IQuery query = new BaseQuery(dao);
 		query.setParaValues(paras);
 		this.setQuery(query);
 	}

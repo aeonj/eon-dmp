@@ -3,6 +3,8 @@ package eon.hg.fap.core.body;
 import eon.hg.fap.core.query.support.IPageList;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -60,14 +62,21 @@ public class PageBody {
     }
 
     /**
-     * 加载
+     * 加载页对象
      * @param page
      * @return
      */
     public PageBody addPageInfo(IPageList page) {
         this.page = page.getCurrentPage();
-        this.total = page.getPages();
+        this.total = page.getRowCount();
         this.data = page.getResult();
+        return this;
+    }
+
+    public PageBody addPageInfo(List resultList, int page, int total) {
+        this.page = page;
+        this.total = total;
+        this.data = resultList;
         return this;
     }
 

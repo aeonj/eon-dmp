@@ -2,9 +2,9 @@ package eon.hg.fap.core.query;
 
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.domain.entity.IdEntity;
-import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQuery;
+import eon.hg.fap.core.security.SecurityUserHolder;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -88,14 +88,16 @@ public class PageList implements IPageList {
 		if (params != null) {
 			query.setParaValues(params);
 		}
-		boolean filterRg = CommUtil.isExistsAttr(this.cls, "rg_code") && !CommUtil.null2Boolean(query.getParams().get("allrg"));
-		if (filterRg) {
-			condition = " obj.rg_code=:rg_code and "+condition;
-			query.getParams().put("rg_code", SecurityUserHolder.getRgCode());
-		}
-		query.getParams().remove("allrg");
-		if (IdEntity.class.isAssignableFrom(this.cls)) {
-			condition = " obj.is_deleted=0 and "+condition;
+		if (this.cls!=null) {
+			boolean filterRg = CommUtil.isExistsAttr(this.cls, "rg_code") && !CommUtil.null2Boolean(query.getParams().get("allrg"));
+			if (filterRg) {
+				condition = " obj.rg_code=:rg_code and " + condition;
+				query.getParams().put("rg_code", SecurityUserHolder.getRgCode());
+			}
+			query.getParams().remove("allrg");
+			if (IdEntity.class.isAssignableFrom(this.cls)) {
+				condition = " obj.is_deleted=0 and " + condition;
+			}
 		}
 		int total = query.getRows(totalSQL + " where " + condition);
 		// System.out.println("query:" + queryHQL + ";total:" + total);

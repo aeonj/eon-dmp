@@ -3,6 +3,10 @@ package eon.hg.fap.core.jpa.support;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.core.jpa.GenericRepository;
+import eon.hg.fap.core.query.PageObject;
+import eon.hg.fap.core.query.query.GenericPageList;
+import eon.hg.fap.core.query.support.IPageList;
+import eon.hg.fap.core.query.support.IQueryObject;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
@@ -104,6 +108,21 @@ public class SimpleGenericRepository<T, ID extends Serializable> implements Gene
 		}
 		query.unwrap(NativeQueryImpl.class).setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 		return query.getResultList();
+	}
+
+	@Override
+	public IPageList list(IQueryObject properties) {
+		if (properties == null) {
+			return null;
+		}
+		GenericPageList pList = new GenericPageList(properties, this);
+		PageObject pageObj = properties.getPageObj();
+		if (pageObj != null) {
+			pList.doList(pageObj.getCurrentPage(),pageObj.getPageSize());
+		} else {
+			pList.doList(0,-1);
+		}
+		return pList;
 	}
 
 	@Transactional

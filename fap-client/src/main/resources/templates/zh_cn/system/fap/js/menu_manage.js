@@ -279,7 +279,11 @@ function pageLoad() {
         addPanel.reset();
         addWindow.show();
         addPanel.getForm().findField('mg_id').setValue(selmgid);
-        addPanel.getForm().findField('parent_id').setValue(seltreeid);
+        if (seltreetype=='1') {
+            addPanel.getForm().findField('parent_id').setValue(null);
+        } else {
+            addPanel.getForm().findField('parent_id').setValue(seltreeid);
+        }
         addPanel.getForm().findField('parent_id').requestload =true;
 
     }

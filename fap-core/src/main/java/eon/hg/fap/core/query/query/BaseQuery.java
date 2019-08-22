@@ -1,4 +1,4 @@
-package eon.hg.fap.core.query;
+package eon.hg.fap.core.query.query;
 
 import eon.hg.fap.core.jpa.BaseRepository;
 import eon.hg.fap.core.query.support.IQuery;
@@ -21,7 +21,7 @@ import java.util.Map;
  * </p>
  * 
  */
-public class GenericQuery implements IQuery {
+public class BaseQuery implements IQuery {
 
 	private BaseRepository dao;
 
@@ -36,7 +36,7 @@ public class GenericQuery implements IQuery {
 	 *
 	 * @param dao
 	 */
-	public GenericQuery(BaseRepository dao) {
+	public BaseQuery(BaseRepository dao) {
 		this.dao = dao;
 	}
 

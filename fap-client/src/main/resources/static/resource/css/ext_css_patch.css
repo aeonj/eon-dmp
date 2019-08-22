@@ -1,5 +1,5 @@
-/* --------------- �޸� Ext CSS -------------- */ /* Ext 2.0 */
- @CHARSET "UTF-8";
+/* --------------- 修改 Ext CSS -------------- */ /* Ext 2.0 */
+@CHARSET "UTF-8";
 
 .x-window-footer {
 	position: relative;
@@ -23,7 +23,7 @@
 	font-size: 12px;
 }
 
-/* ����и�(15),modify by xiongchun */
+/* 表格行高(15),modify by xiongchun */
 .x-grid3-row TD {
 	font-size: 12px;
 	LINE-HEIGHT: 15px;
@@ -83,7 +83,7 @@
 
 .
 .x-btn-text-icon .x-btn-center .x-btn-text {ext-all .css (line 227)
-	background-position:0pt2px;
+background-position:0pt2px;
 	background-repeat: no-repeat;
 	padding: 3px 0pt 2px 18px;
 }
@@ -96,8 +96,8 @@
 	font-size: 12px;
 }
 
-/* ��Ӱ��ʽ,modify by xiongchun */
+/* 阴影样式,modify by xiongchun */
 .x-mask-loading{
-   font-size: 12px;
+	font-size: 12px;
 }
 /* END */

@@ -1,5 +1,6 @@
 package eon.hg.fap.core.query;
 
+import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.query.support.IQueryObject;
@@ -27,9 +28,11 @@ public class QueryObject implements IQueryObject {
 
 	protected Map params = new HashMap();
 
-	protected String queryString = "1=1";
+	protected String queryString = "";
 	
 	protected String fetchs = "";
+
+	protected String nativeSql;   //原生sql语句
 
 	public String getConstruct() {
 		return construct;
@@ -55,7 +58,7 @@ public class QueryObject implements IQueryObject {
 		this.pageSize = pageSize;
 	}
 
-	protected void setParams(Map params) {
+	public void setParams(Map params) {
 		this.params = params;
 	}
 
@@ -90,6 +93,16 @@ public class QueryObject implements IQueryObject {
 	 */
 	public String getFetchs() {
 		return fetchs;
+	}
+
+	/**
+	 * 获取原生sql语句
+	 *
+	 * @return
+	 */
+	@Override
+	public String getNativeSql() {
+		return nativeSql;
 	}
 
 	/**
@@ -232,6 +245,29 @@ public class QueryObject implements IQueryObject {
 	}
 
 	/**
+	 * 创建原生sql查询实例
+	 * @param nativeSql
+	 * @return
+	 */
+	public static QueryObject SqlCreate(String nativeSql) {
+		return SqlCreate(nativeSql,null);
+	}
+	/**
+	 * 创建原生sql查询实例
+	 * @param nativeSql
+	 * @param params
+	 * @return
+	 */
+	public static QueryObject SqlCreate(String nativeSql, Map params) {
+		QueryObject qo = new QueryObject();
+		qo.nativeSql = nativeSql;
+		if (params!=null) {
+			qo.params = params;
+		}
+		return qo;
+	}
+
+	/**
 	 * 获取一个分页信息
 	 * 
 	 * @return 分页信息
@@ -248,7 +284,16 @@ public class QueryObject implements IQueryObject {
 
 	public String getQuery() {
 		customizeQuery();
-		return queryString + orderString();
+		if (StrUtil.isEmpty(queryString)) {
+			return "1=1 "+orderString();
+		} else {
+			String condition = queryString;
+			int iAnd = StrUtil.indexOfIgnoreCase(condition," and ");
+			if (iAnd!=-1) {
+				condition = condition.substring(iAnd+5);
+			}
+			return condition + orderString();
+		}
 	}
 
 	protected String orderString() {
