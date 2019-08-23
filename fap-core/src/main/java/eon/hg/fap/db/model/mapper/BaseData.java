@@ -6,6 +6,7 @@
 
 package eon.hg.fap.db.model.mapper;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.core.beans.SpringUtils;
@@ -37,6 +38,7 @@ public abstract class BaseData extends IdEntity implements Serializable {
 	@Column
 	private String treepath;
 	@Transient
+    @JSONField(serialize = false)
 	private String parentpath;
 	@Column(name = "level_num")
 	private Byte level=1;
@@ -45,6 +47,7 @@ public abstract class BaseData extends IdEntity implements Serializable {
 	private String last_ver;
 	private Long parent_id;
 
+	@JSONField(serialize = false)
 	public BaseData getParent() {
 		IBaseDataService baseDataService = SpringUtils.getBean("baseDataServiceImpl",IBaseDataService.class);
 		if (CommUtil.isNotEmpty(this.getParent_id())) {

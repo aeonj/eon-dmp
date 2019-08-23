@@ -48,6 +48,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
     public BaseData getObjById(Class clz, Long id) {
+        if (id==null) return null;
         this.basedataDao.setEntityClass(clz);
         BaseData basedata = this.basedataDao.get(id);
         if (basedata != null) {

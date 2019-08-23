@@ -3,6 +3,7 @@ package eon.hg.fap.web.manage.action;
 import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.core.body.PageBody;
 import eon.hg.fap.core.body.ResultBody;
+import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.query.support.IPageList;
@@ -56,11 +57,12 @@ public class BaseDataAction {
             Element ele = elementOP.getEleSource(source);
             if (StrUtil.isNotBlank(ele.getClass_name())) {
                 QueryObject qo = new QueryObject(null, "code", "asc", page, limit);
+                qo.addQuery(" and obj.code like '"+code+"%'",null);
                 IPageList pageList = this.baseDataService.list(Class.forName(ele.getClass_name()), qo);
                 return PageBody.success().addPageInfo(pageList);
             } else {
-                QueryObject qo = QueryObject.SqlCreate("SELECT obj.* from "+ele.getEle_source()+" obj where code= "+code);
-                //qo.addQuery("code",new SysMap("code",code),"like");
+                QueryObject qo = QueryObject.SqlCreate("SELECT obj.* from "+ele.getEle_source()+" obj");
+                qo.addQuery("code",new SysMap("code",code+"%"),"like");
                 IPageList pageList = this.baseDataService.list(null,qo);
                 return PageBody.success().addPageInfo(pageList);
             }

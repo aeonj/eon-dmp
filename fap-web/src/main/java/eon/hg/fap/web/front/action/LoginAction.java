@@ -37,7 +37,7 @@ public class LoginAction {
             QueryObject qo = new QueryObject();
             List<BaseData> bds = baseDataService.find(EleDepartment.class,qo);
             for (BaseData bd:bds) {
-                System.out.println(bd.getParent());
+                System.out.println(baseDataService.getObjById(bd.getClass(),bd.getParent_id()));
             }
             return bds;
     }

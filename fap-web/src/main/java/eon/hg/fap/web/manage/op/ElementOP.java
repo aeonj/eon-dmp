@@ -295,9 +295,10 @@ public class ElementOP {
 	}
 	
 	private void addNodeChild(List<Dto> lst, BaseData node, boolean onlyname,boolean isfulldata) {
-		BaseData parent = node.getParent();
-		if (parent!=null) {
-			int idx = ContainsNode(node);
+
+		if (node.getParent_id()!=null) {
+			BaseData parent = this.baseDataService.getObjById(node.getClass(),node.getParent_id());
+			int idx = ContainsNode(parent.getChild(),node);
 			if (idx!=-1) {
 				parent.getChild().add(idx,BaseData2Dto(node,onlyname,isfulldata));
 			}
@@ -335,11 +336,6 @@ public class ElementOP {
 		return lst.size();
 	}
 
-	private int ContainsNode(BaseData node) {
-		BaseData parent = node.getParent();
-		return ContainsNode(parent.getChild(),node);
-	}
-	
 	private Dto BaseData2Dto(BaseData bd, boolean onlyname,boolean isfulldata) {
 		String code = bd.getCode();
 		Dto dto = new HashDto();
