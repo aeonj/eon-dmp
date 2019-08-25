@@ -19,8 +19,7 @@ import java.util.Date;
 @Entity
 @Table(name = Globals.SYS_TABLE_SUFFIX + "accessory")
 public class Accessory extends IdEntity {
-	private static final long serialVersionUID = 3239621636492969947L;
-	
+
 	private String name;// 附件名称
 	private String path;// 存放路径
 	@Column(name = "asize",precision = 12, scale = 2)

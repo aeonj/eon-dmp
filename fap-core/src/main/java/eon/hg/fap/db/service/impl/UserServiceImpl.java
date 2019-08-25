@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -18,64 +17,37 @@ import java.util.Map;
 public class UserServiceImpl implements IUserService {
 	@Resource
 	private UserDao userDao;
-	
-	public boolean save(User user) {
-		/**
-		 * init other field here
-		 */
-		try {
-			this.userDao.save(user);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	public User getObjById(Long id) {
-		User user = this.userDao.get(id);
-		if (user != null) {
-			return user;
-		}
-		return null;
+
+	public User save(User user) {
+		return this.userDao.save(user);
 	}
 
-	public boolean delete(Long id) {
-		try {
-			this.userDao.remove(id);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public User getObjById(Long id) {
+		return this.userDao.get(id);
+	}
+
+	public void delete(Long id) {
+		this.userDao.remove(id);
 	}
 	
-	public boolean batchDelete(List<Long> userIds) {
-		// TODO Auto-generated method stub
-		for (Serializable id : userIds) {
-			delete((Long) id);
+	public void batchDelete(List<Long> userIds) {
+		for (Long id : userIds) {
+			delete(id);
 		}
-		return true;
 	}
 	
 	public IPageList list(IQueryObject properties) {
 		return userDao.list(properties);
 	}
-	
-	public boolean update(User user) {
-		try {
-			this.userDao.update( user);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}	
+
+	public User update(User user) {
+		return this.userDao.update( user);
+	}
 	public List<User> query(String query, Map params, int begin, int max){
 		return this.userDao.query(query, params, begin, max);
 		
 	}
-	
+
 	@Override
 	public User getObjByProperty(String construct, String propertyName,
 			Object value) {

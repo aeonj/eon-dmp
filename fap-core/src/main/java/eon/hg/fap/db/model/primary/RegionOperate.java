@@ -5,8 +5,6 @@ package eon.hg.fap.db.model.primary;
 
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 
@@ -15,7 +13,6 @@ import javax.persistence.*;
  * @author AEON
  *
  */
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Entity
 @Table(name = Globals.SYS_TABLE_SUFFIX + "region_operate")
 public class RegionOperate extends IdEntity {

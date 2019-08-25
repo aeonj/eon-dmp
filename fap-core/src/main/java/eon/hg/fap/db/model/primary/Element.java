@@ -3,10 +3,10 @@ package eon.hg.fap.db.model.primary;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 /**
  * 系统要素类，管理基础数据
@@ -14,7 +14,6 @@ import javax.persistence.*;
  *
  */
 @Data
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Entity
 @Table(name = Globals.SYS_TABLE_SUFFIX + "element")
 public class Element extends IdEntity {

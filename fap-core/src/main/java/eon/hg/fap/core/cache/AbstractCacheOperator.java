@@ -22,21 +22,13 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 	@Autowired
 	CachePool cachePool;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see eon.hg.fap.core.cache.CacheOperator#reset()
-	 */
-	public void reset() {
-	    try {
-//			for (Iterator<String> it = cachePool.keySet().iterator(); it.hasNext();) {
-//				String cacheKey = it.next();
-//				cachePool.remove(cacheKey);
-//			}
-			cachePool.clear();
-			redisPool.reset();
-		} catch (Exception e) {
-	    	e.printStackTrace();
+	public void reset(Object... params) {
+		String cacheId = getCacheId(params);
+		if (cachePool.containsKey(cacheId)) {
+			cachePool.get(cacheId).clear();
+		}
+		if (redisPool.hasKey(cacheId)) {
+			redisPool.del(cacheId);
 		}
 	}
 

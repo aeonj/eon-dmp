@@ -33,7 +33,7 @@ public interface CacheOperator {
 	/**
 	 * Reset.
 	 */
-	void reset();
+	void reset(Object... params);
 
 	/**
 	 * delete one item

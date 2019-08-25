@@ -6,11 +6,16 @@
 
 package eon.hg.fap.db.service.impl;
 
+import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.db.dao.primary.ElementDao;
 import eon.hg.fap.db.model.primary.Element;
 import eon.hg.fap.db.service.IElementService;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,10 +29,12 @@ import java.util.Map;
  */
 @Service
 @Transactional
+@CacheConfig(cacheNames = Globals.DEFAULT_TABLE_SUFFIX+"element")
 public class ElementServiceImpl implements IElementService {
 	@Resource
 	private ElementDao elementDao;
-	
+
+	@CachePut(key = "'ele_code-'+#element.ele_code")
 	@Override
 	public Element save(Element element) {
 		return this.elementDao.save(element);
@@ -38,15 +45,17 @@ public class ElementServiceImpl implements IElementService {
 		return this.elementDao.get(id);
 	}
 
+	@CacheEvict(allEntries = true)
 	@Override
 	public void delete(Long id) {
 		this.elementDao.remove(id);
 	}
 
+	@CacheEvict(allEntries = true)
 	@Override
 	public void batchDelete(List<Long> ids) {
 		for (Long id : ids) {
-			delete(id);
+			this.elementDao.remove(id);
 		}
 	}
 
@@ -63,6 +72,7 @@ public class ElementServiceImpl implements IElementService {
 		return elementDao.list(properties);
 	}
 
+	@CachePut(key = "'ele_code-'+#element.ele_code")
 	@Override
 	public Element update(Element element) {
 		return this.elementDao.update(element);
@@ -78,6 +88,7 @@ public class ElementServiceImpl implements IElementService {
 	}
 
 
+	@Cacheable(key = "#propertyName+'-'+#value")
 	@Override
 	public Element getObjByProperty(String construct, String propertyName,
 			Object value) {

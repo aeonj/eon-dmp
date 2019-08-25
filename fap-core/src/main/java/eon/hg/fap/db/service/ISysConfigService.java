@@ -9,7 +9,7 @@ public interface ISysConfigService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(SysConfig instance);
+	SysConfig save(SysConfig instance);
 	
 	/**
 	 * 删除一个SysConfig
@@ -17,17 +17,12 @@ public interface ISysConfigService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 			
 	/**
 	 * 更新一个SysConfig
-	 * 
-	 * @param id
-	 *            需要更新的SysConfig的id
-	 * @param dir
-	 *            需要更新的SysConfig
 	 */
-	boolean update(SysConfig instance);
+	SysConfig update(SysConfig instance);
 	
 	/**
 	 * 

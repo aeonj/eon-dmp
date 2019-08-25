@@ -1,6 +1,7 @@
 package eon.hg.fap.db.service.impl;
 
 import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.core.cache.AbstractCacheOperator;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.query.support.IPageList;
@@ -23,7 +24,7 @@ import java.util.Map;
 
 @Service
 @Transactional
-public class UserConfigServiceImpl implements IUserConfigService {
+public class UserConfigServiceImpl extends AbstractCacheOperator implements IUserConfigService {
 	@Resource
 	private UserConfigDao userConfigDao;
 	@Resource
@@ -97,18 +98,44 @@ public class UserConfigServiceImpl implements IUserConfigService {
 		OnlineUser u = SecurityUserHolder.getOnlineUser();
 		UserConfig config = null;
 		if (u != null) {
-			User user = this.userDAO.get(CommUtil.null2Long(u.getUserid()));
-			if (user != null) {
-				config = user.getConfig();
-				if (config==null) {
-					config = new UserConfig();
-					config.setUser_id(user.getId());
-					config.setAddTime(new Date());
-					config.setTheme(Globals.DEFAULT_THEME);
-					config.setLayout(AeonConstants.APP_LAYOUT_CLASSIC);
-					this.save(config);
-					user.setConfig(config);
-				}
+			try {
+				config = getCache(u.getUserid());
+			} catch (Exception e) {
+				config = getObject(u.getUserid());
+			}
+
+		} else {
+			config = new UserConfig();
+			config.setTheme(Globals.DEFAULT_THEME);
+			config.setLayout(AeonConstants.APP_LAYOUT_CLASSIC);
+		}
+		return config;
+	}
+
+	@Override
+	public String getCacheId(Object... params) {
+		return "user_config";
+	}
+
+	@Override
+	public String getKey(Object... params) {
+		return CommUtil.null2String(params[0]);
+	}
+
+	@Override
+	public UserConfig getObject(Object... params) {
+		UserConfig config;
+		User user = this.userDAO.get(CommUtil.null2Long(params[0]));
+		if (user != null) {
+			config = user.getConfig();
+			if (config==null) {
+				config = new UserConfig();
+				config.setUser_id(user.getId());
+				config.setAddTime(new Date());
+				config.setTheme(Globals.DEFAULT_THEME);
+				config.setLayout(AeonConstants.APP_LAYOUT_CLASSIC);
+				this.save(config);
+				user.setConfig(config);
 			}
 		} else {
 			config = new UserConfig();
@@ -117,5 +144,4 @@ public class UserConfigServiceImpl implements IUserConfigService {
 		}
 		return config;
 	}
-	
 }

@@ -1,5 +1,6 @@
 package eon.hg.fap.db.service.impl;
 
+import eon.hg.fap.core.cache.AbstractCacheOperator;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.db.dao.primary.SysConfigDao;
 import eon.hg.fap.db.model.primary.Accessory;
@@ -13,23 +14,15 @@ import java.util.List;
 
 @Service
 @Transactional
-public class SysConfigServiceImpl implements ISysConfigService {
+public class SysConfigServiceImpl extends AbstractCacheOperator implements ISysConfigService {
 	@Resource
 	private SysConfigDao sysConfigDao;
-	
-	public boolean save(SysConfig sysConfig) {
-		/**
-		 * init other field here
-		 */
-		try {
-			this.sysConfigDao.save(sysConfig);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+
+	public SysConfig save(SysConfig sysConfig) {
+		this.reset();
+		return this.sysConfigDao.save(sysConfig);
 	}
-	
+
 	public SysConfig getObjById(Long id) {
 		SysConfig sysConfig = this.sysConfigDao.get(id);
 		if (sysConfig != null) {
@@ -37,24 +30,40 @@ public class SysConfigServiceImpl implements ISysConfigService {
 		}
 		return null;
 	}
-	
-	public boolean delete(Long id) {
-		return false;
+
+	public void delete(Long id) {
+		this.reset();
+		this.sysConfigDao.remove(id);
 	}
-	
-	public boolean update(SysConfig sysConfig) {
-		try {
-			this.sysConfigDao.update( sysConfig);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}	
+
+	public SysConfig update(SysConfig sysConfig) {
+		this.reset();
+		return this.sysConfigDao.update( sysConfig);
+	}
 	
 	@Transactional(readOnly = true)
 	public SysConfig getSysConfig() {
-		List<SysConfig> configs = this.sysConfigDao.query("select obj from SysConfig obj", null, -1, -1);
+		try {
+			SysConfig sc = this.getCache();
+			return sc;
+		} catch (Exception e) {
+			return getObject();
+		}
+	}
+
+	@Override
+	public String getCacheId(Object... params) {
+		return "sys_config";
+	}
+
+	@Override
+	public String getKey(Object... params) {
+		return "config";
+	}
+
+	@Override
+	public SysConfig getObject(Object... params) {
+		List<SysConfig> configs = this.sysConfigDao.findAll();
 		if (configs != null && configs.size() > 0) {
 			SysConfig sc = configs.get(0);
 			if (sc.getUploadFilePath() == null) {
@@ -144,5 +153,4 @@ public class SysConfigServiceImpl implements ISysConfigService {
 			return sc;
 		}
 	}
-
 }

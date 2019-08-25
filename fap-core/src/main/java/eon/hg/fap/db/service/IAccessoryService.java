@@ -15,7 +15,7 @@ public interface IAccessoryService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(Accessory instance);
+	Accessory save(Accessory instance);
 	
 	/**
 	 * 根据一个ID得到Accessory
@@ -31,7 +31,7 @@ public interface IAccessoryService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 	
 	/**
 	 * 批量删除Accessory
@@ -39,7 +39,7 @@ public interface IAccessoryService {
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
+	void batchDelete(List<Long> ids);
 	
 	/**
 	 * 通过一个查询对象得到Accessory
@@ -55,7 +55,7 @@ public interface IAccessoryService {
 	 * @param instance
 	 *            需要更新的Accessory
 	 */
-	boolean update(Accessory instance);
+	Accessory update(Accessory instance);
 	
 	/**
 	 * 

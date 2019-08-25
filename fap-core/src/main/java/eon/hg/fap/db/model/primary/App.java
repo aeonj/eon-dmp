@@ -2,8 +2,6 @@ package eon.hg.fap.db.model.primary;
 
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -14,7 +12,6 @@ import java.util.Date;
  * @author AEON
  *
  */
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Entity
 @Table(name = Globals.SYS_TABLE_SUFFIX + "app")
 public class App extends IdEntity implements Comparable<App> {

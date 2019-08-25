@@ -1,12 +1,17 @@
 package eon.hg.fap.db.service.impl;
 
 import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.db.dao.primary.AccessoryDao;
 import eon.hg.fap.db.model.primary.Accessory;
 import eon.hg.fap.db.service.IAccessoryService;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,62 +25,40 @@ import java.util.Map;
 
 @Service
 @Transactional
+@CacheConfig(cacheNames = Globals.DEFAULT_TABLE_SUFFIX+"accessory")
 public class AccessoryServiceImpl implements IAccessoryService {
 	@Resource
 	private AccessoryDao accessoryDao;
-	
-	public boolean save(Accessory accessory) {
-		/**
-		 * init other field here
-		 */
-		try {
-			this.accessoryDao.save(accessory);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+
+	@CachePut(key = "#accessory.id")
+	public Accessory save(Accessory accessory) {
+		return this.accessoryDao.save(accessory);
 	}
-	
+
+	@Cacheable(key = "#id")
 	public Accessory getObjById(Long id) {
-		Accessory accessory = this.accessoryDao.get(id);
-		if (accessory != null) {
-			return accessory;
-		}
-		return null;
+		return this.accessoryDao.get(id);
 	}
-	
-	public boolean delete(Long id) {
-		try {
-			this.accessoryDao.remove(id);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+
+	@CacheEvict(key = "#id")
+	public void delete(Long id) {
+		this.accessoryDao.remove(id);
 	}
-	
-	public boolean batchDelete(List<Long> accessoryIds) {
-		// TODO Auto-generated method stub
+
+	public void batchDelete(List<Long> accessoryIds) {
 		for (Serializable id : accessoryIds) {
 			delete((Long) id);
 		}
-		return true;
 	}
 	
 	public IPageList list(IQueryObject properties) {
 		return accessoryDao.list(properties);
 	}
-	
-	public boolean update(Accessory accessory) {
-		try {
-			this.accessoryDao.update( accessory);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}	
+
+	@CachePut(key = "#accessory.id")
+	public Accessory update(Accessory accessory) {
+		return this.accessoryDao.update( accessory);
+	}
 	public List<Accessory> query(String query, Map params, int begin, int max){
 		return this.accessoryDao.query(query, params, begin, max);
 		

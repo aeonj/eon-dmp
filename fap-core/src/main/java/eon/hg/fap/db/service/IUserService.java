@@ -14,7 +14,7 @@ public interface IUserService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(User instance);
+	User save(User instance);
 	
 	/**
 	 * 根据一个ID得到User
@@ -30,7 +30,7 @@ public interface IUserService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 	
 	/**
 	 * 批量删除User
@@ -38,7 +38,7 @@ public interface IUserService {
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
+	void batchDelete(List<Long> ids);
 	
 	/**
 	 * 通过一个查询对象得到User
@@ -52,7 +52,7 @@ public interface IUserService {
 	 * 更新一个User
 	 * 
 	 */
-	boolean update(User instance);
+	User update(User instance);
 	
 	/**
 	 * 

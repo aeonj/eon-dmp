@@ -9,6 +9,7 @@ package eon.hg.fap.db.model.primary;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 
@@ -19,6 +20,7 @@ import javax.persistence.*;
  */
 @Data
 @Entity
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = Globals.SYS_TABLE_SUFFIX + "userconfig")
 public class UserConfig extends IdEntity {
 	private static final long serialVersionUID = -6619413529532587073L;

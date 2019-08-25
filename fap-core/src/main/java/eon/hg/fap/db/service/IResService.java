@@ -12,7 +12,7 @@ public interface IResService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(Res instance);
+	Res save(Res instance);
 	
 	/**
 	 * 根据一个ID得到Res
@@ -28,7 +28,7 @@ public interface IResService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 	
 	/**
 	 * 批量删除Res
@@ -36,7 +36,7 @@ public interface IResService {
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
+	void batchDelete(List<Long> ids);
 	
 	/**
 	 * 更新一个Res
@@ -44,7 +44,7 @@ public interface IResService {
 	 * @param instance
 	 *            需要更新的Res
 	 */
-	boolean update(Res instance);
+	Res update(Res instance);
 	
 	/**
 	 * 

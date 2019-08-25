@@ -14,6 +14,7 @@ import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
 import lombok.ToString;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +30,7 @@ import java.util.*;
 @Data
 @ToString
 @Entity
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = Globals.SYS_TABLE_SUFFIX + "user")
 public class User extends IdEntity implements UserDetails {
 	private static final long serialVersionUID = -6076365663342941338L;

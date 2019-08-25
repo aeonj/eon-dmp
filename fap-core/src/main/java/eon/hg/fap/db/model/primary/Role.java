@@ -9,6 +9,7 @@ package eon.hg.fap.db.model.primary;
 import eon.hg.fap.core.annotation.Lock;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.TreeSet;
  *
  */
 @Entity
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = Globals.SYS_TABLE_SUFFIX + "role")
 public class Role extends IdEntity implements Comparable<Role>{
 	private static final long serialVersionUID = -2875185344092083475L;

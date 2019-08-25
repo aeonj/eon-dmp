@@ -25,6 +25,14 @@ spring:
           auto: update
         format_sql: true
         enable_lazy_load_no_trans: false     #支持全局实体的懒加载，但开销很大
+        cache:
+          use_query_cache: true
+          use_second_level_cache: true
+          provider_configuration_file_resource_path: ehcache.xml
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+  cache:
+    type: ehcache
   redis:
     database: 0
     host: localhost
