@@ -34,6 +34,8 @@ public class QueryObject implements IQueryObject {
 
 	protected String nativeSql;   //原生sql语句
 
+	protected boolean isAllSql;    //是否全sql，包括条件也是sql
+
 	public String getConstruct() {
 		return construct;
 	}
@@ -103,6 +105,11 @@ public class QueryObject implements IQueryObject {
 	@Override
 	public String getNativeSql() {
 		return nativeSql;
+	}
+
+	@Override
+	public boolean isAllSql() {
+		return isAllSql;
 	}
 
 	/**
@@ -250,7 +257,11 @@ public class QueryObject implements IQueryObject {
 	 * @return
 	 */
 	public static QueryObject SqlCreate(String nativeSql) {
-		return SqlCreate(nativeSql,null);
+		return SqlCreate(nativeSql,true);
+	}
+
+	public static QueryObject SqlCreate(String nativeSql, boolean isAllSql) {
+		return SqlCreate(nativeSql,null, isAllSql);
 	}
 	/**
 	 * 创建原生sql查询实例
@@ -259,11 +270,16 @@ public class QueryObject implements IQueryObject {
 	 * @return
 	 */
 	public static QueryObject SqlCreate(String nativeSql, Map params) {
+		return SqlCreate(nativeSql, params, true);
+	}
+
+	public static QueryObject SqlCreate(String nativeSql, Map params, boolean isAllSql) {
 		QueryObject qo = new QueryObject();
 		qo.nativeSql = nativeSql;
 		if (params!=null) {
 			qo.params = params;
 		}
+		qo.isAllSql=isAllSql;
 		return qo;
 	}
 

@@ -14,7 +14,7 @@ public interface IRoleOperateService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(RoleOperate instance);
+	RoleOperate save(RoleOperate instance);
 	
 	/**
 	 * 根据一个ID得到RoleOperate
@@ -30,15 +30,23 @@ public interface IRoleOperateService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 	
+	/**
+	 * 删除一个RoleOperate
+	 *
+	 * @param ro
+	 * @return
+	 */
+	void delete(RoleOperate ro);
+
 	/**
 	 * 批量删除RoleOperate
 	 * 
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
+	void batchDelete(List<Long> ids);
 	
 	/**
 	 * 批量删除RoleOperate
@@ -46,7 +54,7 @@ public interface IRoleOperateService {
 	 * @param mulIds
 	 * @return
 	 */
-	boolean batchDelete(String mulIds);
+	void batchDelete(String mulIds);
 	
 	/**
 	 * 通过一个查询对象得到RoleOperate
@@ -59,12 +67,10 @@ public interface IRoleOperateService {
 	/**
 	 * 更新一个RoleOperate
 	 * 
-	 * @param id
-	 *            需要更新的RoleOperate的id
-	 * @param dir
+	 * @param instance
 	 *            需要更新的RoleOperate
 	 */
-	boolean update(RoleOperate instance);
+	RoleOperate update(RoleOperate instance);
 	
 	/**
 	 * 
@@ -78,7 +84,7 @@ public interface IRoleOperateService {
 	
 	/**
 	 * 
-	 * @param qo
+	 * @param properties
 	 * @return
 	 */
 	List<RoleOperate> find(IQueryObject properties);

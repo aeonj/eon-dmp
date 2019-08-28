@@ -52,14 +52,14 @@ public class GenericQuery implements IQuery {
 	 * 根据查询条件查询对应区间的结果值，返回结果数据集合List
 	 */
 	public List getResult(String sql) {
-		return this.dao.findDtoBySql(sql, this.params);
+		return this.dao.findDtoBySql(sql, this.params, begin, max);
 	}
 
 	/**
 	 * 根据查询条件查询结果总数，使用count(obj.id)来完成，该方法仅仅用在计算分页信息
 	 */
 	public int getRows(String sql) {
-		List<Map> ret = dao.findBySql(sql, this.params, 0, 0);
+		List<Map> ret = dao.findDtoBySql(sql, this.params);
 		if (ret != null && ret.size() > 0) {
 			return CommUtil.null2Int(ret.get(0).get("count_num"));
 		} else {

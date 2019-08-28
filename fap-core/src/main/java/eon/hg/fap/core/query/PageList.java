@@ -1,5 +1,6 @@
 package eon.hg.fap.core.query;
 
+import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import eon.hg.fap.core.query.support.IPageList;
@@ -99,7 +100,8 @@ public class PageList implements IPageList {
 				condition = " obj.is_deleted=0 and " + condition;
 			}
 		}
-		int total = query.getRows(totalSQL + " where " + condition);
+		condition = StrUtil.isBlank(condition) ? "" : " where " + condition;
+		int total = query.getRows(totalSQL + condition);
 		// System.out.println("query:" + queryHQL + ";total:" + total);
 		if (total > 0) {
 			this.rowCount = total;
@@ -112,7 +114,7 @@ public class PageList implements IPageList {
 				query.setFirstResult((intPageNo - 1) * pageSize);
 				query.setMaxResults(pageSize);
 			}
-			rs = query.getResult(querySql + " where " + condition);
+			rs = query.getResult(querySql + condition);
 		}
 		if (rs != null)
 			result = rs;

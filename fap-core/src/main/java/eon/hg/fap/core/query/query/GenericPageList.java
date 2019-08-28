@@ -19,13 +19,16 @@ public class GenericPageList extends PageList {
 
     protected String scope;
 
+    protected boolean isAllSql;
+
     public GenericPageList(IQueryObject queryObject, GenericRepository dao) {
-        this(queryObject.getNativeSql(), queryObject.getQuery(), queryObject.getParameters(), dao);
+        this(queryObject.getNativeSql(), queryObject.getQuery(), queryObject.getParameters(), queryObject.isAllSql(), dao);
     }
 
-    public GenericPageList(String genericSql, String scope, Map params, GenericRepository dao) {
+    public GenericPageList(String genericSql, String scope, Map params, boolean isAllSql, GenericRepository dao) {
         this.genericSql = genericSql;
         this.scope = scope;
+        this.isAllSql = isAllSql;
         IQuery query = new GenericQuery(dao);
         query.setParaValues(params);
         this.setQuery(query);
@@ -39,31 +42,44 @@ public class GenericPageList extends PageList {
      */
     public void doList(int currentPage, int pageSize) {
         String querySql;
-        int iWhere = StrUtil.indexOfIgnoreCase(genericSql, " where ");
-        if (iWhere >= 0) {
-            querySql = genericSql.substring(0, iWhere);
-            int iOrder = StrUtil.indexOfIgnoreCase(genericSql, " order by ");
-            if (iOrder >= 0) {
-                String sWhere = genericSql.substring(iWhere + 7, iOrder);
-                String sOrder = genericSql.substring(iOrder);
-                this.scope = sWhere + " and " + this.scope + sOrder;
-            } else {
-                this.scope = genericSql.substring(iWhere + 7) + " and "+this.scope;
-            }
-        } else {
+        if (isAllSql) {
             int iOrder = StrUtil.indexOfIgnoreCase(genericSql, " order by ");
             if (iOrder >= 0) {
                 querySql = genericSql.substring(0, iOrder);
-                String sOrder = genericSql.substring(iOrder);
-                this.scope = this.scope + sOrder;
             } else {
                 querySql = genericSql;
             }
+            int iFrom = StrUtil.indexOfIgnoreCase(querySql, " from ");
+            String sFromSql = querySql.substring(iFrom);
+            String totalSql = "select count(1) as count_num " + sFromSql;
+            super.doList(pageSize, currentPage, genericSql, totalSql, "");
+        } else {
+            int iWhere = StrUtil.lastIndexOfIgnoreCase(genericSql, " where ");
+            if (iWhere >= 0) {
+                querySql = genericSql.substring(0, iWhere);
+                int iOrder = StrUtil.indexOfIgnoreCase(genericSql, " order by ");
+                if (iOrder >= 0) {
+                    String sWhere = genericSql.substring(iWhere + 7, iOrder);
+                    String sOrder = genericSql.substring(iOrder);
+                    this.scope = sWhere + " and " + this.scope + sOrder;
+                } else {
+                    this.scope = genericSql.substring(iWhere + 7) + " and " + this.scope;
+                }
+            } else {
+                int iOrder = StrUtil.indexOfIgnoreCase(genericSql, " order by ");
+                if (iOrder >= 0) {
+                    querySql = genericSql.substring(0, iOrder);
+                    String sOrder = genericSql.substring(iOrder);
+                    this.scope = this.scope + sOrder;
+                } else {
+                    querySql = genericSql;
+                }
+            }
+            int iFrom = StrUtil.indexOfIgnoreCase(querySql, " from ");
+            String sFromSql = querySql.substring(iFrom);
+            String totalSql = "select count(1) as count_num " + sFromSql;
+            super.doList(pageSize, currentPage, querySql, totalSql, this.scope);
         }
-        int iFrom = StrUtil.indexOfIgnoreCase(querySql, " from ");
-        String sFromSql = querySql.substring(iFrom);
-        String totalSql = "select count(1) as count_num " + sFromSql;
-        super.doList(pageSize, currentPage, querySql, totalSql, this.scope);
     }
 
 }

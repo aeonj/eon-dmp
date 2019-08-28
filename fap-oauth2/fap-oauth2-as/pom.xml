@@ -38,7 +38,7 @@
                 <configuration>
                     <fork>true</fork>
                     <classifier>exec</classifier>
-                    <mainClass>eon.hg.FapOauth2Application</mainClass>
+                    <mainClass>eon.hg.fap.FapOauth2Application</mainClass>
                     <addResources>true</addResources>
                 </configuration>
                 <executions>

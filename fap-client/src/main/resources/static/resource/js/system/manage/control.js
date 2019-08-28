@@ -131,7 +131,8 @@ Ext.define('Ext.vcf.AssistTree', {
                 root: {
                     id: '0',
                     text: this.treeRootText,
-                    expanded: true
+                    expanded: true,
+                    checked: treeobj.selectModel == 'multiple' ? false : null
                 },
                 proxy: {
                     type: 'ajax',

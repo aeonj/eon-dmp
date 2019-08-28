@@ -19,17 +19,8 @@ public class RoleOperateServiceImpl implements IRoleOperateService {
 	@Resource
 	private RoleOperateDao roleOperateDao;
 	
-	public boolean save(RoleOperate roleOperate) {
-		/**
-		 * init other field here
-		 */
-		try {
-			this.roleOperateDao.save(roleOperate);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public RoleOperate save(RoleOperate roleOperate) {
+		return this.roleOperateDao.save(roleOperate);
 	}
 	
 	public RoleOperate getObjById(Long id) {
@@ -40,31 +31,26 @@ public class RoleOperateServiceImpl implements IRoleOperateService {
 		return null;
 	}
 	
-	public boolean delete(Long id) {
-		try {
-			this.roleOperateDao.remove(id);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public void delete(Long id) {
+		this.roleOperateDao.remove(id);
 	}
 	
-	public boolean batchDelete(List<Long> roleOperateIds) {
-		// TODO Auto-generated method stub
+	public void delete(RoleOperate ro) {
+		this.roleOperateDao.remove(ro);
+	}
+
+	public void batchDelete(List<Long> roleOperateIds) {
 		for (Serializable id : roleOperateIds) {
 			delete((Long) id);
 		}
-		return true;
 	}
 	
 	@Override
-	public boolean batchDelete(String mulIds) {
+	public void batchDelete(String mulIds) {
 		String[] ids = mulIds.split(",");
 		for (String id : ids) {
 			delete(Long.parseLong(id));
 		}
-		return true;
 	}
 
 	public IPageList list(IQueryObject properties) {
@@ -81,15 +67,9 @@ public class RoleOperateServiceImpl implements IRoleOperateService {
 		return this.roleOperateDao.find(construct, query, params, -1, -1);
 	}
 	
-	public boolean update(RoleOperate roleOperate) {
-		try {
-			this.roleOperateDao.update( roleOperate);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}	
+	public RoleOperate update(RoleOperate roleOperate) {
+		return this.roleOperateDao.update( roleOperate);
+	}
 	public List<RoleOperate> query(String query, Map params, int begin, int max){
 		return this.roleOperateDao.query(query, params, begin, max);
 		

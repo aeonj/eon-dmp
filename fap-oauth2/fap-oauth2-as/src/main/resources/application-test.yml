@@ -36,16 +36,6 @@ spring:
         max-wait: -1ms
         max-idle: 8
         min-idle: 0
-  freemarker:
-    request-context-attribute: req  #req访问request
-    suffix:   #后缀名
-    content-type: text/html
-    enabled: true
-    cache: false #缓存配置
-    template-loader-path: classpath:/ #模板加载路径 按需配置
-    charset: UTF-8 #编码格式
-    settings:
-      number_format: '0.##'   #数字格式化，无小数点
 security:
   oauth2:
     authorization:
@@ -55,7 +45,7 @@ eon:
     security:
       authType: token
       oauth2:
-        storeType: jdbc         #TokenStore存储类别：jdbc,redis,jwt
+        storeType: jwt         #TokenStore存储类别：jdbc,redis,jwt
     async:
       corePoolSize : 10
       maxPoolSize : 200

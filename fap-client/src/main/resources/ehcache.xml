@@ -35,7 +35,7 @@
            memoryStoreEvictionPolicy="LRU"/>
 
     <cache name="hg_element"
-           maxEntriesLocalHeap="10000"
+           maxEntriesLocalHeap="30"
            eternal="false"
            timeToIdleSeconds="300"
            timeToLiveSeconds="0"

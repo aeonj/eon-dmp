@@ -111,4 +111,6 @@ public interface IQueryObject {
 	 */
 	String getNativeSql();
 
+	boolean isAllSql();
+
 }
