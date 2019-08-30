@@ -38,6 +38,9 @@ public class HttpInclude {
 		// System.out.println(new Date()+"加载"+includePath);
 		StringWriter sw = new StringWriter(8192);
 		String[] path = StrUtil.split(jsPath,":");
+		if (StrUtil.contains(path[0],'.')) {
+			path[0] = StrUtil.replace(path[0],".","/");
+		}
 		include("/manage/jsload.htm?name="+path[0]+"/js/"+path[1], sw);
 		return sw.toString();
 	}
