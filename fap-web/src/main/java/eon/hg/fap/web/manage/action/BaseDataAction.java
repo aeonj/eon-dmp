@@ -11,6 +11,7 @@ import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.model.mapper.BaseData;
 import eon.hg.fap.db.model.primary.Element;
 import eon.hg.fap.db.service.IBaseDataService;
+import eon.hg.fap.db.service.IBaseTreeService;
 import eon.hg.fap.db.service.ISysConfigService;
 import eon.hg.fap.db.service.IUserConfigService;
 import eon.hg.fap.security.annotation.SecurityMapping;
@@ -18,6 +19,7 @@ import eon.hg.fap.web.manage.op.ElementOP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -36,6 +38,8 @@ public class BaseDataAction {
     private IUserConfigService userConfigService;
     @Autowired
     private IBaseDataService baseDataService;
+    @Autowired
+    private IBaseTreeService baseTreeService;
     @Autowired
     private ElementOP elementOP;
 
@@ -130,4 +134,11 @@ public class BaseDataAction {
             return ResultBody.failed("要素类名未定义");
         }
     }
+
+    @RequestMapping("/basedata_sync_memory.htm")
+    public @ResponseBody void basedata_sync_memory() {
+        this.baseTreeService.reset();
+    }
+
+
 }

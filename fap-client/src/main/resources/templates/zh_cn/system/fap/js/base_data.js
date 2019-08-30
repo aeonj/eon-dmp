@@ -434,6 +434,21 @@ Ext.onReady(function () {
             handler: function () {
                 importWindow.show();
             }
+        }, '-', {
+            text : '缓存同步',
+            iconCls : 'arrow_refreshIcon',
+            hidden : b_elecode!=''?true:false,
+            handler : function() {
+                Ext.Ajax.request({
+                    url : 'basedata_sync_memory.htm',
+                    success : function(response) {
+                        Ext.Msg.alert('提示', '缓存同步成功');
+                    },
+                    failure : function(response) {
+                        Ext.Msg.alert('提示', '缓存同步失败:'+response.responseText);
+                    }
+                });
+            }
         }, '->', new Ext.form.TextField({
             id: 'queryParam',
             name: 'queryParam',
