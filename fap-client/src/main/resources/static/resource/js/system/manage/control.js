@@ -582,7 +582,6 @@ Ext.define('Ext.vcf.treefield', {
     ],
     triggerCls: Ext.baseCSSPrefix + 'form-arrow-trigger',
     url : '/manage/ele_chk_tree.htm',
-    fieldLabel : '下拉树',
     treeRootText : '全部',
     source : '',
     condition : '',
