@@ -172,19 +172,13 @@ public class WebHandler {
                             wrapper.registerCustomEditor(property
                                     .getPropertyType(), new IdEntityEditor(
                                     property.getPropertyType()));
-                            propertyValue = map.get(key);
+                            propertyValue = Convert.toLong(map.get(key));
                         } else {
                             try {
-                                propertyValue = map.get(key);
+                                propertyValue = Convert.convert(property.getPropertyType(),map.get(key));
                             } catch (Exception e) {
-                                if (property.getPropertyType().toString()
-                                        .equals("int")) {
-                                    propertyValue = 0;
-                                }
-                                if (property.getPropertyType().toString()
-                                        .toLowerCase().indexOf("boolean") >= 0) {
-                                    propertyValue = false;
-                                }
+                                log.error("复制属性：" + property.getName()+"未成功");
+                                continue;
                             }
                         }
                         log.debug("复制值：" + propertyValue + ",复制到：" + property.getName());
