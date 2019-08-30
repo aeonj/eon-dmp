@@ -653,7 +653,7 @@ public class UIManageAction extends BizAction {
 
     @RequestMapping("/ui_sync_memory.htm")
     public @ResponseBody void ui_sync_memory() {
-        this.uiManagerService.reset();
+        this.baseUIService.reset();
     }
 
 }
