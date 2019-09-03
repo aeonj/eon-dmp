@@ -47,7 +47,7 @@ function assist_ztree(compid,config,sets) {
             },
 			async: {
 				enable: true,
-				url: config.url || (typeof webContext=='undefined' ? "/dns/manage/ele_chk_tree.htm" : webContext+"/manage/ele_chk_tree.htm"),
+				url: config.url || "/manage/ele_chk_tree.htm",
 				autoParam: ["id=node"],
 				otherParam: otherParam
 			},

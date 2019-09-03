@@ -70,7 +70,7 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                 dto.remove("permission");
                 dto.remove("relations");
                 if (CommUtil.isNotEmpty(dto.getString("source"))) {
-                    Element ele = this.elementDAO.getBy("ele_code",dto.getString("source"));
+                    Element ele = this.elementDAO.getOne("ele_code",dto.getString("source"));
                     dto.put("table_name",ele.getEle_source());
                     if (CommUtil.isNotEmpty(dto.get("ispermission")) && dto.getBoolean("ispermission")) {
                         dto.put("permission", getPermissionSql(dto));
@@ -176,7 +176,7 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                         existsSqlCondition = true;
                         Dto dtoRm = lst.get(0);
                         if (System.getProperty("aeonDao.db").equals("oracle")) {
-                            Element ele = this.elementDAO.getBy("ele_code",dto.getString("source"));
+                            Element ele = this.elementDAO.getOne("ele_code",dto.getString("source"));
                             String table_name = ele.getEle_source();
                             sql += "and e.chr_id in (select et.chr_id from " + table_name + " et connect by prior et.parent_id=et.chr_id\n" +
                                     " start with et.chr_id in (select r.sec_ele_value from ea_relations r where r.relation_id='" + Convert.toStr(dtoRm.get("relation_id")) +

@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -20,54 +19,24 @@ public class EnumerateServiceImpl implements IEnumerateService {
 	@Resource
 	private EnumerateDao enumerateDao;
 	
-	public boolean save(Enumerate enumerate) {
-		/**
-		 * init other field here
-		 */
-		try {
-			this.enumerateDao.save(enumerate);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public Enumerate save(Enumerate enumerate) {
+		return this.enumerateDao.save(enumerate);
 	}
 	
 	public Enumerate getObjById(Long id) {
-		Enumerate enumerate = this.enumerateDao.get(id);
-		if (enumerate != null) {
-			return enumerate;
-		}
-		return null;
+		return this.enumerateDao.get(id);
 	}
 	
-	public boolean delete(Long id) {
-		try {
+	public void delete(Long id) {
+		this.enumerateDao.remove(id);
+	}
+	
+	public void batchDelete(List<Long> enumerateIds) {
+		for (Long id : enumerateIds) {
 			this.enumerateDao.remove(id);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
 		}
 	}
 	
-	public boolean batchDelete(List<Long> enumerateIds) {
-		// TODO Auto-generated method stub
-		for (Serializable id : enumerateIds) {
-			delete((Long) id);
-		}
-		return true;
-	}
-	
-	@Override
-	public boolean batchDelete(String mulIds) {
-		String[] ids = mulIds.split(",");
-		for (String id : ids) {
-			delete(Long.parseLong(id));
-		}
-		return true;
-	}
-
 	public IPageList list(IQueryObject properties) {
 		return enumerateDao.list(properties);
 	}
@@ -82,15 +51,9 @@ public class EnumerateServiceImpl implements IEnumerateService {
 		return this.enumerateDao.find(construct, query, params, -1, -1);
 	}
 	
-	public boolean update(Enumerate enumerate) {
-		try {
-			this.enumerateDao.update( enumerate);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}	
+	public Enumerate update(Enumerate enumerate) {
+		return this.enumerateDao.update( enumerate);
+	}
 	public List<Enumerate> query(String query, Map params, int begin, int max){
 		return this.enumerateDao.query(query, params, begin, max);
 		

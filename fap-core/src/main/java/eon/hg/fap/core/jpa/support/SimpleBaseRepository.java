@@ -4,8 +4,8 @@ import cn.hutool.core.convert.Convert;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.jpa.BaseRepository;
-import eon.hg.fap.core.query.query.BasePageList;
 import eon.hg.fap.core.query.PageObject;
+import eon.hg.fap.core.query.query.BasePageList;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
@@ -16,7 +16,6 @@ import org.springframework.data.jpa.repository.support.JpaEntityInformationSuppo
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -64,19 +63,36 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
     }
 
     @Override
-    public T getBy(String propertyName, Object value) {
+    public T getOne(Object... properties) {
         Specification<T> sf = (Root<T> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
             Predicate finalConditions = criteriaBuilder.conjunction();
             if (CommUtil.isExistsAttr(getDomainClass(),"rg_code")) {
                 finalConditions = criteriaBuilder.and(finalConditions, criteriaBuilder.equal(root.get("rg_code"),SecurityUserHolder.getRgCode()));
             }
-            if (StringUtils.isEmpty(propertyName) || value==null) {
+            if (properties.length % 2!=0) {
                 return null;
             }
-            finalConditions = criteriaBuilder.and(finalConditions, criteriaBuilder.equal(root.get(propertyName),value));
+            for (int i=0; i<properties.length; i++) {
+                if (CommUtil.isEmpty(properties[i])) {
+                    return null;
+                }
+                String propertyName = CommUtil.null2String(properties[i]);
+                i++;
+                Object propertyValue = properties[i];
+                if (propertyValue==null) {
+                    finalConditions = criteriaBuilder.and(finalConditions, criteriaBuilder.isNull(root.get(propertyName)));
+                } else {
+                    finalConditions = criteriaBuilder.and(finalConditions, criteriaBuilder.equal(root.get(propertyName), propertyValue));
+                }
+            }
             return finalConditions;
         };
-        return this.findOne(sf).get();
+        Optional<T> optional = this.findOne(sf);
+        if (optional.isPresent()) {
+            return optional.get();
+        } else {
+            return null;
+        }
     }
 
     @Override

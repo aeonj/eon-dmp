@@ -19,7 +19,7 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
      */
     T get(ID id);
 
-    T getBy(String propertyName, Object value) ;
+    T getOne(Object... properties) ;
 
     T getBy(String construct, String propertyName, Object value) ;
 

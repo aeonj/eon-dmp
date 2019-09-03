@@ -284,6 +284,7 @@ public class ElementOP {
 	}
 	
 	private void setCheckTreeList(List<Dto> lst,List<String> checkids) {
+		if (lst==null) return;
 		for (Dto dto : lst) {
 			if (checkids!=null) {
 				dto.put("checked", checkids.contains(dto.getString("id")));
@@ -353,7 +354,9 @@ public class ElementOP {
 		} else {
 			dto.put("text", code+" "+bd.getName());
 		}
-		dto.put("children", bd.getChild());
+		if (bd.getChild()!=null && bd.getChild().size()>0) {
+			dto.put("children", bd.getChild());
+		}
 		if (isfulldata) {
 			WebHandler.toMap(bd, dto);
 		}
@@ -462,7 +465,7 @@ public class ElementOP {
 			List innerList = rn.getList("children");
 			rn.put("checked", false);
 			//判断是否已选
-			if (innerList.size()==0) {
+			if (innerList==null || innerList.size()==0) {
 				if (IsCheckedInIds(rn,Ids)) {
 					isChecked = true;
 					rn.put("checked", true);

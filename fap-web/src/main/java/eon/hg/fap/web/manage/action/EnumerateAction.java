@@ -1,11 +1,11 @@
 package eon.hg.fap.web.manage.action;
 
+import eon.hg.fap.core.body.PageBody;
 import eon.hg.fap.core.body.ResultBody;
 import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.query.support.IPageList;
-import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.model.primary.Enumerate;
 import eon.hg.fap.db.service.IEnumerateService;
@@ -46,12 +46,12 @@ public class EnumerateAction {
 
     @SecurityMapping("enumerate:view")
     @RequestMapping("/enumerate_list.htm")
-    public String element_list(int page, int limit) {
+    public PageBody element_list(int page, int limit) {
         QueryObject qo = new QueryObject("field,sortno", "asc");
         qo.setCurrentPage(page);
         qo.setPageSize(limit);
         IPageList list = this.enumerateService.list(qo);
-        return JsonHandler.toPageJson(list);
+        return PageBody.success().addPageInfo(list);
     }
 
     @SecurityMapping(title = "枚举值新增", value = "enumerate:insert")

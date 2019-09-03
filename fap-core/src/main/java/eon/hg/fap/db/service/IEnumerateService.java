@@ -14,7 +14,7 @@ public interface IEnumerateService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(Enumerate instance);
+	Enumerate save(Enumerate instance);
 	
 	/**
 	 * 根据一个ID得到Enumerate
@@ -30,7 +30,7 @@ public interface IEnumerateService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 	
 	/**
 	 * 批量删除Enumerate
@@ -38,15 +38,7 @@ public interface IEnumerateService {
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
-	
-	/**
-	 * 批量删除Enumerate
-	 * 
-	 * @param mulIds
-	 * @return
-	 */
-	boolean batchDelete(String mulIds);
+	void batchDelete(List<Long> ids);
 	
 	/**
 	 * 通过一个查询对象得到Enumerate
@@ -62,7 +54,7 @@ public interface IEnumerateService {
 	 * @param instance
 	 *            需要更新的Enumerate
 	 */
-	boolean update(Enumerate instance);
+	Enumerate update(Enumerate instance);
 	
 	/**
 	 * 
@@ -94,6 +86,6 @@ public interface IEnumerateService {
 	 * @param field 对照字段
 	 * @return
 	 */
-	public List<Enumerate> getCodeList(String field) ;
+	List<Enumerate> getCodeList(String field) ;
 
 }

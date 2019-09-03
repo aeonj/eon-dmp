@@ -398,6 +398,11 @@ function unionObj(o1,o2){
     return o;
 }
 
+/**
+ * 树节点对象显示
+ * @param value
+ * @returns {string}
+ */
 function objEntityRender(value) {
     if (value!=null && typeof v == "object") {
         return '<span data-qtip="'+value.code+' '+value.name+'">'+value.name+'</span>';

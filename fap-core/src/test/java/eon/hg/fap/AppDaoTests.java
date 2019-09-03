@@ -26,9 +26,9 @@ public class AppDaoTests {
     @Test
     public void testFindOne() {
         System.out.println(appDAO.findById(Long.valueOf(6)).get().getName());
-        App app= appDAO.get(Long.valueOf(6));
+        App app= appDAO.getOne(Long.valueOf(6));
         System.out.println(app.getName());
-        System.out.println(appDAO.getBy("id",Long.valueOf(6)).getName());
+        System.out.println(appDAO.getOne("id",Long.valueOf(6)).getName());
     }
 
     @Test

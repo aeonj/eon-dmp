@@ -41,7 +41,11 @@ public class PageBody {
     public static PageBody success(Object o) {
         PageBody pageBody = new PageBody(ResultCode.SUCCESS.getCode());
         pageBody.setSuccess(true);
-        return pageBody.addObject(o);
+        if (o instanceof IPageList) {
+            return pageBody.addPageInfo((IPageList) o);
+        } else {
+            return pageBody.addObject(o);
+        }
     }
 
     /**
