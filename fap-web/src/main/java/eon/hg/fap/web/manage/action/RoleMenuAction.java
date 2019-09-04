@@ -232,7 +232,7 @@ public class RoleMenuAction extends BizAction {
             List innerList = rn.getList("children");
             rn.put("checked", false);
             //判断是否已选
-            if (innerList.size() == 0) {
+            if (innerList==null || innerList.size() == 0) {
                 boolean is_exists = false;
                 for (Long id : idList) {
                     if (id.longValue() == rn.getLong("id").longValue()) {

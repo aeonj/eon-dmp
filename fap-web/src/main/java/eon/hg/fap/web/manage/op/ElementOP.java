@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -205,13 +204,7 @@ public class ElementOP {
 			addNodeChild(lstTree,bd,onlyname,isfulldata);
 		}
 		if (hasChecked) {
-			String checkids = dtoParam.getString("checkids");
-			List<String> lstchecks = null;
-			if (CommUtil.isNotEmpty(checkids)) {
-				String[] arr = checkids.split(",");
-				lstchecks = Arrays.asList(arr);
-			}
-			setCheckTreeList(lstTree,lstchecks);
+			CommUtil.setCheckTreeList(lstTree,dtoParam.getString("checkids"));
 		}
 		return lstTree;
 	}
@@ -283,18 +276,6 @@ public class ElementOP {
 		return result;
 	}
 	
-	private void setCheckTreeList(List<Dto> lst,List<String> checkids) {
-		if (lst==null) return;
-		for (Dto dto : lst) {
-			if (checkids!=null) {
-				dto.put("checked", checkids.contains(dto.getString("id")));
-			} else {
-				dto.put("checked", false);
-			}
-			setCheckTreeList((List<Dto>) dto.getList("children"),checkids);
-		}
-	}
-	
 	private void addNodeChild(List<Dto> lst, BaseData node, boolean onlyname,boolean isfulldata) {
 
 		if (node.getParent_id()!=null) {
@@ -354,9 +335,7 @@ public class ElementOP {
 		} else {
 			dto.put("text", code+" "+bd.getName());
 		}
-		if (bd.getChild()!=null && bd.getChild().size()>0) {
-			dto.put("children", bd.getChild());
-		}
+        dto.put("children", bd.getChild());
 		if (isfulldata) {
 			WebHandler.toMap(bd, dto);
 		}

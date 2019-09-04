@@ -6,6 +6,7 @@ import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.core.cache.AbstractCacheOperator;
 import eon.hg.fap.core.constant.AeonConstants;
+import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.dao.primary.ElementDao;
@@ -138,16 +139,16 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
         if (CommUtil.isNotEmpty(dto.get("loginuserid")) && CommUtil.isNotEmpty(dto.get("belong_source"))) {
             if (dto.get("belong_source").equals(dto.getString("source"))) {
                 if (System.getProperty("aeonDao.db").equals("oracle")) {
-                    sql += "connect by prior e.parent_id=e.chr_id\n" +
+                    sql += "connect by prior e.parent_id=e.id\n" +
                             " start with exists(\n" +
                             "select o.org_id from ea_usermanage u,ea_user_org o\n" +
-                            "  where o.org_id=e.chr_id and u.user_id=o.user_id and o.user_id='"+dto.getString("loginuserid")+"'\n" +
-                            "  and u.org_type=(select ot.orgtype_code from ea_orgtype ot where ele_code='"+dto.getString("source")+"'))";
+                            "  where o.org_id=e.id and u.user_id=o.user_id and o.user_id='"+dto.getString("loginuserid")+"'\n" +
+                            "  and u.org_type=(select ot.orgCode from sys_orgtype ot where ele_code='"+dto.getString("source")+"'))";
                 } else {
                     sql += " and exists(\n" +
-                            "select o.org_id from ea_usermanage u,ea_user_org o\n" +
-                            "  where o.org_id=e.chr_id and u.user_id=o.user_id and o.user_id='"+dto.getString("loginuserid")+"'\n" +
-                            "  and u.org_type=(select ot.orgtype_code from ea_orgtype ot where ele_code='"+dto.getString("source")+"'))";
+                            "select o.org_id from sys_user u,ea_user_org o\n" +
+                            "  where o.org_id=e.id and u.user_id=o.user_id and o.user_id='"+dto.getString("loginuserid")+"'\n" +
+                            "  and u.org_type=(select ot.orgCode from sys_orgtype ot where ele_code='"+dto.getString("source")+"'))";
                 }
             }
         } else {
@@ -170,7 +171,7 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                     String priValue = dtoRela.getString("value");
                     String secSource = dto.getString("source");
 
-                    String tmpsql = "select * from ea_relation_manager where pri_ele_code='"+priSource+"' and sec_ele_code='"+secSource+"'";
+                    String tmpsql = "select * from " +Globals.SYS_TABLE_SUFFIX + "relation_main where pri_ele='"+priSource+"' and sec_ele='"+secSource+"'";
                     List<Dto> lst = genericDao.findDtoBySql(tmpsql);
                     if (lst != null && lst.size() > 0) {
                         existsSqlCondition = true;
@@ -178,11 +179,11 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                         if (System.getProperty("aeonDao.db").equals("oracle")) {
                             Element ele = this.elementDAO.getOne("ele_code",dto.getString("source"));
                             String table_name = ele.getEle_source();
-                            sql += "and e.chr_id in (select et.chr_id from " + table_name + " et connect by prior et.parent_id=et.chr_id\n" +
-                                    " start with et.chr_id in (select r.sec_ele_value from ea_relations r where r.relation_id='" + Convert.toStr(dtoRm.get("relation_id")) +
+                            sql += "and e.id in (select et.id from " + table_name + " et connect by prior et.parent_id=et.id\n" +
+                                    " start with et.id in (select r.sec_ele_value from " +Globals.SYS_TABLE_SUFFIX + "relation_detail r where r.main_id='" + Convert.toStr(dtoRm.get("id")) +
                                     "' and pri_ele_value='" + priValue + "'))";
                         } else {
-                            sql += " and e.chr_id in (select r.sec_ele_value from ea_relations r where r.relation_id='" + Convert.toStr(dtoRm.get("relation_id")) +
+                            sql += " and e.id in (select r.sec_ele_value from " +Globals.SYS_TABLE_SUFFIX + "relation_detail r where r.main_id='" + Convert.toStr(dtoRm.get("id")) +
                                     "' and pri_ele_value='" + priValue + "')";
                         }
                     }

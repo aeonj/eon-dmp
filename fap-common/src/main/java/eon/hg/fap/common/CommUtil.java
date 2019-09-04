@@ -1400,4 +1400,60 @@ public class CommUtil {
 		return dtoList;
 	}
 
+	/**
+	 * 更新树节点
+	 * @param lst
+	 */
+    public static void updateTreesLeaf(List<Dto> lst) {
+        for (Dto dto : lst) {
+            List<Dto> childrens = (List<Dto>) dto.getList("children");
+            if (childrens==null || childrens.size()==0) {
+                dto.remove("children");
+                dto.put("leaf", true);
+            } else {
+                dto.put("leaf", false);
+                updateTreesLeaf(childrens);
+            }
+        }
+    }
+
+	/**
+	 * 多选树更新选择值
+	 * @param lstTree
+	 * @param checkids
+	 */
+	public static void setCheckTreeList(List<Dto> lstTree,String checkids) {
+		List<String> lstchecks = null;
+		if (CommUtil.isNotEmpty(checkids)) {
+			String[] arr = checkids.split(",");
+			lstchecks = Arrays.asList(arr);
+		}
+		CommUtil.setCheckTreeList(lstTree,lstchecks);
+	}
+
+	/**
+	 * 多选树更新选择值
+	 * @param lstTree
+	 * @param checkids
+	 */
+	public static void setCheckTreeList(List<Dto> lst,List<String> checkids) {
+		for (Dto dto : lst) {
+			if (checkids!=null) {
+				dto.put("checked", checkids.contains(dto.getString("id")));
+			} else {
+				dto.put("checked", false);
+			}
+			List<Dto> childrens = (List<Dto>) dto.getList("children");
+			if (childrens==null || childrens.size()==0) {
+				dto.remove("children");
+				dto.put("leaf", true);
+			} else {
+				dto.put("leaf", false);
+				setCheckTreeList(childrens, checkids);
+			}
+		}
+	}
+
+
+
 }

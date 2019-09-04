@@ -66,7 +66,9 @@ public class MenuOP extends TreeSort {
 		if (AeonConstants.SUPER_USER.equals(SecurityUserHolder.getOnlineUser().getUsername())) {
 			List<MenuGroup> menuGroups = this.menuGroupService.query("select obj from MenuGroup obj order by obj.sequence",null,-1,-1);
 			for (MenuGroup menuGroup : menuGroups) {
-				String menuListJson = JsonHandler.toJson(getCardMenuList(menuGroup.getMenus()));
+				List<Dto> treeList = getCardMenuList(menuGroup.getMenus());
+				CommUtil.updateTreesLeaf(treeList);
+				String menuListJson = JsonHandler.toJson(treeList);
 				menuGroup.setMenujson(menuListJson);
 			}
 			return menuGroups;
@@ -76,9 +78,10 @@ public class MenuOP extends TreeSort {
 			}}, -1, -1);
 			if (list != null && list.size() > 0) {
 				User user = list.get(0);
-
 				for (MenuGroup menuGroup : user.getMgs()) {
-					String menuListJson = JsonHandler.toJson(getCardMenuList(menuGroup.getAuthmenus()));
+					List<Dto> treeList = getCardMenuList(menuGroup.getAuthmenus());
+					CommUtil.updateTreesLeaf(treeList);
+					String menuListJson = JsonHandler.toJson(treeList);
 					menuGroup.setMenujson(menuListJson);
 				}
 				return user.getMgs();
@@ -125,13 +128,9 @@ public class MenuOP extends TreeSort {
 
 		boolean isChecked = dtoParam.getString("selectmodel").equalsIgnoreCase("multiple") ;
 		if (isChecked) {
-			String checkids = dtoParam.getString("checkids");
-			List<String> lstchecks = null;
-			if (CommUtil.isNotEmpty(checkids)) {
-				String[] arr = checkids.split(",");
-				lstchecks = Arrays.asList(arr);
-			}
-			setCheckTreeList(lstTree,lstchecks);
+			CommUtil.setCheckTreeList(lstTree,dtoParam.getString("checkids"));
+		} else {
+			CommUtil.updateTreesLeaf(lstTree);
 		}
 		return lstTree;
 	}
@@ -193,17 +192,6 @@ public class MenuOP extends TreeSort {
 		return dto;
 	}
 
-	private void setCheckTreeList(List<Dto> lst,List<String> checkids) {
-		for (Dto dto : lst) {
-			if (checkids!=null) {
-				dto.put("checked", checkids.contains(dto.getString("id")));
-			} else {
-				dto.put("checked", false);
-			}
-			setCheckTreeList((List<Dto>) dto.getList("children"),checkids);
-		}
-	}
-	
 	public List<Menu> sortMenus(List<Menu> menus) {
 		Collections.sort(menus, new Comparator<Menu>() {  
             public int compare(Menu arg0, Menu arg1) {  

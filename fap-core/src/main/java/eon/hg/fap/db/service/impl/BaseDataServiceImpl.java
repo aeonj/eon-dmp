@@ -7,17 +7,12 @@
 
 package eon.hg.fap.db.service.impl;
 
-import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.db.dao.primary.BaseDataDao;
 import eon.hg.fap.db.dao.primary.GenericDao;
 import eon.hg.fap.db.model.mapper.BaseData;
 import eon.hg.fap.db.service.IBaseDataService;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +28,7 @@ import java.util.Map;
  */
 @Service
 @Transactional
-@CacheConfig(cacheNames = Globals.DEFAULT_TABLE_SUFFIX + "base_data")
+//@CacheConfig(cacheNames = Globals.DEFAULT_TABLE_SUFFIX + "base_data")
 public class BaseDataServiceImpl implements IBaseDataService {
     @Resource
     private BaseDataDao basedataDao;
@@ -43,7 +38,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
     /* (non-Javadoc)
      * @see com.aeon.foundation.service.IBaseDataService#save(com.aeon.foundation.table.mapper.BaseData)
      */
-    @CachePut(key = "#basedata.getClass().getName()+#basedata.id")
+    //@CachePut(key = "#basedata.getClass().getName()+#basedata.id")
     @Override
     public BaseData save(BaseData basedata) {
         return this.basedataDao.save(basedata);
@@ -53,22 +48,18 @@ public class BaseDataServiceImpl implements IBaseDataService {
      * @see com.aeon.foundation.service.IBaseDataService#getObjById(java.lang.Long)
      */
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-    @Cacheable(key = "#clz.getName()+#id")
+    //@Cacheable(key = "#clz.getName()+#id")
     @Override
     public BaseData getObjById(Class clz, Long id) {
         if (id==null) return null;
         this.basedataDao.setEntityClass(clz);
-        BaseData basedata = this.basedataDao.get(id);
-        if (basedata != null) {
-            return basedata;
-        }
-        return null;
+        return this.basedataDao.get(id);
     }
 
     /* (non-Javadoc)
      * @see com.aeon.foundation.service.IBaseDataService#delete(java.lang.Long)
      */
-    @CachePut(key = "#clz.getName()+#id")
+    //@CachePut(key = "#clz.getName()+#id")
     @Override
     public void delete(Class clz, Long id) {
         this.basedataDao.setEntityClass(clz);
@@ -79,7 +70,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
      * @see com.aeon.foundation.service.IBaseDataService#batchDelete(java.util.List)
      */
     @Override
-    @CacheEvict(allEntries = true)
+    //@CacheEvict(allEntries = true)
     public void batchDelete(Class clz, List<Long> ids) {
         this.basedataDao.setEntityClass(clz);
         for (Long id : ids) {
@@ -104,7 +95,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
     /* (non-Javadoc)
      * @see com.aeon.foundation.service.IBaseDataService#update(com.aeon.foundation.table.mapper.BaseData)
      */
-    @CachePut(key = "#basedata.getClass().getName()+#basedata.id")
+    //@CachePut(key = "#basedata.getClass().getName()+#basedata.id")
     @Override
     public BaseData update(BaseData basedata) {
         basedata.setTreepath(basedata.getParentpath());
