@@ -84,7 +84,7 @@ public class BaseDataAction {
             Class<BaseData> clz = (Class<BaseData>) Class.forName(ele.getClass_name());
 
             BaseData baseData = WebHandler.toPo(mapPara,clz);
-            BaseData vf = this.baseDataService.getObjByProperty(baseData.getClass(), null, "code", baseData.getCode());
+            BaseData vf = this.baseDataService.getObjByProperty(baseData.getClass(), "code", baseData.getCode());
             if (vf != null) {
                 return ResultBody.failed("编码不能重复");
             } else {
@@ -105,16 +105,18 @@ public class BaseDataAction {
         Element ele = elementOP.getEleSource(source);
         try {
             Class<BaseData> clz = (Class<BaseData>) Class.forName(ele.getClass_name());
-            BaseData vf = this.baseDataService.getObjByProperty(clz, null, "code", code);
+            BaseData vf = this.baseDataService.getObjByProperty(clz,  "code", code);
             if (vf != null && !vf.getId().equals(id)) {
                 return ResultBody.failed("编码不能重复");
             } else {
-                BaseData baseData = this.baseDataService.getObjById(clz, id);
+                BaseData baseData = this.baseDataService.getObjById(clz,id);
+                baseData.setOld_parent_id(baseData.getParent_id());
                 BaseData obj = WebHandler.toPo(mapPara, baseData);
+                //BaseData obj = BeanUtil.fillBeanWithMapIgnoreCase(mapPara,baseData,false);
                 this.baseDataService.update(obj);
                 return ResultBody.success();
             }
-        } catch (ClassNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResultBody.failed("要素类名未定义");
         }

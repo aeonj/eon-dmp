@@ -1436,8 +1436,8 @@ public class CommUtil {
 	 * @param lstTree
 	 * @param checkids
 	 */
-	public static void setCheckTreeList(List<Dto> lst,List<String> checkids) {
-		for (Dto dto : lst) {
+	public static void setCheckTreeList(List<Dto> lstTree,List<String> checkids) {
+		for (Dto dto : lstTree) {
 			if (checkids!=null) {
 				dto.put("checked", checkids.contains(dto.getString("id")));
 			} else {

@@ -129,7 +129,7 @@ public class ElementOP {
 			if (element!=null) {
 				String class_name = element.getClass_name();
 				if (CommUtil.isNotEmpty(class_name)) {
-					return this.baseDataService.getObjByProperty(Class.forName(class_name),null, "code", value);
+					return this.baseDataService.getObjByProperty(Class.forName(class_name), "code", value);
 				} else {
 			    	StringBuffer sql = new StringBuffer();
 					sql.append("SELECT e.* ");

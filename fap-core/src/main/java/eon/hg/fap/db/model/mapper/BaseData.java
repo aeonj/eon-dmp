@@ -46,6 +46,8 @@ public abstract class BaseData extends IdEntity implements Serializable {
 	private boolean enabled=true;
 	private String last_ver;
 	private Long parent_id;
+	@Transient
+	private Long old_parent_id;
 
 	@JSONField(serialize = false)
 	public BaseData getParent() {

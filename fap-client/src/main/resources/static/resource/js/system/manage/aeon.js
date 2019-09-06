@@ -404,10 +404,11 @@ function unionObj(o1,o2){
  * @returns {string}
  */
 function objEntityRender(value) {
-    if (value!=null && typeof v == "object") {
+    if (value!=null && typeof value == "object") {
         return '<span data-qtip="'+value.code+' '+value.name+'">'+value.name+'</span>';
+    } else {
+        return value==null ? "" : value;
     }
-    return value.name;
 }
 /**
  * 

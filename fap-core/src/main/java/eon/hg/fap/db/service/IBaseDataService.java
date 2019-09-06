@@ -76,11 +76,11 @@ public interface IBaseDataService {
 
 	/**
 	 *
-	 * @param propertyName
-	 * @param value
+	 * @param clz
+	 * @param fields
 	 * @return
 	 */
-	BaseData getObjByProperty(Class clz, String construct, String propertyName, Object value);
+	BaseData getObjByProperty(Class clz, Object... fields);
 	
 	List<BaseData> findBySql(String sql);
 	List<BaseData> findBySql(String sql, Object[] obj);
