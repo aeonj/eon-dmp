@@ -6,11 +6,13 @@
 
 package eon.hg.fap.db.model.primary;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.core.annotation.Lock;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.List;
  */
 @Entity
 @Data
+@ToString(exclude={"roles","operates"})
 @Table(name = Globals.SYS_TABLE_SUFFIX + "menu")
 public class Menu extends IdEntity implements Comparable<Menu> {
 	private static final long serialVersionUID = -2502634473094918124L;
@@ -43,9 +46,11 @@ public class Menu extends IdEntity implements Comparable<Menu> {
 	private List<Dto> child = new ArrayList<Dto>();
 	@ManyToOne
 	private MenuGroup mg;  //对应菜单组
+	@JSONField(serialize = false)
 	@ManyToMany(mappedBy = "menus", targetEntity = Role.class, fetch = FetchType.LAZY)
 	private List<Role> roles = new ArrayList<Role>();
 	@OneToMany(mappedBy = "menu")
+	@JSONField(serialize = false)
 	private List<Operate> operates = new ArrayList<Operate>();// 对应的操作信息
     @Column(length=42)
     private String authkey;

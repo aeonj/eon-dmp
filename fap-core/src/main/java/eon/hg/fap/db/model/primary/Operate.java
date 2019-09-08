@@ -3,6 +3,7 @@
  */
 package eon.hg.fap.db.model.primary;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class Operate extends IdEntity {
 	
 	@Column(length=20)
 	private String name;    //操作名称
+	@JSONField(serialize = false)
 	@ManyToOne(fetch = FetchType.LAZY)
 	private Menu menu;      //对应的菜单
 	private String selector;    //jquery选择器
