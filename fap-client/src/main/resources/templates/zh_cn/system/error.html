@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html style="overflow-x:hidden;" lang="zh">
+<head>
+    <meta charset="utf-8"/>
+    <title>$!{config.title} - $!{config.poweredby}</title>
+    <!-- bootstrap & fontawesome -->
+    <link href="/resource/css/bootstrap.min14ed.css?v=3.3.6" rel="stylesheet">
+    <link href="/resource/css/font-awesome.min93e3.css?v=4.4.0" rel="stylesheet">
+    <style type="text/css">
+        .page-content {
+            background-color: #FFF;
+            position: relative;
+            margin: 0;
+            padding: 8px 20px 24px;
+        }
+        .page-header {
+            margin: 0 0 12px;
+            border-bottom: 1px dotted #E2E2E2;
+            padding-bottom: 16px;
+            padding-top: 7px;
+        }
+        .bigokimg {
+            float:left;
+            width:121px;
+        }
+        .bigleft {
+            float:left;
+            width:300px;
+            margin-left:30px;
+        }
+        .bigleft ul li {
+            line-height:30px;
+        }
+        .hui{ color:#ccc;}
+        .successbtn a {
+            margin-top:20px;
+            display:block;
+            float:left;
+            background:url(/resource/image/aback.jpg) no-repeat;
+            width:92px;
+            height:25px;
+            line-height:25px;
+            text-align:center;
+            margin-right:15px;
+            font-weight:bold
+        }
+        .seldown {
+            max-width: none;
+            z-index: 3000;
+            padding: 0 0;
+        }
+
+
+    </style>
+</head>
+<body class="no-skin">
+<div class="page-content">
+    <div class="page-header">
+        <h1>
+            系统消息
+        </h1>
+    </div><!-- /.page-header -->
+    <div class="col-xs-12">
+        <div class="bigokimg"><img src="/resource/style/system/manage/images/error.jpg"/></div>
+        <div class="bigleft">
+            <ul>
+                <li>$!{op_title}!</li>
+                #if($!list_url)
+                <li class="hui">自动为您跳转到刚才的页面！</li>
+                <li class="successbtn"><a href="$!list_url">返回上一页</a>#if($!open_url)<a href="javascript:void(0);"
+                                                                                       onclick="window.parent.openURL('url','$!open_url','main_workspace','$!open_mark')">$!open_op</a>#end
+                </li>
+                #end
+            </ul>
+        </div>
+        #if($!list_url)
+        <script type="text/javascript">
+            var count = 3;
+            window.setInterval(go, 1000);
+
+            function go() {
+                count--;
+                if (count == 0) window.location.href = "$!list_url";
+            }
+        </script>
+        #end
+    </div>
+</div>
+</body>
+</html>
