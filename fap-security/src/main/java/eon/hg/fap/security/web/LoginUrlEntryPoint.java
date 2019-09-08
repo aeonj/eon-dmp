@@ -1,5 +1,6 @@
 package eon.hg.fap.security.web;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,12 @@ public class LoginUrlEntryPoint implements AuthenticationEntryPoint {
 		// TODO 增加处理逻辑
 		targetUrl = refererUrl;
 		if (url.indexOf("/manage/") >= 0) {//判断是否为后台业务管理请求
-			targetUrl = request.getContextPath() + "/manage/login.htm";
+			if (request.getQueryString()!=null && request.getQueryString().contains("menu_id=")) {
+				targetUrl = request.getContextPath() + "manage/login.htm";
+			} else {
+				response.sendError(HttpStatus.UNAUTHORIZED.value(), authException.getMessage());
+				return;
+			}
 		} else if (url.indexOf("/wap/") >= 0) {//判断是否为wap请求
 			targetUrl = request.getContextPath() + "/wap/login.htm";
 		} else {

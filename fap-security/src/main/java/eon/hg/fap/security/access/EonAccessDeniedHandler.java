@@ -3,12 +3,13 @@ package eon.hg.fap.security.access;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.db.model.primary.User;
+import eon.hg.fap.db.service.IUserService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.AccessDeniedHandlerImpl;
 import org.springframework.stereotype.Component;
@@ -20,8 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 重写SpringSecurity权限控制接口，管理系统无权限操作的页面导向，及用户多次登录分别加载对应权限信息，系统可以采用多种登陆机制
@@ -31,7 +30,8 @@ import java.util.List;
  */
 @Component
 public class EonAccessDeniedHandler implements AccessDeniedHandler {
-	public static final String SPRING_SECURITY_ACCESS_DENIED_EXCEPTION_KEY = "SPRING_SECURITY_403_EXCEPTION";
+	@Autowired
+	private IUserService userService;
 	protected static final Log logger = LogFactory
 			.getLog(AccessDeniedHandlerImpl.class);
 	private String errorPage;
@@ -62,44 +62,33 @@ public class EonAccessDeniedHandler implements AccessDeniedHandler {
 				e.printStackTrace();
 			}
 		} else {
-			this.errorPage = "/authority.htm";
+			this.errorPage = null;
 			User user = SecurityUserHolder.getCurrentUser();
-			List<GrantedAuthority> all_authorities = user.get_all_Authorities();
-			Authentication auth = SecurityContextHolder.getContext()
-					.getAuthentication();
-			Collection<? extends GrantedAuthority> current_authorities = auth.getAuthorities();
 			if (user.getUserRole().indexOf("MANAGE") < 0) {
 				this.errorPage = "/authority.htm";
 			} else {
-				// for(GrantedAuthority auth1:all_authorities){
-				// boolean p=false;
-				// for(GrantedAuthority auth2:current_authorities){
-				// if(auth1.toString().equals(auth2.toString())){
-				// p=true;
-				// }
-				// }
-				// if(p){
-				// System.out.println("共同存在:"+auth1.toString());
-				// }else{
-				// System.out.println("=========================================不存在:"+auth1.toString());
-				// }
-				// }
-				if (all_authorities.size() != current_authorities.size()) {
-					this.errorPage = "/manage/login.htm";
+				if (request.getQueryString()!=null && request.getQueryString().contains("menu_id=")) {
+					this.errorPage = "/manage/authority.htm";
 				}
 			}
-			if (this.errorPage != null) {
-				((HttpServletRequest) request).setAttribute(
-						"SPRING_SECURITY_403_EXCEPTION", accessDeniedException);
+            if (!response.isCommitted()) {
+                if (errorPage != null) {
+                    // Put exception into request scope (perhaps of use to a view)
+                    request.setAttribute(WebAttributes.ACCESS_DENIED_403,
+                            accessDeniedException);
 
-				RequestDispatcher rd = request.getRequestDispatcher(this.errorPage);
-				rd.forward(request, response);
-			}
+                    // Set the 403 status code.
+                    response.setStatus(HttpStatus.FORBIDDEN.value());
 
-			if (!response.isCommitted()) {
-				((HttpServletResponse) response).sendError(403,
-						accessDeniedException.getMessage());
-			}
+                    // forward to error page.
+                    RequestDispatcher dispatcher = request.getRequestDispatcher(errorPage);
+                    dispatcher.forward(request, response);
+                }
+                else {
+                    response.sendError(HttpStatus.FORBIDDEN.value(),
+                            "访问被拒绝");
+                }
+            }
 		}
 	}
 

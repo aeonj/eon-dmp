@@ -113,7 +113,7 @@ public interface AeonConstants {
 	 * Ajax请求超时错误码<br>
 	 * 999:Ajax请求超时错误码
 	 */
-	public static final int Ajax_Timeout = 999;
+	public static final int Ajax_Timeout = 500408;
 	
 	/**
 	 * Ajax请求非法错误码<br>

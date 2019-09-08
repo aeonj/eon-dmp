@@ -62,43 +62,36 @@
   Ext.QuickTips.init();
   Ext.form.Field.prototype.msgTarget = 'qtip';
 
-  // Ext.Ajax.on('requestexception', function(conn, response, options) {
-	// 	if (response.status == ajaxErrCode) {
-	// 		setTimeout(function(){
-	// 			//延时避免被failure回调函数中的aler覆盖
-	// 			top.Ext.MessageBox.alert('提示', '由于长时间未操作,空闲会话已超时;您将被强制重定向到登录页面!', function() {
-	// 				parent.location.href = webContext + '/manage/login.htm';
-	// 			});
-	// 		},200);
-	// 	}else if (response.status == '998') {
-	// 		setTimeout(function(){
-	// 			//延时避免被failure回调函数中的aler覆盖
-	// 			top.Ext.MessageBox.alert('提示', '您的会话连接由于在其它窗口上被注销而失效,系统将把您强制重定向到登录界面.', function() {
-	// 				parent.location.href = webContext + '/manage/login.htm';
-	// 			});
-	// 		},200);
-	// 	}else if (response.status == -1) {
-	// 		setTimeout(function(){
-	// 			//延时避免被failure回调函数中的aler覆盖
-	// 			top.Ext.MessageBox.alert('提示', '请求失败,超时或服务器无响应.', function() {
-	// 			});
-	// 		},200);
-	// 	}else{
-	// 	     parent.showException(response.responseText);
-	// 	}
-  // });
+  Ext.Ajax.on('requestexception', function(conn, response, options) {
+		if (response.status == '401' || response.status == '408' || response.status == '500408' ) {
+			setTimeout(function(){
+				//延时避免被failure回调函数中的aler覆盖
+				top.Ext.MessageBox.alert('提示', '由于长时间未操作,空闲会话已超时;您将被强制重定向到登录页面!', function() {
+					parent.location.href = webContext + '/manage/login.htm';
+				});
+			},200);
+        }else if (response.status == '403') {
+			setTimeout(function(){
+				//延时避免被failure回调函数中的aler覆盖
+				top.Ext.MessageBox.alert('提示', '很遗憾的通知您：您没有权限请求该资源，请与管理员联系!');
+			},200);
+		}else{
+		    if (parent.showException) {
+                parent.showException(response.responseText);
+            }
+		}
+  });
   
 
 <#if htmltag.exportExceptionWindow == "true">
 //异常截获窗口
 function showException(strMsg) {
-	var arr = '400,500'.split(',');
-	var shortWindow = new Ext.Window({
+	var shortWindow = Ext.create('Ext.Window',{
 		title : '<span class="commoncss">系统发生错误</span>', 
 		layout : 'fit', 
-		iconCls : 'exclamationIcon',
-		width : arr[0], 
-		height : arr[1], 
+		//iconCls : 'exclamationIcon',
+		width : 400,
+		height : 160,
 		animateTarget : Ext.getBody(),
 		closable : true, 
 		closeAction : 'close', 
@@ -151,7 +144,8 @@ function showException(strMsg) {
 					    shortWindow.close();
 					}
 				}]
-	}).show();
+	});
+	shortWindow.show();
 }
 </#if>
 

@@ -298,7 +298,7 @@ public class BaseManageAction extends BizAction{
 		return mv;
 	}
 
-	@RequestMapping("/success.htm")
+	@RequestMapping("/manage/success.htm")
 	public ModelAndView success(HttpServletRequest request,
                                 HttpServletResponse response) {
 		ModelAndView mv = new JModelAndView("success.html",
@@ -318,7 +318,7 @@ public class BaseManageAction extends BizAction{
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping("/error.htm")
+	@RequestMapping("/manage/error.htm")
 	public ModelAndView error(HttpServletRequest request,
                               HttpServletResponse response) {
 		ModelAndView mv = new JModelAndView("error.html",
@@ -341,7 +341,7 @@ public class BaseManageAction extends BizAction{
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping("/exception.htm")
+	@RequestMapping("/manage/exception.htm")
 	public ModelAndView exception(HttpServletRequest request,
                                   HttpServletResponse response) {
 		User user = (User) request.getSession().getAttribute("user");
@@ -367,7 +367,7 @@ public class BaseManageAction extends BizAction{
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping("/authority.htm")
+	@RequestMapping(value = "/manage/authority.htm")
 	public ModelAndView authority(HttpServletRequest request,
                                   HttpServletResponse response) {
 		ModelAndView mv = new JModelAndView("authority.html",
@@ -391,7 +391,7 @@ public class BaseManageAction extends BizAction{
 	 * @param response
 	 * @throws IOException
 	 */
-	@RequestMapping("/getCode.htm")
+	@RequestMapping("/manage/getCode.htm")
 	public void getCode(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		HttpSession session = request.getSession(false);

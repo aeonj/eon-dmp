@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    ${httpInclude.include("html_tag.htm?showLoading=false&isSubPage=true&exportExceptionWindow=true")}
+    ${httpInclude.include("html_tag.htm")}
     ${httpInclude.include("code_render.htm?fields=ENABLED,YESNO")}
     <#if (req_params["elerender"])??>
     ${httpInclude.include("ele_render.htm?fields=${req_params['elerender']}")}

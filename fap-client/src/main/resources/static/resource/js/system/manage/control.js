@@ -1372,7 +1372,7 @@ Ext.define('Ext.vcf.QueryPanel', {
             rules = [];
         for (var i = 0; i < fields.getCount(); i++) {
             var field = fields.get(i);
-            var meta = {field : field.getName(),op : field.logic, data : field.getValue()};
+            var meta = {field : field.getName(),op : field.logic, data : field.getSubmitValue()};
             rules.push(meta);
         }
         return rules;

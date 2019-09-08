@@ -48,16 +48,14 @@ public class RequestFilter implements Filter {
                 }
             } else {
                 if (SecurityUserHolder.getOnlineUser() != null) {
-                    if (url.indexOf("/manage") < 0 && url.indexOf("/wap") < 0) {
-                        if (url.indexOf("/login.htm") >= 0) {
+                        if (url.indexOf("/manage/login.htm") >= 0) {
                             redirect = true;
-                            redirect_url = CommUtil.getURL(request) + "/index.htm";
+                            redirect_url = CommUtil.getURL(request) + "/manage/index.htm";
                         }
                         if (url.indexOf("/register.htm") >= 0) {
                             redirect = true;
                             redirect_url = CommUtil.getURL(request) + "/index.htm";
                         }
-                    }
                 } else {
                     if (url.indexOf("/install") >= 0) {
                         redirect_url = CommUtil.getURL(request) + "/index.htm";
