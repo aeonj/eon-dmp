@@ -213,7 +213,7 @@ function pageLoad() {
                         Ext.Msg.alert('提示', '数据保存失败:<br>'+action.result.msg);
                         break;
                     default:
-                        Ext.Msg.alert('错误', '数据保存失败:<br>'+action.responseText);
+                        Ext.Msg.alert('错误', '数据保存失败:<br>'+action.response.responseText);
                 }
             }
         });
