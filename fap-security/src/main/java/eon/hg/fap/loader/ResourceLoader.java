@@ -119,6 +119,7 @@ public class ResourceLoader {
 
     @PostConstruct
 	public void init_sys_table() throws Exception {
+		sysConfigService.reset();
 		SysConfig sc = sysConfigService.getSysConfig();
 	    if (sc.isDb_reset()) {
 			loaderService.initSysTable();

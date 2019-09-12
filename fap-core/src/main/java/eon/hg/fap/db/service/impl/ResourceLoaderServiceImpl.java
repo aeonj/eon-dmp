@@ -48,14 +48,10 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         String path = ResourceUtils.getURL("classpath:").getPath();
         uiConfDAO.deleteAll();
         impTableJsonData(getClassPathStream("static/data/json/sys_uiconf.json"), (Map<String, Object> mapRecord) -> {
-            UIConf uiConf = new UIConf();
-            WebHandler.toPo(mapRecord, uiConf);
+            UIConf uiConf = WebHandler.toPo(mapRecord, UIConf.class);
+            uiConf.setId(null);
             uiConfDAO.save(uiConf);
         });
-        uiConfDetailDAO.deleteAll();
-        uiDetailDAO.deleteAll();
-        uiConfMainDAO.deleteAll();
-        uiManageDAO.deleteAll();
         List<UIManager> uiManagerList = new ArrayList<>();
         impTableJsonData(getClassPathStream("static/data/json/sys_uimanager.json"), (Map<String, Object> mapRecord) -> {
             UIManager uiManager = BeanUtil.mapToBeanIgnoreCase(mapRecord, UIManager.class, true);
@@ -94,20 +90,26 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
             }
         });
         for (UIManager uiManager : uiManagerList) {
+            UIManager vf = uiManageDAO.getOne("ui_code",uiManager.getUi_code());
+            if (vf!=null) {
+                uiManageDAO.remove(vf);
+            }
             UIManager uiparent = uiManageDAO.getBy(null, "ui_code", uiManager.getUi_code().substring(0, uiManager.getUi_code().length() - 3));
             uiManager.setParent_id(uiparent == null ? null : uiparent.getId());
             uiManageDAO.save(uiManager);
         }
 
         //初始化菜单
-        menuDAO.deleteAll();
-        menuGroupDAO.deleteAll();
         impTableJsonData(getClassPathStream("static/data/json/sys_menugroup.json"), (Map<String, Object> mapRecord) -> {
             MenuGroup menuGroup = BeanUtil.mapToBeanIgnoreCase(mapRecord, MenuGroup.class, true);
             Stack<Menu> stack = new Stack();
             impTableJsonData(getClassPathStream("static/data/json/sys_menu.json"), (Map<String, Object> mapMenu) -> {
                 if (mapMenu.get("mg_id").equals(mapRecord.get("id"))) {
                     Menu menu = BeanUtil.mapToBeanIgnoreCase(mapMenu, Menu.class, true);
+                    Menu mvf = menuDAO.getOne("menuCode",menu.getMenuCode());
+                    if (mvf!=null) {
+                        menuDAO.remove(mvf);
+                    }
                     menu.setMg(menuGroup);
 
                     if (CommUtil.isEmpty(mapMenu.get("parent_id"))) {
@@ -117,14 +119,20 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
                     }
                 }
             });
+            MenuGroup vf =menuGroupDAO.getOne("name",menuGroup.getName());
+            if (vf!=null) {
+                menuGroupDAO.remove(vf);
+            }
             menuGroup.setId(null);
             menuGroupDAO.save(menuGroup);
+
             while (!stack.isEmpty()) {
                 Menu menu = stack.pop();
                 System.out.println(menu.getMenuCode() + menu.getMenuName());
                 Long parent_id = menu.getId();
+                Menu save;
                 menu.setId(null);
-                Menu save = menuDAO.save(menu);
+                save = menuDAO.save(menu);
                 //处理
                 List<Menu> childs = CollectionUtil.filter(menuGroup.getMenus(), (Menu child) -> (
                         child.getParent_id().longValue() == parent_id.longValue()
@@ -138,21 +146,36 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         });
 
         //初始化要素
-        elementDAO.deleteAll();
         impTableJsonData(getClassPathStream("static/data/json/sys_element.json"), (Map<String, Object> mapRecord) -> {
             Element obj = BeanUtil.mapToBeanIgnoreCase(mapRecord, Element.class, true);
-            obj.setId(null);
-            elementDAO.save(obj);
+            Element vf = elementDAO.getOne("ele_code",obj.getEle_code());
+            if (vf==null) {
+                obj.setId(null);
+                elementDAO.save(obj);
+            } else {
+                obj.setId(vf.getId());
+                elementDAO.update(obj);
+            }
         });
 
         //初始化枚举值
-        enumerateDAO.deleteAll();
         impTableJsonData(getClassPathStream("static/data/json/sys_enumerate.json"), (Map<String, Object> mapRecord) -> {
             Enumerate obj = BeanUtil.mapToBeanIgnoreCase(mapRecord, Enumerate.class, true);
-            obj.setId(null);
-            enumerateDAO.save(obj);
+            Enumerate vf = enumerateDAO.getOne("field",obj.getField(),"code",obj.getCode());
+            if (vf==null) {
+                obj.setId(null);
+                enumerateDAO.save(obj);
+            } else {
+                obj.setId(vf.getId());
+                enumerateDAO.update(obj);
+            }
         });
 
+
+    }
+
+    @Override
+    public void upgrateSysTable() throws Exception {
 
     }
 
@@ -187,6 +210,8 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
                 }
                 reader.endArray();
                 System.out.println("结束解析关键字：" + key);
+            } else if (key.equals("TABLE")) {
+
             }
         }
         reader.endObject();

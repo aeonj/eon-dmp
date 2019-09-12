@@ -1,48 +1,18 @@
 {
 "RECORDS":[
 {
-"id":"13537",
-"addTime":"05/21/2019 15:28:10",
+"id":"17806",
+"addTime":"07/02/2019 06:42:36",
 "is_deleted":"0",
-"lastTime":"05/21/2019 15:28:10",
-"lastUser":"super",
-"icons":"fa fa-desktop",
-"name":"测试",
-"sequence":"5",
-"type":"MANAGE"
-},
-{
-"id":"13529",
-"addTime":"05/21/2019 15:28:10",
-"is_deleted":"0",
-"lastTime":"05/21/2019 15:28:10",
-"lastUser":"super",
-"icons":"glyphicon glyphicon-user",
-"name":"用户配置",
-"sequence":"2",
-"type":"MANAGE"
-},
-{
-"id":"13534",
-"addTime":"05/21/2019 15:28:10",
-"is_deleted":"0",
-"lastTime":"05/21/2019 15:28:10",
-"lastUser":"super",
-"icons":"fa fa-desktop",
-"name":"开发配置",
-"sequence":"3",
-"type":"MANAGE"
-},
-{
-"id":"13510",
-"addTime":"05/21/2019 15:28:10",
-"is_deleted":"0",
-"lastTime":"05/21/2019 15:28:10",
+"lastTime":"07/02/2019 06:42:36",
 "lastUser":"super",
 "icons":"",
 "name":"系统管理",
 "sequence":"0",
-"type":"MANAGE"
+"type":"MANAGE",
+"add_time":"",
+"last_time":"",
+"last_user":""
 }
 ]
 }

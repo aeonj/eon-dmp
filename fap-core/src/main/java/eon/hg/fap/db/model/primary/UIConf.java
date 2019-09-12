@@ -12,9 +12,7 @@ import lombok.Data;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 /**
  * @author AEON
@@ -23,14 +21,17 @@ import javax.persistence.Transient;
 @Data
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Entity
-@Table(name = Globals.SYS_TABLE_SUFFIX + "uiconf")
+@Table(name = Globals.SYS_TABLE_SUFFIX + "uiconf",uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"uiconf_type","uiconf_field"})})
 public class UIConf extends IdEntity {
 
-	private static final long serialVersionUID = -2293386937117617538L;
-	
+    @Column(length = 42, nullable = false)
 	private String uiconf_type;
+    @Column(length = 60, nullable = false)
 	private String uiconf_field;
+    @Column(length = 120)
 	private String uiconf_title;
+	@Column(length = 42)
 	private String uiconf_datatype;
 	private String ref_selmodel;
 	private int order_no;

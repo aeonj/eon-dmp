@@ -1,8 +1,9 @@
 package eon.hg.fap.db.service;
 
+import eon.hg.fap.core.cache.CacheOperator;
 import eon.hg.fap.db.model.primary.SysConfig;
 
-public interface ISysConfigService {
+public interface ISysConfigService extends CacheOperator {
 	/**
 	 * 保存一个SysConfig，如果保存成功返回true，否则返回false
 	 * 

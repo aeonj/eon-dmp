@@ -55,6 +55,24 @@
 "ui_id":""
 },
 {
+"id":"13541",
+"addTime":"05/21/2019 15:28:10",
+"is_deleted":"0",
+"lastTime":"05/21/2019 15:28:10",
+"lastUser":"super",
+"class_name":"",
+"code_rule":"",
+"dispmode":"0",
+"ele_code":"EL",
+"ele_name":"系统要素",
+"ele_source":"vw_ele_element",
+"enabled":"1",
+"from_rg":"0",
+"max_level":"2",
+"set_year":"2016",
+"ui_id":""
+},
+{
 "id":"13591",
 "addTime":"05/25/2019 08:24:26",
 "is_deleted":"0",
