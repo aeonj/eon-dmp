@@ -190,7 +190,7 @@ function addUIByServer(comp, ray, pos) {
                         elenames.push({source:children[j].uiconf_value,compname:items.name});
 
                         //判断是否在要素维护关系里面
-                        var relamanager = getRelationManager();
+                        var relamanager = eon_relation_ele || [];
                         //遍历要素关联关系静态对象
                         for (var m=0; m<relamanager.length; m++) {
                             if (relamanager[m].prisource == children[j].uiconf_value) {
@@ -496,8 +496,3 @@ function addGridByServer(comp, ray) {
 }
 
 
-function getRelationManager() {
-    var rela = [];
-    rela.push({prisource:'BK',secsource:'BKA'});
-    return rela;
-}

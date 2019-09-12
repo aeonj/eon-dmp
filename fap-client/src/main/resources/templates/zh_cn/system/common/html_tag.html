@@ -81,6 +81,16 @@
             }
 		}
   });
+
+  <#if htmltag.isSubPage=="true">
+  var eon_relation_ele = function() {
+      var rela = [];
+      <#list relationList as relation>
+      rela.push({prisource:'${relation.pri_ele}',secsource:'${relation.sec_ele}'});
+      </#list>
+      return rela;
+  }();
+  </#if>
   
 
 <#if htmltag.exportExceptionWindow == "true">

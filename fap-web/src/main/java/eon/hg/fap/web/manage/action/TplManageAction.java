@@ -12,10 +12,7 @@ import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.model.primary.Element;
-import eon.hg.fap.db.service.IBaseTreeService;
-import eon.hg.fap.db.service.ISysConfigService;
-import eon.hg.fap.db.service.IUserConfigService;
-import eon.hg.fap.db.service.IUserService;
+import eon.hg.fap.db.service.*;
 import eon.hg.fap.web.manage.dto.CodeStoreTagDto;
 import eon.hg.fap.web.manage.dto.EleRenderTagDto;
 import eon.hg.fap.web.manage.dto.HtmlTagDto;
@@ -51,6 +48,8 @@ public class TplManageAction {
 	@Autowired
 	private IBaseTreeService baseTreeService;
 	@Autowired
+	private IRelationMainService relationMainService;
+	@Autowired
 	private EnumerateOP enumOP;
 	@Autowired
 	private ElementOP eleOP;
@@ -74,6 +73,7 @@ public class TplManageAction {
 		String urlSecurity = pHelper.getValue("urlSecurity", "1");
 		mv.addObject("urlSecurity", urlSecurity);
 		mv.addObject("ajaxErrCode", AeonConstants.Ajax_Timeout);
+		mv.addObject("relationList", relationMainService.query("select obj from RelationMain obj",null,-1,1));
 		return mv;
 	}
 

@@ -4,6 +4,7 @@ import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -15,6 +16,8 @@ import javax.persistence.UniqueConstraint;
 })
 public class RelationMain extends IdEntity {
     private String name;  //关联名称
+    @Column(length = 42,nullable = false)
     private String pri_ele;  //主控要素
+    @Column(length = 42,nullable = true)
     private String sec_ele;  //被控要素
 }
