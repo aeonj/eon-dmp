@@ -172,7 +172,7 @@ public class WebHandler {
                             wrapper.registerCustomEditor(property
                                     .getPropertyType(), new IdEntityEditor(
                                     property.getPropertyType()));
-                            propertyValue = Convert.toLong(map.get(key));
+                            propertyValue = Convert.toStr(map.get(key));
                         } else {
                             try {
                                 propertyValue = Convert.convert(property.getPropertyType(),map.get(key));

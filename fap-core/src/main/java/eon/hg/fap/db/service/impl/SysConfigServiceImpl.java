@@ -148,6 +148,14 @@ public class SysConfigServiceImpl extends AbstractCacheOperator implements ISysC
 			sc.setBigWidth(Globals.DEFAULT_IMAGE_BIG_WIDTH);
 			sc.setImageSuffix(Globals.DEFAULT_IMAGE_SUFFIX);
 			sc.setSmsURL(Globals.DEFAULT_SMS_URL);
+            Accessory memberIcon = new Accessory();
+            memberIcon.setPath("resources/style/common/images");
+            memberIcon.setName("member.jpg");
+            sc.setMemberIcon(memberIcon);
+            Accessory logoIcon = new Accessory();
+            logoIcon.setPath("resources/style/common/images");
+            logoIcon.setName("logo.ico");
+            sc.setWebsiteLogo(logoIcon);
 			sc.setDb_reset(true);
 			this.save(sc);
 			return sc;

@@ -3,10 +3,7 @@ package eon.hg.fap.loader;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.core.constant.AeonConstants;
-import eon.hg.fap.db.model.primary.Permissions;
-import eon.hg.fap.db.model.primary.Res;
-import eon.hg.fap.db.model.primary.SysConfig;
-import eon.hg.fap.db.model.primary.User;
+import eon.hg.fap.db.model.primary.*;
 import eon.hg.fap.db.service.*;
 import eon.hg.fap.security.annotation.SecurityMapping;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +35,8 @@ public class ResourceLoader {
 	private IResService resService;
 	@Autowired
 	private IUserService userService;
+    @Autowired
+    private IRoleService roleService;
 	@Autowired
 	private IPermissionsService permissionsService;
 	@Autowired
@@ -115,6 +114,18 @@ public class ResourceLoader {
 			this.userService.save(user);
 			log.info("初始化超级管理员super！");
 		}
+        // 添加默认公众角色并赋予所有权限
+        Role role = this.roleService.getObjByProperty(null, "roleCode",
+                "ROLE_PUBLIC_DEFAULT");
+        if (role == null) {
+            role = new Role();
+            role.setAddTime(new Date());
+            role.setBuiltin(true);
+            role.setRoleCode("ROLE_PUBLIC_DEFAULT");
+            role.setRoleName("公众角色");
+            role.setType("PUBLIC");
+            this.roleService.save(role);
+        }
 	}
 
     @PostConstruct

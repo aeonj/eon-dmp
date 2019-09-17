@@ -8,7 +8,6 @@ package eon.hg.fap.db.model.primary;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import eon.hg.fap.common.util.metatype.Dto;
-import eon.hg.fap.core.annotation.Lock;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
@@ -32,8 +31,6 @@ public class Menu extends IdEntity implements Comparable<Menu> {
 	private String menuName;// 菜单名称
 	@Column(unique = true)
 	private String menuCode;// 菜单编码，ss根据该编码来识别菜单
-	@Lock
-	private String type;// MANAGE为后台业务系统权限，，PUBLIC为公众权限
 	private String info;// 菜单说明
 	private boolean display = true;// 是否显示菜单
 	private int sequence;// 排序

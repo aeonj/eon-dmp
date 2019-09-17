@@ -108,7 +108,7 @@ public class User extends IdEntity implements UserDetails {
 					if (this.getUsername().equals("super") || menu.getManageTypes().contains(String.valueOf(this.getManageType()))) {
 						if (!menus.contains(menu)) {
 							menus.add(menu);
-							if (menu.getType().equals("MANAGE") && menu.getMg()!=null) {
+							if (menu.getMg()!=null) {
 								if (this.mgs==null) {
 									this.mgs = new ArrayList<MenuGroup>();
 								}
@@ -149,6 +149,7 @@ public class User extends IdEntity implements UserDetails {
 		return this.mgs;
 	}
 
+	@Deprecated
 	public List<GrantedAuthority> get_all_Authorities() {
 		List<String> list = new ArrayList<String>();
 		for (Role role : roles) {
@@ -163,6 +164,7 @@ public class User extends IdEntity implements UserDetails {
 		return grantedAuthorities;
 	}
 
+	@Deprecated
 	public List<GrantedAuthority> get_common_Authorities() {
 		List<String> list = new ArrayList<String>();
 		for (Role role : roles) {

@@ -3,6 +3,7 @@ package eon.hg.fap.db.model.primary;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
+import lombok.ToString;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
@@ -13,6 +14,7 @@ import java.util.Date;
  *
  */
 @Data
+@ToString(exclude={"websiteLogo","memberIcon","admin_login_logo","admin_manage_logo"})
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Entity
 @Table(name = Globals.SYS_TABLE_SUFFIX + "sysconfig")
@@ -48,12 +50,12 @@ public class SysConfig extends IdEntity {
 	private String emailUserName;// 邮箱用户名
 	private String emailPws;// 邮箱密码
 	private String emailTest;// 邮件发送测试
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL)
 	private Accessory websiteLogo;// 网站logo
 	private boolean websiteState=true;// 网站状态(开/关)
 	private boolean second_domain_open=false;// 是否开通二级域名
 	private String closeReason;// 网站关闭原因
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(cascade = CascadeType.ALL)
 	private Accessory memberIcon;// 默认用户图标
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Accessory admin_login_logo;// 后台业务系统登录页的左上角Logo

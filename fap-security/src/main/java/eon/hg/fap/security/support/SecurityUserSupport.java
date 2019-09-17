@@ -66,11 +66,9 @@ public class SecurityUserSupport implements UserDetailsService {
                     Role role = roleIterator.next();
                     //根据类型加载用户权限
                     if (loginRole.equalsIgnoreCase("MANAGE")) {
-                        if (role.getType().equals("MANAGE")) {
-                            GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
-                                    role.getAuthCode());
-                            authorities.add(grantedAuthority);
-                        }
+                        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
+                                role.getAuthCode());
+                        authorities.add(grantedAuthority);
                     } else {
                         if (loginRole.equalsIgnoreCase("PUBLIC")) {
                             if (role.getType().equals("PUBLIC")) {

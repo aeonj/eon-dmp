@@ -121,7 +121,6 @@ public class MenuManageAction extends BizAction {
             Menu menu = BeanUtil.mapToBeanIgnoreCase(mapPara, Menu.class,true);
             MenuGroup menuGroup = this.menuGroupService.getObjById(menuGroupId);
             menu.setMg(menuGroup);
-            menu.setType("MANAGE");
             this.menuService.save(menu);
             return OkTipMsg("数据保存成功！");
         } else {
