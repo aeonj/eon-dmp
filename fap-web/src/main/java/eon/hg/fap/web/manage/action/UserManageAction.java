@@ -127,6 +127,7 @@ public class UserManageAction extends BizAction {
                     return "[]";
                 }
                 Dto dto = new HashDto();
+                dto.put("source",orgType.getEleCode());
                 //只要要素设置了类名，必须使用类方式获取树
                 boolean istable = false;
                 if (CommUtil.isEmpty(ele.getClass_name())) {
@@ -137,7 +138,6 @@ public class UserManageAction extends BizAction {
                 boolean isChecked = dto.getString("selectmodel").equalsIgnoreCase("multiple");
                 dto.put("table_name", ele.getEle_source());
                 if (istable) {
-                    dto.put("source",orgType.getEleCode());
                     list = baseTreeService.getCache(dto);
                     if (isChecked && dto.get("checkids") != null) {
                         dto.put("values", dto.get("checkids"));
