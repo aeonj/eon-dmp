@@ -1,6 +1,7 @@
 package eon.hg.fap.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateSettings;
 import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
@@ -30,6 +31,7 @@ public class DataSourceConfig {
 
     @Bean(name = "secondaryDataSource")
     @ConfigurationProperties("spring.datasource.secondary")
+    @ConditionalOnProperty(prefix = "spring.datasource.secondary", name = "jdbc-url")
     public DataSource secondDataSource() {
         return DataSourceBuilder.create().build();
     }
