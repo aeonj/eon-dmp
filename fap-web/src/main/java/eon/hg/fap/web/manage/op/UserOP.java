@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * 用户工具类
@@ -137,10 +138,32 @@ public class UserOP {
 		}
 	}
 
-	private Dto getEleParent(String sql,String id) {
+	private Dto getEleParent(String sql, List<Dto> lst, String id) {
+		Stack<Dto> stack = new Stack();
+		for (Dto dto: lst) {
+			stack.push(dto);
+		}
+		//前序遍历
+		while (!stack.isEmpty()) {
+			Dto curr = stack.pop();
+			//比较
+			if (StrUtil.equals(curr.getString("id"),id)) {
+				return curr;
+			}
+			if (curr.containsKey("children")) {
+				List<Dto> childs = (List<Dto>) curr.get("children");
+				if (childs != null && childs.size()>0) {
+					for (Dto child : childs) {
+						stack.push(child);
+					}
+				}
+			}
+		}
+		//没有找到的处理
 		List<Dto> dtoList = genericDao.findDtoBySql(sql,new Object[]{id});
 		if (dtoList!=null && dtoList.size()>0) {
 			Dto bd = dtoList.get(0);
+			bd.put("children", new ArrayList<>());
 			return bd;
 		} else {
 			return null;
@@ -151,14 +174,13 @@ public class UserOP {
 		node.put("text", node.getString("code")+" "+node.getString("name"));
 		node.put("leaf", false);
 		node.put("type", "2");
-		Dto dtoParent=getEleParent(sql,node.getString("parent_id"));
+		Dto dtoParent=getEleParent(sql,lst,node.getString("parent_id"));
 		if (dtoParent!=null) {
-			dtoParent.put("children", new ArrayList<>());
 			List<Dto> pChilds = (List<Dto>) dtoParent.get("children");
 			if (!ContainsNode(pChilds,node)) {
 				pChilds.add(node);
 			}
-			addEleTree(sql, lst,dtoParent);
+			addEleTree(sql, lst, dtoParent);
 		} else {
 			if (!ContainsNode(lst,node)) {
 				lst.add(node);
