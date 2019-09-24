@@ -137,6 +137,7 @@ public class UserManageAction extends BizAction {
                 }
                 boolean isChecked = dto.getString("selectmodel").equalsIgnoreCase("multiple");
                 dto.put("table_name", ele.getEle_source());
+                dto.put("parent_id", node);
                 if (istable) {
                     list = baseTreeService.getCache(dto);
                     if (isChecked && dto.get("checkids") != null) {

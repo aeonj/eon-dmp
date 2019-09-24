@@ -20,43 +20,22 @@ public class SysLogServiceImpl implements ISysLogService {
 	@Resource
 	private SysLogDao sysLogDao;
 	
-	public boolean save(SysLog sysLog) {
-		/**
-		 * init other field here
-		 */
-		try {
-			this.sysLogDao.save(sysLog);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public SysLog save(SysLog sysLog) {
+		return this.sysLogDao.save(sysLog);
 	}
 	
 	public SysLog getObjById(Long id) {
-		SysLog sysLog = this.sysLogDao.get(id);
-		if (sysLog != null) {
-			return sysLog;
-		}
-		return null;
+		return this.sysLogDao.get(id);
 	}
 	
-	public boolean delete(Long id) {
-		try {
-			this.sysLogDao.remove(id);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public void delete(Long id) {
+		this.sysLogDao.remove(id);
 	}
 	
-	public boolean batchDelete(List<Long> sysLogIds) {
-		// TODO Auto-generated method stub
+	public void batchDelete(List<Long> sysLogIds) {
 		for (Serializable id : sysLogIds) {
 			delete((Long) id);
 		}
-		return true;
 	}
 	
 	@Transactional(readOnly = true, propagation= Propagation.SUPPORTS)
@@ -64,15 +43,10 @@ public class SysLogServiceImpl implements ISysLogService {
 		return sysLogDao.list(properties);
 	}
 
-	public boolean update(SysLog sysLog) {
-		try {
-			this.sysLogDao.update( sysLog);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}	
+	public SysLog update(SysLog sysLog) {
+		return this.sysLogDao.update(sysLog);
+	}
+
 	public List<SysLog> query(String query, Map params, int begin, int max){
 		return this.sysLogDao.query(query, params, begin, max);
 		

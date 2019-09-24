@@ -19,58 +19,32 @@ public class SystemTipServiceImpl implements ISystemTipService {
 	@Resource
 	private SystemTipDao systemTipDao;
 	
-	public boolean save(SystemTip systemTip) {
-		/**
-		 * init other field here
-		 */
-		try {
-			this.systemTipDao.save(systemTip);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public SystemTip save(SystemTip systemTip) {
+		return this.systemTipDao.save(systemTip);
 	}
 	
 	public SystemTip getObjById(Long id) {
-		SystemTip systemTip = this.systemTipDao.get(id);
-		if (systemTip != null) {
-			return systemTip;
-		}
-		return null;
+		return this.systemTipDao.get(id);
 	}
 	
-	public boolean delete(Long id) {
-		try {
-			this.systemTipDao.remove(id);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public void delete(Long id) {
+		this.systemTipDao.remove(id);
 	}
 	
-	public boolean batchDelete(List<Long> systemTipIds) {
-		// TODO Auto-generated method stub
+	public void batchDelete(List<Long> systemTipIds) {
 		for (Serializable id : systemTipIds) {
 			delete((Long) id);
 		}
-		return true;
 	}
 	
 	public IPageList list(IQueryObject properties) {
 		return systemTipDao.list(properties);
 	}
 	
-	public boolean update(SystemTip systemTip) {
-		try {
-			this.systemTipDao.update( systemTip);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}	
+	public SystemTip update(SystemTip systemTip) {
+		return this.systemTipDao.update( systemTip);
+	}
+
 	public List<SystemTip> query(String query, Map params, int begin, int max){
 		return this.systemTipDao.query(query, params, begin, max);
 		

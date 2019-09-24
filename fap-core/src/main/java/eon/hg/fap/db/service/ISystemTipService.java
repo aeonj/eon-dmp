@@ -14,7 +14,7 @@ public interface ISystemTipService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(SystemTip instance);
+	SystemTip save(SystemTip instance);
 	
 	/**
 	 * 根据一个ID得到SystemTip
@@ -30,7 +30,7 @@ public interface ISystemTipService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 	
 	/**
 	 * 批量删除SystemTip
@@ -38,7 +38,7 @@ public interface ISystemTipService {
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
+	void batchDelete(List<Long> ids);
 	
 	/**
 	 * 通过一个查询对象得到SystemTip
@@ -51,12 +51,11 @@ public interface ISystemTipService {
 	/**
 	 * 更新一个SystemTip
 	 * 
-	 * @param id
-	 *            需要更新的SystemTip的id
-	 * @param dir
+	 * @param instance
 	 *            需要更新的SystemTip
 	 */
-	boolean update(SystemTip instance);
+	SystemTip update(SystemTip instance);
+
 	/**
 	 * 
 	 * @param query

@@ -14,7 +14,7 @@ public interface IUserConfigService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(UserConfig instance);
+	UserConfig save(UserConfig instance);
 	
 	/**
 	 * 根据一个ID得到UserConfig
@@ -30,7 +30,7 @@ public interface IUserConfigService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 	
 	/**
 	 * 批量删除UserConfig
@@ -38,7 +38,7 @@ public interface IUserConfigService {
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
+	void batchDelete(List<Long> ids);
 	
 	/**
 	 * 通过一个查询对象得到UserConfig
@@ -51,12 +51,10 @@ public interface IUserConfigService {
 	/**
 	 * 更新一个UserConfig
 	 * 
-	 * @param id
-	 *            需要更新的UserConfig的id
-	 * @param dir
+	 * @param instance
 	 *            需要更新的UserConfig
 	 */
-	boolean update(UserConfig instance);
+	UserConfig update(UserConfig instance);
 	
 	/**
 	 * 

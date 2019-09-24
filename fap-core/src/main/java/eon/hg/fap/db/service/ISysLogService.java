@@ -14,7 +14,7 @@ public interface ISysLogService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(SysLog instance);
+	SysLog save(SysLog instance);
 	
 	/**
 	 * 根据一个ID得到SysLog
@@ -30,7 +30,7 @@ public interface ISysLogService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 	
 	/**
 	 * 批量删除SysLog
@@ -38,7 +38,7 @@ public interface ISysLogService {
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
+	void batchDelete(List<Long> ids);
 	
 	/**
 	 * 通过一个查询对象得到SysLog
@@ -51,12 +51,10 @@ public interface ISysLogService {
 	/**
 	 * 更新一个SysLog
 	 * 
-	 * @param id
-	 *            需要更新的SysLog的id
-	 * @param dir
+	 * @param instance
 	 *            需要更新的SysLog
 	 */
-	boolean update(SysLog instance);
+	SysLog update(SysLog instance);
 	
 	/**
 	 * 

@@ -30,58 +30,32 @@ public class UserConfigServiceImpl extends AbstractCacheOperator implements IUse
 	@Resource
 	private UserDao userDAO;
 	
-	public boolean save(UserConfig userConfig) {
-		/**
-		 * init other field here
-		 */
-		try {
-			this.userConfigDao.save(userConfig);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public UserConfig save(UserConfig userConfig) {
+		return this.userConfigDao.save(userConfig);
 	}
 	
 	public UserConfig getObjById(Long id) {
-		UserConfig userConfig = this.userConfigDao.get(id);
-		if (userConfig != null) {
-			return userConfig;
-		}
-		return null;
+		return this.userConfigDao.get(id);
 	}
 	
-	public boolean delete(Long id) {
-		try {
-			this.userConfigDao.remove(id);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	public void delete(Long id) {
+		this.userConfigDao.remove(id);
 	}
 	
-	public boolean batchDelete(List<Long> userConfigIds) {
-		// TODO Auto-generated method stub
+	public void batchDelete(List<Long> userConfigIds) {
 		for (Serializable id : userConfigIds) {
 			delete((Long) id);
 		}
-		return true;
 	}
 	
 	public IPageList list(IQueryObject properties) {
 		return userConfigDao.list(properties);
 	}
 	
-	public boolean update(UserConfig userConfig) {
-		try {
-			this.userConfigDao.update( userConfig);
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-	}	
+	public UserConfig update(UserConfig userConfig) {
+		return this.userConfigDao.update( userConfig);
+	}
+
 	public List<UserConfig> query(String query, Map params, int begin, int max){
 		return this.userConfigDao.query(query, params, begin, max);
 		
@@ -136,6 +110,7 @@ public class UserConfigServiceImpl extends AbstractCacheOperator implements IUse
 				config.setLayout(AeonConstants.APP_LAYOUT_CLASSIC);
 				this.save(config);
 				user.setConfig(config);
+				this.userDAO.update(user);
 			}
 		} else {
 			config = new UserConfig();
