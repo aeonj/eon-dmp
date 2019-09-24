@@ -722,7 +722,7 @@ Ext.onReady(function () {
             success: function (form, action) {
                 addUserWindow.hide();
                 // 获取对应树节点
-                parent_id = addForm.form.findField('orgtype_ele_id')
+                var parent_id = addForm.form.findField('orgtype_ele_id')
                     .getValue();
                 refreshNode(parent_id);
                 form.reset();
@@ -777,9 +777,9 @@ Ext.onReady(function () {
             success: function (form, action) {
                 addUserWindow.hide();
                 // 获取对应树节点
-                parent_id = addForm.form.findField('orgtype_ele_id')
+                var sel_user_id = addForm.form.findField('id')
                     .getValue();
-                refreshNode(parent_id);
+                refreshNode(sel_user_id);
                 form.reset();
                 Ext.MessageBox.alert('提示', action.result.msg);
             },
@@ -847,7 +847,7 @@ Ext.onReady(function () {
             url: './sysuser.do?reqCode=enabledUserItem',
             success: function (response) {
                 // 获取对应树节点
-                refreshNode(selectNode.parentNode.id);
+                refreshNode(selectNode.id);
             },
             failure: function (response) {
                 var resultArray = Ext.util.JSON
@@ -866,20 +866,19 @@ Ext.onReady(function () {
      * 刷新指定节点
      */
     function refreshNode(nodeid) {
-        var node = userTree.getStore().getNodeById(nodeid);
-        /* 异步加载树在没有展开节点之前是获取不到对应节点对象的 */
-        if (Ext.isEmpty(node)) {
-            userTree.getStore().reload();
-            return;
-        }
-        if (node.leaf) {
-            var nodeRef = {node: node.parentNode};
-            userTree.getStore().load(nodeRef);
-            // node.parentNode.reload();
+        if (nodeid!=null && nodeid!='') {
+            userTreeStore.load({
+                node:userTree.getRootNode(),
+                callback:function(){
+                    var selNode = userTreeStore.getNodeById(nodeid);
+                    var idPath = selNode.getPath("id");
+                    userTree.expandPath(idPath,'id', '/', function(bSucess, oLastNode) {
+                        userTree.getSelectionModel().select(oLastNode);
+                    });
+                }
+            })
         } else {
-            var nodeRef = {node: node};
-            userTree.getStore().load(nodeRef);
-            // node.reload();
+            userTreeStore.reload();
         }
     }
 
