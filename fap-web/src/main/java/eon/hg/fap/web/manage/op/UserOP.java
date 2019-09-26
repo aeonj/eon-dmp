@@ -104,7 +104,7 @@ public class UserOP {
 		dto.put("leaf", true);
 		dto.put("children", new ArrayList<Dto>());
 		dto.put("type", "3");
-		dto.put("iconSkin", "user");
+		dto.put("glyph", "xf007@FontAwesome");
 		return dto;
 	}
 
@@ -117,6 +117,7 @@ public class UserOP {
 		dto.put("leaf", false);
 		dto.put("children", bd.getChild());
 		dto.put("type", "2");
+		dto.put("glyph", "xf19c@FontAwesome");
 		return dto;
 	}
 
@@ -129,6 +130,7 @@ public class UserOP {
 		dto.put("leaf", false);
 		dto.put("children", org.getChild());
 		dto.put("type", "1");
+		dto.put("glyph", "xf233@FontAwesome");
 		return dto;
 	}
 

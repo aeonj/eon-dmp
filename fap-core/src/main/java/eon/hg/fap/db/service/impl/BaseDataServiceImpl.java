@@ -116,7 +116,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
-    public BaseData getObjById(Class clz, Long id) {
+    public synchronized BaseData getObjById(Class clz, Long id) {
         if (id==null) return null;
         this.basedataDao.setEntityClass(clz);
         return this.basedataDao.get(id);
@@ -187,7 +187,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
-    public List<BaseData> find(Class clz, IQueryObject properties) {
+    public synchronized List<BaseData> find(Class clz, IQueryObject properties) {
         if (properties == null) {
             return null;
         }
@@ -200,7 +200,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     @Override
-    public BaseData getObjByProperty(Class clz, Object... fields) {
+    public synchronized BaseData getObjByProperty(Class clz, Object... fields) {
         this.basedataDao.setEntityClass(clz);
         return this.basedataDao.getOne(fields);
     }

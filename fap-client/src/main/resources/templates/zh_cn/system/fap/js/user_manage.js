@@ -12,6 +12,7 @@ Ext.onReady(function () {
         },
         root: {
             text: '用户信息',
+            glyph: 'xf015@FontAwesome',
             expanded: true,
             id: '0'
         }

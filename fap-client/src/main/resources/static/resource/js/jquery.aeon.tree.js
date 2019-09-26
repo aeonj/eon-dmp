@@ -247,7 +247,7 @@ function disabled_ztree(elid,val) {
 					if (config.isCodeAsValue)
 						node =treeObj.getNodeByParam("code",config.checkids,null);
 					else
-						node = treeObj.getNodeByTId(config.checkids);
+						node = treeObj.getNodeByParam("id",config.checkids,null);
 					if (node!=null) {
 						if (typeof eletext=="undefined") {
 							comp.element.val(node.name);

@@ -1410,9 +1410,9 @@ Ext.define('Ext.vcf.TableGrid', {
     //是否启用分页
     isPaged: true,
     //预定义的grid列
-    columnBase: [],
+    /**@columnBase: [],*/
     //预定义的字段列
-    fieldBase: [],
+    /**@fieldBase: [],*/
     //使用自定义的远程调用地址
     url: '',
     //默认查询参数
@@ -1432,35 +1432,36 @@ Ext.define('Ext.vcf.TableGrid', {
     stripeRows: true,
     frame: true,
     initComponent: function() {
-        var grid = this;
-
-        if (typeof grid.columns == 'undefined') {
-            if (grid.columnBase.length == 0) {
-                grid.columnBase.push({xtype: 'rownumberer', width: 40});
-                if (grid.isChecked) {
+        var me = this,
+            columnBase = me.columnBase || [];
+        me.fieldBase = me.fieldBase || [];
+        if (typeof me.columns == 'undefined') {
+            if (columnBase.length == 0) {
+                columnBase.push({xtype: 'rownumberer', width: 40});
+                if (me.isChecked) {
                     var sm = Ext.create('Ext.selection.CheckboxModel', {checkOnly: this.checkOnly, injectCheckbox: 1});
-                    grid.selModel = sm;
+                    me.selModel = sm;
                 }
             }
-            // var cm = Ext.create('Ext.vcf.ColumnModel',{columns:this.columnBase});
-            grid.columns = grid.columnBase;
+            // var cm = Ext.create('Ext.vcf.ColumnModel',{columns:columnBase});
+            me.columns = me.columnBase = columnBase;
         }
 
-        if (typeof grid.store == 'undefined') {
-            grid.keyDataIndex = grid.keyDataIndex || 'id';
-            if (typeof grid.model != 'undefined') {
+        if (typeof me.store == 'undefined') {
+            me.keyDataIndex = me.keyDataIndex || 'id';
+            if (typeof me.model != 'undefined') {
 
             }
             var model = Ext.create('Ext.data.Model', {
-                fields: grid.fieldBase,
-                validators : grid.validators,
-                idProperty : grid.keyDataIndex
+                fields: me.fieldBase,
+                validators : me.validators,
+                idProperty : me.keyDataIndex
             });
             /**
              * 数据存储
              */
-            grid.store = Ext.create('Ext.data.Store',{
-                model : grid.model || model,
+            me.store = Ext.create('Ext.data.Store',{
+                model : me.model || model,
                 proxy : {
                     type : 'ajax',
                     url : this.url,
@@ -1471,14 +1472,14 @@ Ext.define('Ext.vcf.TableGrid', {
                         type : 'json',
                         totalProperty: 'total',
                         rootProperty : 'data',
-                        implicitIncludes: grid.implicitIncludes
+                        implicitIncludes: me.implicitIncludes
                     }
                 }
             });
 
         }
 
-        if (grid.isPaged) {
+        if (me.isPaged) {
             var pagesize_combo = Ext.create('Ext.form.field.ComboBox',{
                 name: 'pagesize',
                 triggerAction: 'all',
@@ -1498,18 +1499,18 @@ Ext.define('Ext.vcf.TableGrid', {
                 }),
                 valueField: 'value',
                 displayField: 'text',
-                value: grid.pageSize,
+                value: me.pageSize,
                 editable: false,
                 width: 100
             });
             pagesize_combo.on("select", function(comboBox) {
                 var number = parseInt(comboBox.getValue());
-                grid.store.setPageSize(number);
-                grid.store.currentPage =1;
+                me.store.setPageSize(number);
+                me.store.currentPage =1;
                 bbar.doRefresh();
             });
 
-            grid.store.pageSize = grid.pageSize;
+            me.store.pageSize = me.pageSize;
             var bbar = Ext.create('Ext.toolbar.Paging',{
                 // pageSize: number,
                 displayInfo: true,
@@ -1518,17 +1519,17 @@ Ext.define('Ext.vcf.TableGrid', {
                 emptyMsg: "没有符合条件的记录",
                 items: ['-', '&nbsp;&nbsp;', pagesize_combo]
             });
-            grid.bbar = bbar;
+            me.bbar = bbar;
         }
 
         this.callParent(arguments);
         //this.addEvents('loadrelation', this);
         if (!this.userDefined) {
-            grid.store.load({
-                params: grid.params
+            me.store.load({
+                params: me.params
             });
         } else {
-            grid.initUI();
+            me.initUI();
         }
     },
     /**
@@ -1797,8 +1798,12 @@ Ext.define('Ext.vcf.EditorTableGrid', {
      * 判断记录是否可编辑的字段名，和columnBase里的editable属性配合使用
      */
     editDataIndex : '',
-    columnBase : [],
-    fieldBase : [],
+    /**
+     * @columnBase : [],
+     */
+    /**
+     * @fieldBase : [],
+     */
     url : '',
     params : {},
     pageSize : 50,
@@ -1814,26 +1819,27 @@ Ext.define('Ext.vcf.EditorTableGrid', {
     stripeRows: true,
     frame: true,
     initComponent: function() {
-        var grid = this;
-
-        grid.editing = Ext.create('Ext.grid.plugin.CellEditing',{
-            clicksToEdit: grid.clicksToEdit
+        var me = this,
+            columnBase = me.columnBase || [];
+        me.fieldBase = me.fieldBase || [];
+        me.editing = Ext.create('Ext.grid.plugin.CellEditing',{
+            clicksToEdit: me.clicksToEdit
         });
-        grid.plugins = grid.plugins || [];
-        grid.plugins.push(grid.editing);
+        me.plugins = me.plugins || [];
+        me.plugins.push(me.editing);
 
-        if (typeof this.columns == 'undefined') {
-            if (this.columnBase.length == 0) {
-                this.columnBase.push({xtype:'rownumberer'});
-                if (this.isChecked) {
+        if (typeof me.columns == 'undefined') {
+            if (columnBase.length == 0) {
+                columnBase.push({xtype:'rownumberer'});
+                if (me.isChecked) {
                     var sm = Ext.create('Ext.selection.CheckboxModel',{ checkOnly: this.checkOnly });
-                    this.selModel = sm;
+                    me.selModel = sm;
                 }
             }
-            if (!this.isRowEditor) {
-                this.columns = this.columnBase;
+            if (!me.isRowEditor) {
+                me.columns = me.columnBase = columnBase;
             } else {
-                this.editors = {
+                me.editors = {
                     'string': new Ext.grid.CellEditor({
                         field: new Ext.form.field.Text({
                             selectOnFocus: true,
@@ -1869,15 +1875,16 @@ Ext.define('Ext.vcf.EditorTableGrid', {
                     })
                 };
 
-                this.columns = new Ext.vcf.EditorColumnModel(grid, grid.store, grid.columnBase);
+                me.columnBase = columnBase;
+                me.columns = new Ext.vcf.EditorColumnModel(me, me.store, me.columnBase);
             }
         }
 
-        this.callParent(arguments);
-        if (!this.userDefined) {
-            grid.store.load(grid.params);
+        me.callParent(arguments);
+        if (!me.userDefined) {
+            me.store.load(me.params);
         } else {
-            grid.initUI();
+            me.initUI();
         }
     },
     getCellEditor: function(record, column) {

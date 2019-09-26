@@ -23,6 +23,7 @@ import eon.hg.fap.db.service.IBaseDataService;
 import eon.hg.fap.db.service.IElementService;
 import eon.hg.fap.db.service.ISysConfigService;
 import eon.hg.fap.db.service.IUserConfigService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,7 @@ import java.util.List;
  *
  */
 @Component
+@Slf4j
 public class ElementOP {
 	@Autowired
 	private ISysConfigService configService;
@@ -280,6 +282,9 @@ public class ElementOP {
 
 		if (node.getParent_id()!=null) {
 			BaseData parent = this.baseDataService.getObjById(node.getClass(),node.getParent_id());
+			if (parent==null) {
+				log.error("后台数据源错误，未找到父节点",node);
+			}
 			int idx = ContainsNode(parent.getChild(),node);
 			if (idx!=-1) {
 				parent.getChild().add(idx,BaseData2Dto(node,onlyname,isfulldata));
