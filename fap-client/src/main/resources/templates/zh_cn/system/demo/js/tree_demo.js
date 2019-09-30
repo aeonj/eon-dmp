@@ -54,7 +54,7 @@ Ext.onReady(function() {
             title : '',
             renderTo : 'treeDiv',
             tbar : tbar,
-            source : 'ROLE',
+            source : 'EN',
             isCodeAsValue : false,  //是否将编码作为值 默认为false，即获取基础数据的ID作为值
             isDirect : false,    //默认为false，指是否每次从数据库获取
             isPermission : true,    //默认为true，指是否按权限过滤基础数据
@@ -196,10 +196,10 @@ Ext.onReady(function() {
             renderTo : 'treeDiv',
             checkReadOnly : true,
             tbar : tbar,
-            source : 'ROLE',
+            source : 'MB',
             isCodeAsValue : true,  //是否将编码作为值 默认为false，即获取基础数据的ID作为值
             isDirect : false,    //默认为false，指是否每次从数据库获取
-            isPermission : false,    //默认为true，指是否按权限过滤基础数据
+            isPermission : true,    //默认为true，指是否按权限过滤基础数据
             width : 500,
             selectModel : 'multiple',     //single单选 （默认） multiple 多选的
             // border: false, //面板边框

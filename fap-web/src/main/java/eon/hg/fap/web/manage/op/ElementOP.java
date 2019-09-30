@@ -14,15 +14,12 @@ import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.common.util.tools.StringUtils;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.security.SecurityUserHolder;
+import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.dao.primary.GenericDao;
 import eon.hg.fap.db.model.mapper.BaseData;
-import eon.hg.fap.db.model.primary.Area;
-import eon.hg.fap.db.model.primary.Element;
-import eon.hg.fap.db.service.IBaseDataService;
-import eon.hg.fap.db.service.IElementService;
-import eon.hg.fap.db.service.ISysConfigService;
-import eon.hg.fap.db.service.IUserConfigService;
+import eon.hg.fap.db.model.primary.*;
+import eon.hg.fap.db.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -50,6 +47,10 @@ public class ElementOP {
 	private GenericDao genericDao;
 	@Autowired
 	private RegionOP regionOp;
+	@Autowired
+    private IPartGroupService partGroupService;
+	@Autowired
+    private IRelationMainService relationMainService;
 
 	/**
 	 * 根据要素编码，获取要素信息
@@ -189,6 +190,7 @@ public class ElementOP {
 			if (CommUtil.isNotEmpty(dto.get("ispermission")) && dto.getBoolean("ispermission")) {
 				dto.put("permission", getPermissionSql(dto));
 			}
+            dto.put("relations", getRelationSql(dto));
 			boolean isChecked = dto.getString("selectmodel").equalsIgnoreCase("multiple") ;
 			boolean onlyname = CommUtil.isNotEmpty(dto.get("onlyname")) && dto.getBoolean("onlyname");
 			boolean isfulldata = CommUtil.isNotEmpty(dto.get("isfulldata")) && dto.getBoolean("isfulldata");
@@ -220,6 +222,9 @@ public class ElementOP {
 	    }
 	    if (CommUtil.isNotEmpty(dtoParam.get("permission"))) {
 	    	sql.append(" and ").append(dtoParam.getString("permission"));
+	    }
+	    if (CommUtil.isNotEmpty(dtoParam.get("relations"))) {
+	    	sql.append(dtoParam.getString("relations"));
 	    }
 	    if (CommUtil.isExistsAttr(dtoParam.getString("class_name"), "rg_code")) {
 	    	if (dtoParam.getString("source").equals("PBC_ORG")
@@ -411,18 +416,62 @@ public class ElementOP {
 
 	private String getPermissionSql(Dto dto) {
 		String sql = "";
-    	if (CommUtil.isNotEmpty(dto.get("loginuserid")) && CommUtil.isNotEmpty(dto.get("belong_source"))) {
-    		if (dto.get("belong_source").equals(dto.getString("source"))) {
-				sql += " exists(\n" + 
-    					"select o.org_id from User u,UserAuthority o\n" + 
-    					"  where o.org_id=obj.id and u.id=o.user.id and o.user_id='"+dto.getString("loginuserid")+"'\n" + 
-    					"  and u.org_type=(select ot.orgtype_code from ea_orgtype ot where ele_code='"+dto.getString("source")+"'))";
-    		}
+        //判断本要素是否需要筛选
+        User cur_user = SecurityUserHolder.getCurrentUser();
+        if (CommUtil.isNotEmpty(cur_user.getBelong_source())) {
+            List<Dto> lstBelong = JsonHandler.parseList(cur_user.getBelong_source());
+            if (dto.get("belong_source").equals(dto.getString("source"))) {
+                for (Dto dtoBelong : lstBelong) {
+                    if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
+                        sql += " exists(select 1 from UserBelong o where o.user_id=" + cur_user.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=obj.id)";
+                        break;
+                    }
+                }
+            }
+        } else if (CommUtil.isNotEmpty(cur_user.getPg_id()) && cur_user.getPg_id()!=-1l) {
+            PartGroup pg = partGroupService.getObjById(cur_user.getPg_id());
+            if (pg!=null) {
+                List<Dto> lstBelong = JsonHandler.parseList(pg.getBelong_source());
+                for (Dto dtoBelong : lstBelong) {
+                    if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
+                        sql += " exists(select 1 from PartDetail o where o.pg.id=" + pg.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=obj.id)";
+                        break;
+                    }
+                }
+            }
     	} else {
     		sql += " 1=0 ";
     	}
     	return sql;
 	}
+
+    public String getRelationSql(Dto dto) {
+        String sql = "";
+        //要素关联关系
+        if (CommUtil.isNotEmpty(dto.get("relationfilter"))) {
+            boolean existsSqlCondition = false;
+            //解析json
+            List lstRela = JsonHandler.parseList(dto.getString("relationfilter"));
+            if (lstRela!=null && lstRela.size()>0) {
+                for (int i = 0; i < lstRela.size(); i++) {
+                    Dto dtoRela = (Dto) lstRela.get(i);
+                    String priSource = dtoRela.getString("source");
+                    String priValue = dtoRela.getString("value");
+                    String secSource = dto.getString("source");
+
+                    RelationMain relationMain = relationMainService.getObjByProperty("pri_ele",priSource,"sec_ele",secSource);
+                    if (relationMain!=null) {
+                        sql += " and exists(select 1 from RelationDetail r where r.main.id=" + relationMain.getId() + " and r.pri_ele_value='" + priValue + "' and r.sec_ele_value=obj.id)";
+                        existsSqlCondition = true;
+                    }
+                }
+            }
+            if (!existsSqlCondition) {
+                sql = " and 1=0";
+            }
+        }
+        return sql;
+    }
 	
 	public List getEleCodeList() {
 		return new ArrayList();

@@ -11,6 +11,7 @@ import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.tools.JsonHandler;
+import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.model.primary.*;
 import eon.hg.fap.db.service.*;
 import eon.hg.fap.security.annotation.SecurityMapping;
@@ -81,13 +82,13 @@ public class UserManageAction extends BizAction {
             roles += role.getRoleCode()+" "+role.getRoleName()+"\n";
         }
         map.put("roles", roles);
-        return JsonHandler.toExtJson(map, true, new JsonIncludePreFilter( "id", "username", "userName", "nickName", "trueName", "orgtypename", "orgtype_ele_id", "roles", "birthday", "telephone", "QQ", "years", "address", "sex", "email", "mobile", "card"));
+        return JsonHandler.toExtJson(map, true, new JsonIncludePreFilter( "id", "username", "userName", "nickName", "trueName", "orgtypename", "orgtype_ele_id", "roles", "birthday", "telephone", "QQ", "years", "address", "sex", "email", "mobile", "card", "pg_id", "belong_source"));
     }
 
     @RequestMapping("user_query_edtinfo.htm")
     public String user_query_edtinfo(Long user_id) {
         User user = userService.getObjById(user_id);
-        return JsonHandler.toExtJson(user,true,new JsonIncludePreFilter(User.class, "id", "username", "nickName", "trueName", "orgtype_id", "orgtype_ele_id", "birthday", "telephone", "QQ", "years", "address", "sex", "email", "mobile", "card"));
+        return JsonHandler.toExtJson(user,true,new JsonIncludePreFilter(User.class, "id", "username", "nickName", "trueName", "orgtype_id", "orgtype_ele_id", "birthday", "telephone", "QQ", "years", "address", "sex", "email", "mobile", "card", "pg_id", "belong_source"));
     }
 
     @RequestMapping("user_query_edtroleinfo.htm")
@@ -161,7 +162,8 @@ public class UserManageAction extends BizAction {
     public Dto user_save(@RequestParam Map<String, Object> mapPara,
                          @RequestParam("username") String userName,
                          @RequestParam("password") String password,
-                         @RequestParam("rolenodes") String roleids) {
+                         @RequestParam("rolenodes") String roleids,
+                         Long pg_id) {
         if (CommUtil.null2String(userName).equalsIgnoreCase("super")) {
             return ErrTipMsg("super是系统内置用户，不允许维护");
         }
@@ -188,7 +190,7 @@ public class UserManageAction extends BizAction {
                 return ErrTipMsg("Email已存在，不能使用");
             }
         }
-        User user = BeanUtil.mapToBeanIgnoreCase(mapPara, User.class, true);
+        User user = WebHandler.toPo(mapPara, User.class);
         //用户角色处理
         String[] arr_roleid = roleids.split(",");
         user.getRoles().clear();
@@ -197,9 +199,11 @@ public class UserManageAction extends BizAction {
             user.getRoles().add(role);
         }
 
+        user.setUserName(userName);
         user.setRg_code(AeonConstants.SUPER_RG_CODE);
         user.setUserRole("MANAGE");
         user.setPassword(passwordEncoder.encode(password));
+        user.setPg_id(pg_id);
         user.setId(null);
         this.userService.save(user);
         return OkTipMsg("数据保存成功！");
@@ -211,7 +215,8 @@ public class UserManageAction extends BizAction {
                            @RequestParam("id") Long id,
                            @RequestParam("username") String userName,
                            @RequestParam("password") String password,
-                           @RequestParam("rolenodes") String roleids) {
+                           @RequestParam("rolenodes") String roleids,
+                           Long pg_id) {
         if (CommUtil.null2String(userName).equalsIgnoreCase(AeonConstants.SUPER_USER)) {
             return ErrTipMsg("super是系统内置用户，不允许维护");
         }
@@ -242,7 +247,8 @@ public class UserManageAction extends BizAction {
             }
         }
         User user = this.userService.getObjById(id);
-        user = BeanUtil.fillBeanWithMapIgnoreCase(mapPara, user, true);
+        user = WebHandler.toPo(mapPara, user);
+        user.setUserName(userName);
         //用户角色处理
         String[] arr_roleid = roleids.split(",");
         user.getRoles().clear();
@@ -253,6 +259,7 @@ public class UserManageAction extends BizAction {
         if (StrUtil.isNotBlank(password)) {
             user.setPassword(passwordEncoder.encode(password));
         }
+        user.setPg_id(pg_id);
         userService.update(user);
         return OkTipMsg("数据修改成功！");
     }

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>${config.title}</title>
+    <link rel="stylesheet" href="/webjars/bootstrap/3.3.2/css/bootstrap.css">
+    <link rel="stylesheet" href="/resource/style/common/css/jquery-ui-1.11.4.css" />
+    <link rel="stylesheet" href="/resource/components/layuiadmin/layui/css/layui.css">
+    <link rel="stylesheet" href="/resource/components/layuiadmin/style/admin.css" media="all">
+    <link rel="stylesheet" href="/resource/components/layuiadmin/style/template.css" media="all">
+    <link rel="stylesheet" href="/resource/components/zTree/css/metroStyle/metroStyle.css">
+    <link rel="stylesheet" href="/resource/components/font-awesome/css/font-awesome.min.css">
+    <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+    <script src="/webjars/bootstrap/3.3.2/js/bootstrap.js"></script>
+    <script src="/resource/js/jquery/jquery-ui-1.11.4.js"></script>
+    <script src="/resource/js/jquery/jquery.validate.min.js"></script>
+    <script src="/resource/js/jquery/jquery.aeon.validate.js"></script>
+    <script src="/resource/js/jquery.aeon.common.js"></script>
+    <script src="/resource/js/jquery.aeon.tree.js"></script>
+    <script src="/resource/js/jquery.form.js"></script>
+    <script src="/resource/components/layui/layui.all.js"></script>
+    <script src="/resource/components/zTree/js/jquery.ztree.all.js"></script>
+    <script type="text/javascript">
+        jQuery(function(){
+            assist_ztree("treeLeft",{
+                url : "/manage/partgroup_tree.htm"
+            },{callback:{
+                    onClick :function(event, treeId, treeNode) {
+                        jQuery.ajax({type: 'POST',url: '/manage/partgroup_view.htm',data: {"obj_id":treeNode.id},
+                            success:function(data){
+                                jQuery("#view-cxj").html(data);
+                            }
+                        });
+                    }
+                }});
+            resizeLayout();
+            jQuery(window).resize(function(){
+                resizeLayout();
+            })
+        })
+
+        function resizeLayout(){
+            var header = jQuery(".layui-card-header");
+            var h_left = jQuery(window).height() - header.offset().top-header.height()-7;
+            var h_right = jQuery(window).height() - header.offset().top - 7;
+            jQuery("#left-body").css("height",h_left);
+            jQuery("#view-cxj").css("height",h_right);
+
+        }
+        function adddata() {
+            showInputDialog('add');
+        }
+        function upddata() {
+            var treeObj = jQuery.fn.zTree.getZTreeObj("treeLeft");
+            var nodes = treeObj.getSelectedNodes();
+            if (nodes.length>0) {
+                showInputDialog('edit',nodes[0].id);
+            } else {
+                layer.alert("请选择需修改的区域管理员信息!");
+            }
+        }
+        function showInputDialog(op_flag,obj_id) {
+            jQuery.ajax({type: 'POST',url: '/manage/partgroup_input.htm',data: {"op_flag":op_flag,"obj_id":obj_id},
+                success:function(data){
+                    jQuery("#dialog_edt").html(data);
+                }
+            });
+            var dialogtitle = '增加';
+            if (op_flag=='edit') {
+                dialogtitle = '修改';
+            }
+            var dialog=jQuery('#dialog_edt').removeClass('hide').dialog({
+                modal : true,
+                title: "<div class='widget-header widget-header-small'><h5><i class='icon-ok'></i>权限组"+dialogtitle+"</h5></div>",
+                title_html: true,
+                position: { my: "top+20px", at: "top+20px", of: window},
+                width : 700,
+                buttons: [
+                    {
+                        text: "取消",
+                        "class" : "btn btn-minier btn-default",
+                        click: function() {
+                            jQuery( this ).dialog( "close" );
+                        }
+                    },
+                    {
+                        text: "保存",
+                        "class" : "btn btn-primary btn-minier",
+                        click: function() {
+                            if(jQuery('#edt-form').valid()) {
+                                var comp = this;
+                                if (typeof jsonObj!='undefined') {
+                                    var eleids =[];
+                                    for (var i=0; i < jsonObj.length; i++) {
+                                        var radioval=$("input:radio[name='radio"+jsonObj[i].eleCode+"']:checked").val();
+                                        jsonObj[i].isPart = radioval;
+                                        var treeObj = jQuery.fn.zTree.getZTreeObj("edtTree"+jsonObj[i].eleCode);
+                                        var nodes = treeObj.getCheckedNodes(true);
+                                        var treeids = zTreeCheckedId2JsString(nodes);
+
+                                        eleids.push({eleCode:jsonObj[i].eleCode,eleValue:treeids});
+                                        //jsonObj[i].eleValue = treeids;
+                                    }
+
+                                    var loadingElement = layer.load('保存中…');
+                                    jQuery("#edt-form").ajaxSubmit({
+                                        url : "/manage/partgroup_save.htm",
+                                        type : "post",
+                                        dataType : "json",
+                                        data : {belong_source:JSON.stringify(jsonObj), belong_value : JSON.stringify(eleids)},
+                                        success : function(data){
+                                            layer.close(loadingElement);
+                                            if (data.success) {
+                                                var treeObj = jQuery.fn.zTree.getZTreeObj("treeLeft");
+                                                treeObj.reAsyncChildNodes(null, "refresh");
+                                                jQuery( comp ).dialog( "close" );
+                                            } else layer.alert(data.msg);
+                                        },
+                                        error: function(XMLHttpRequest, textStatus, errorThrown){
+                                            layer.close(loadingElement);
+                                            layer.alert("保存出错,请稍后再试!");
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+                ]
+            });
+        }
+        function deldata() {
+            var treeObj = jQuery.fn.zTree.getZTreeObj("treeLeft");
+            var nodes = treeObj.getSelectedNodes();
+            if (nodes.length>0) {
+                layer.confirm("确认要删除所选权限组吗？",{btn:["确认","取消"]},function(index) {
+                    jQuery.ajax({
+                        type: 'POST',
+                        url: '/manage/partgroup_del.htm',
+                        dataType : "json",
+                        data: {"mulitId":nodes[0].id},
+                        success: function (data) {
+                            if(data.success){
+                                //删除成功刷新页面
+                                var treeObj = jQuery.fn.zTree.getZTreeObj("treeLeft");
+                                treeObj.reAsyncChildNodes(null, "refresh");
+                            } else {
+                                layer.alert(data.msg);
+                            }
+                        }
+
+                    });
+                    layer.close(index);
+                })
+            } else {
+                layer.alert("请选择需删除的权限组信息!");
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <div class="layadmin-iframe">
+        <div class="layui-btn-group">
+            <button type="button" onclick="adddata();" class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe654;</i> 新增</button>
+            <button type="button" onclick="upddata();" class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe642;</i> 修改</button>
+            <button type="button" onclick="deldata();" class="layui-btn layui-btn-primary"><i class="layui-icon">&#xe640;</i> 删除</button>
+        </div>
+        <div class="layui-row layui-col-space12">
+            <div class="layui-col-md3">
+                <div class="layui-card">
+                    <div class="layui-card-header">权限组信息</div>
+                    <div class="layui-card-body" id="left-body">
+                        <ul id="treeLeft" class="ztree ztree-left"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-md9">
+                <div class="layui-card">
+                    <div class="layui-card-body" id="view-cxj">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="dialog_edt" class="hide"></div>
+</body>
+</html>

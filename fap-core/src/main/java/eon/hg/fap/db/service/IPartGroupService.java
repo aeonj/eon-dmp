@@ -9,86 +9,77 @@ import java.util.Map;
 
 public interface IPartGroupService {
 	/**
-	 * 保存一个PartGroup，如果保存成功返回true，否则返回false
-	 * 
-	 * @param instance
-	 * @return 是否保存成功
-	 */
-	boolean save(PartGroup instance);
-	
-	/**
 	 * 根据一个ID得到PartGroup
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
 	PartGroup getObjById(Long id);
-	
+
+	/**
+	 * 根据任意字段得到PartGroup
+	 *
+	 * @param fields
+	 * @return
+	 */
+	PartGroup getObjByProperty(Object... fields);
+
+	/**
+	 * 保存一个PartGroup，如果保存成功返回true，否则返回false
+	 *
+	 * @param instance
+	 * @return 是否保存成功
+	 */
+	PartGroup save(PartGroup instance);
+
+	/**
+	 * 更新一个PartGroup
+	 *
+	 * @param instance
+	 *            需要更新的PartGroup
+	 */
+	PartGroup update(PartGroup instance);
+
 	/**
 	 * 删除一个PartGroup
-	 * 
+	 *
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
-	
+	void delete(Long id);
+
 	/**
 	 * 批量删除PartGroup
-	 * 
+	 *
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
-	
+	void batchDelete(List<Long> ids);
+
 	/**
-	 * 批量删除PartGroup
-	 * 
-	 * @param mulIds
-	 * @return
-	 */
-	boolean batchDelete(String mulIds);
-	
-	/**
-	 * 通过一个查询对象得到PartGroup
-	 * 
-	 * @param properties
-	 * @return
-	 */
-	IPageList list(IQueryObject properties);
-	
-	/**
-	 * 更新一个PartGroup
-	 * 
-	 * @param id
-	 *            需要更新的PartGroup的id
-	 * @param dir
-	 *            需要更新的PartGroup
-	 */
-	boolean update(PartGroup instance);
-	
-	/**
-	 * 
-	 * @param query
-	 * @param params
-	 * @param begin
-	 * @param max
-	 * @return
-	 */
-	List<PartGroup> query(String query, Map params, int begin, int max);
-	
-	/**
-	 * 
+	 * 通过一个查询对象得到PartGroup分页列表
+	 *
 	 * @param qo
 	 * @return
 	 */
-	List<PartGroup> find(IQueryObject properties);
-	
+	IPageList list(IQueryObject qo);
+
 	/**
-	 * 
-	 * @param propertyName
-	 * @param value
+	 * 通过一个查询对象得到PartGroup完整列表
+	 *
+	 * @param qo
 	 * @return
 	 */
-	PartGroup getObjByProperty(String construct, String propertyName, Object value);
+	List<PartGroup> find(IQueryObject qo);
+
+	/**
+	 *
+	 * @param query 完整的HQL语句，使用命名参数
+	 * @param params 查询条件中的参数的值。使用Map
+	 * @param begin 开始查询的位置
+	 * @param max 需要查询对象的个数
+	 * @return
+	 */
+	List<PartGroup> query(String query, Map params, int begin, int max);
 
 }

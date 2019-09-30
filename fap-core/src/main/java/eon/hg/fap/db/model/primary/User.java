@@ -78,12 +78,7 @@ public class User extends IdEntity implements UserDetails {
 	private UserConfig config;
 	@Transient
 	private Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
-	private String qq_openid;// qq互联
-	private String weixin_pubid;// 微信公众号id
-	private String weixin_loginid;// 微信登录id
-	private String weixin_unionid;// 微信联合id，只记录微信绑定平台用户
-	private String sina_openid;// 新浪微博id
-	
+
 	private String belong_source;    //json格式存放权限组成员source
 	private Long pg_id;     //是否自定义权限
 	private Long orgtype_id;   //所属机构类型

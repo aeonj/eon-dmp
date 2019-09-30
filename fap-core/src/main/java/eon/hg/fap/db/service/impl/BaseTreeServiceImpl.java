@@ -11,14 +11,16 @@ import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.dao.primary.ElementDao;
 import eon.hg.fap.db.dao.primary.GenericDao;
+import eon.hg.fap.db.dao.primary.PartGroupDao;
 import eon.hg.fap.db.model.primary.Element;
+import eon.hg.fap.db.model.primary.PartGroup;
+import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.service.IBaseTreeService;
 import eon.hg.fap.db.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,6 +31,9 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
 
     @Resource
     ElementDao elementDAO;
+
+    @Resource
+    PartGroupDao partGroupDao;
 
     @Resource
     GenericDao genericDao;
@@ -119,7 +124,7 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                 List<Dto> innerList =null;
                 if ("1".equals(rn.getString("leaf"))) {
                     rn.put("level_num", level_num);
-                    rn.put("children", new ArrayList<Dto>());
+                    //rn.put("children", new ArrayList<Dto>());
                 } else {
                     innerList =getChildNodeList(dto,level_num+1,hasChecked);
                     rn.put("level_num", level_num);
@@ -136,23 +141,46 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
 
     public String getPermissionSql(Dto dto) {
         String sql = "";
-        if (CommUtil.isNotEmpty(dto.get("loginuserid")) && CommUtil.isNotEmpty(dto.get("belong_source"))) {
+        User cur_user = SecurityUserHolder.getCurrentUser();
+        if (cur_user==null) {
+            sql +=" and 0=0 ";
+            return sql;
+        }
+        if (CommUtil.isNotEmpty(cur_user.getBelong_source())) {
+            List<Dto> lstBelong = JsonHandler.parseList(cur_user.getBelong_source());
             if (dto.get("belong_source").equals(dto.getString("source"))) {
-                if (System.getProperty("aeonDao.db").equals("oracle")) {
-                    sql += "connect by prior e.parent_id=e.id\n" +
-                            " start with exists(\n" +
-                            "select o.org_id from ea_usermanage u,ea_user_org o\n" +
-                            "  where o.org_id=e.id and u.user_id=o.user_id and o.user_id='"+dto.getString("loginuserid")+"'\n" +
-                            "  and u.org_type=(select ot.orgCode from sys_orgtype ot where ele_code='"+dto.getString("source")+"'))";
-                } else {
-                    sql += " and exists(\n" +
-                            "select o.org_id from sys_user u,ea_user_org o\n" +
-                            "  where o.org_id=e.id and u.user_id=o.user_id and o.user_id='"+dto.getString("loginuserid")+"'\n" +
-                            "  and u.org_type=(select ot.orgCode from sys_orgtype ot where ele_code='"+dto.getString("source")+"'))";
+                for (Dto dtoBelong : lstBelong) {
+                    if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
+                        if (System.getProperty("aeonDao.db").equals("oracle")) {
+                            sql += "connect by prior e.parent_id=e.id\n" +
+                                    " start with exists(\n" +
+                                    "select 1 " +Globals.SYS_TABLE_SUFFIX + "userbelong o where o.user_id=" + cur_user.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=e.id)";
+                        } else {
+                            sql += " and exists(select 1 from " +Globals.SYS_TABLE_SUFFIX + "userbelong o where o.user_id=" + cur_user.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=e.id)";
+                        }
+                        break;
+                    }
+                }
+            }
+        } else if (CommUtil.isNotEmpty(cur_user.getPg_id()) && cur_user.getPg_id()!=-1l) {
+            PartGroup pg = partGroupDao.get(cur_user.getPg_id());
+            if (pg!=null) {
+                List<Dto> lstBelong = JsonHandler.parseList(pg.getBelong_source());
+                for (Dto dtoBelong : lstBelong) {
+                    if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
+                        if (System.getProperty("aeonDao.db").equals("oracle")) {
+                            sql += "connect by prior e.parent_id=e.id\n" +
+                                    " start with exists(\n" +
+                                    "select 1 " +Globals.SYS_TABLE_SUFFIX + "part_detail o where o.pg_id=" + pg.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=e.id)";
+                        } else {
+                            sql += " and exists(select 1 from " +Globals.SYS_TABLE_SUFFIX + "part_detail o where o.pg_id=" + pg.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=e.id)";
+                        }
+                        break;
+                    }
                 }
             }
         } else {
-            sql +=" and 0=0 ";
+            sql += " and 1=0 ";
         }
         return sql;
     }
@@ -180,11 +208,11 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                             Element ele = this.elementDAO.getOne("ele_code",dto.getString("source"));
                             String table_name = ele.getEle_source();
                             sql += "and e.id in (select et.id from " + table_name + " et connect by prior et.parent_id=et.id\n" +
-                                    " start with et.id in (select r.sec_ele_value from " +Globals.SYS_TABLE_SUFFIX + "relation_detail r where r.main_id='" + Convert.toStr(dtoRm.get("id")) +
-                                    "' and pri_ele_value='" + priValue + "'))";
+                                    " start with et.id in (select r.sec_ele_value from " +Globals.SYS_TABLE_SUFFIX + "relation_detail r where r.main_id=" + Convert.toStr(dtoRm.get("id")) +
+                                    " and pri_ele_value='" + priValue + "'))";
                         } else {
-                            sql += " and e.id in (select r.sec_ele_value from " +Globals.SYS_TABLE_SUFFIX + "relation_detail r where r.main_id='" + Convert.toStr(dtoRm.get("id")) +
-                                    "' and pri_ele_value='" + priValue + "')";
+                            sql += " and e.id in (select r.sec_ele_value from " +Globals.SYS_TABLE_SUFFIX + "relation_detail r where r.main_id=" + Convert.toStr(dtoRm.get("id")) +
+                                    " and pri_ele_value='" + priValue + "')";
                         }
                     }
 
@@ -249,6 +277,9 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
         }
         if (CommUtil.isNotEmpty(dtoParam.get("permission"))) {
             sql.append(dtoParam.getString("permission"));
+        }
+        if (CommUtil.isNotEmpty(dtoParam.get("relations"))) {
+            sql.append(dtoParam.getString("relations"));
         }
         sql.append(" order by e.code");
         List<Dto> bds = this.genericDao.findDtoBySql(sql.toString());

@@ -119,7 +119,7 @@ Ext.onReady(function () {
         }, {
             id: 'user:f_user_set',
             text: 'F3用户对照',
-            iconCls: 'x-fa fa-',
+            iconCls: 'x-fa fa-users',
             handler: function () {
                 linkFUser();
             }
@@ -180,7 +180,7 @@ Ext.onReady(function () {
             xtype: 'rdofield',
             readOnly: true,
             enumData: '1#男+0#女+-1#未知',
-            anchor: '50%' // 宽度百分比
+            anchor: '80%' // 宽度百分比
         }, {
             fieldLabel: '身份证号',
             name: 'card',
@@ -547,17 +547,60 @@ Ext.onReady(function () {
     var tabUserRole = Ext.create('Ext.panel.Panel', {
         id: 'tabUserRole',
         title: '角色信息',
-        layout: 'form',
+        layout: 'border',
         height: 420,
         border: false,
         items: [treeRole]
+    });
+
+    var tabUserAuth = Ext.create('Ext.panel.Panel', {
+        id: 'tabUserAuth',
+        title: '权限信息',
+        layout: 'border',
+        height: 420,
+        border: false,
+        items: [{
+            xtype : 'panel',
+            region : 'north',
+            layout : 'form',
+            items: [{
+                id : 'rdoEdtAuth',
+                name: 'is_part', // name:后台根据此name属性取值
+                xtype: 'rdofield',
+                width: 180,
+                enumData: '1#全部权限+2#部分权限',
+                anchor: '99%', // 宽度百分比
+                listeners : {
+                    change : function (comp, newValue, oldValue) {
+                        var tree = Ext.getCmp('treeEdtAuth');
+                        if (newValue=='1') {
+                            tree.hide();
+                        } else {
+                            tree.show();
+                        }
+                    }
+                }
+            }]
+        },{
+            xtype : 'panel',
+            region : 'center',
+            items : [{
+                id : 'treeEdtAuth',
+                xtype : 'assisttree',
+                border : false,
+                treeRootText : '权限组信息',
+                url : '/manage/partgroup_tree.htm',
+                hidden : true
+            }]
+
+        }]
     });
 
     var userTabs = Ext.create('Ext.tab.Panel', {
         region: 'center',
         margins: '3 3 3 3',
         activeTab: 0,
-        items: [tabUserBase, tabUserRole],
+        items: [tabUserBase, tabUserRole, tabUserAuth],
         enableTabScroll: true,
         //autoWidth : true
         // height : 200
@@ -604,7 +647,7 @@ Ext.onReady(function () {
             }
         }, {
             text: '关闭',
-            iconCls: 'fa fa-window-close',
+            iconCls: 'x-fa fa-close',
             handler: function () {
                 addUserWindow.hide();
             }
@@ -616,6 +659,7 @@ Ext.onReady(function () {
     function addInit() {
         addUserWindow.show();
         addUserWindow.setTitle('<span class="commoncss">新增用户</span>');
+        Ext.getCmp('rdoEdtAuth').setValue("1");
         Ext.getCmp('windowmode').setValue('add');
 
     }
@@ -636,12 +680,19 @@ Ext.onReady(function () {
             url: 'user_query_edtinfo.htm',
             params: {user_id: selectNode.id},
             waitMsg: '请稍后......',
-            success: function (form, result, data) {
+            success: function (form, action) {
+                var pg_id = action.result.data['pg_id'];
+                if (pg_id==null || pg_id=='-1') {
+                    Ext.getCmp('rdoEdtAuth').setValue("1");
+                } else {
+                    Ext.getCmp('rdoEdtAuth').setValue("2");
+                    Ext.getCmp('treeEdtAuth').selectNodeByValue(String(pg_id),false);
+                }
                 Ext.getCmp('add_cmb_org_type').getStore().reload();
                 cmbOrgType.getStore().reload();
                 treeOrg.store.reload();
             },
-            failure: function (form, result) {
+            failure: function (form, action) {
                 Ext.getCmp('add_cmb_org_type').getStore().reload();
                 cmbOrgType.getStore().reload();
                 treeOrg.store.reload();
@@ -711,13 +762,22 @@ Ext.onReady(function () {
         //     }
         // });
 
+        var pg_id = '-1';
+        if (Ext.getCmp('rdoEdtAuth').getValue()=='2') {
+            var selectAuth = Ext.getCmp('treeEdtAuth').getSelectionModel().getSelected().items[0];
+            if (!Ext.isEmpty(selectAuth)) {
+                pg_id =selectAuth.id;
+            }
+        }
+
         addForm.form.submit({
             url: 'user_save.htm',
             waitTitle: '提示',
             method: 'POST',
             params: {
                 rolenodes: rolenodes,
-                orgnodes: orgnodes
+                orgnodes: orgnodes,
+                pg_id: pg_id
             },
             waitMsg: '正在处理数据,请稍候...',
             success: function (form, action) {
@@ -766,13 +826,23 @@ Ext.onReady(function () {
 
         var orgnodes = treeOrg.getCheckValues();
 
+        var pg_id = '-1';
+        if (Ext.getCmp('rdoEdtAuth').getValue()=='2') {
+            var selectAuth = Ext.getCmp('treeEdtAuth').getSelectionModel().getSelected().items[0];
+            if (!Ext.isEmpty(selectAuth)) {
+                pg_id =selectAuth.id;
+            }
+        }
+
+
         addForm.form.submit({
             url: 'user_update.htm',
             waitTitle: '提示',
             method: 'POST',
             params: {
                 rolenodes: rolenodes,
-                orgnodes: orgnodes
+                orgnodes: orgnodes,
+                pg_id: pg_id
             },
             waitMsg: '正在处理数据,请稍候...',
             success: function (form, action) {
