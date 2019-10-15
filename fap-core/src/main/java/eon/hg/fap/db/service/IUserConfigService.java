@@ -1,5 +1,6 @@
 package eon.hg.fap.db.service;
 
+import eon.hg.fap.core.cache.CacheOperator;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.db.model.primary.UserConfig;
@@ -7,7 +8,7 @@ import eon.hg.fap.db.model.primary.UserConfig;
 import java.util.List;
 import java.util.Map;
 
-public interface IUserConfigService {
+public interface IUserConfigService extends CacheOperator {
 	/**
 	 * 保存一个UserConfig，如果保存成功返回true，否则返回false
 	 * 

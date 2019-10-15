@@ -278,8 +278,18 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
             CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getOnlineUser().getUsername());
         }
         CommUtil.invokeSetMethod(entity, "lastTime", new Date());
-        entityManager.merge(entity);
-        return entity;
+        return entityManager.merge(entity);
+    }
+
+    @Transactional
+    public <S extends T> S mergeSave(S entity) {
+
+        if (entityInformation.isNew(entity)) {
+            entityManager.persist(entity);
+            return entity;
+        } else {
+            return entityManager.merge(entity);
+        }
     }
 
     @Transactional

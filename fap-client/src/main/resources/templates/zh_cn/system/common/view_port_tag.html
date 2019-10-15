@@ -193,6 +193,21 @@
         // 如果对centerPanel进行遮罩,则可以出现阴影
         Ext.getCmp('centerPanel').getEl().unmask();
     }
+    var fap_super_click=0;
+	function supermenu() {
+		if (fap_super_click>5) {
+		    fap_super_click = -99;
+            Ext.Ajax.request({
+                url : '/manage/upgrate_table.htm',
+				timeout: 7200000,
+                success: function (response) {
+                    window.location.href = '${webPath}/manage/index.htm';
+                }
+            });
+		}
+		fap_super_click++;
+    }
+
 </script>
 <style type="text/css">
 	#loading-mask {
@@ -282,7 +297,7 @@
 	<table class="banner" width="100%">
 		<tr>
 			<td width="65%"><nobr>&nbsp;<img class="IEPNG" src="${webPath}/resource/image/ext/comments2.png" />&nbsp;${tplOp.getWelcomeMsg()},${user.trueName}!&nbsp;帐户:${user.username}&nbsp;今天是:${dateweek}</nobr></td>
-			<td width="35%"><div align="right"><nobr>禾冠</nobr></div></td>
+			<td width="35%"><div align="right" <#if (user.username=='super')> onclick="javascript:supermenu();</#if>"><nobr>禾冠</nobr></div></td>
 		</tr>
 	</table>
 </div>

@@ -143,7 +143,7 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
         String sql = "";
         User cur_user = SecurityUserHolder.getCurrentUser();
         if (cur_user==null) {
-            sql +=" and 0=0 ";
+            sql +=" and 1=0 ";
             return sql;
         }
         if (CommUtil.isNotEmpty(cur_user.getBelong_source())) {
@@ -180,7 +180,7 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                 }
             }
         } else {
-            sql += " and 1=0 ";
+            //sql += " and 1=0 ";
         }
         return sql;
     }

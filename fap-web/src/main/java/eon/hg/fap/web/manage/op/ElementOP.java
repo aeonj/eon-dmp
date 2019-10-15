@@ -221,7 +221,7 @@ public class ElementOP {
 	    	sql.append(" and ").append(dtoParam.getString("condition"));
 	    }
 	    if (CommUtil.isNotEmpty(dtoParam.get("permission"))) {
-	    	sql.append(" and ").append(dtoParam.getString("permission"));
+	    	sql.append(dtoParam.getString("permission"));
 	    }
 	    if (CommUtil.isNotEmpty(dtoParam.get("relations"))) {
 	    	sql.append(dtoParam.getString("relations"));
@@ -423,7 +423,7 @@ public class ElementOP {
             if (dto.get("belong_source").equals(dto.getString("source"))) {
                 for (Dto dtoBelong : lstBelong) {
                     if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
-                        sql += " exists(select 1 from UserBelong o where o.user_id=" + cur_user.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=obj.id)";
+                        sql += " and exists(select 1 from UserBelong o where o.user_id=" + cur_user.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=obj.id)";
                         break;
                     }
                 }
@@ -434,13 +434,13 @@ public class ElementOP {
                 List<Dto> lstBelong = JsonHandler.parseList(pg.getBelong_source());
                 for (Dto dtoBelong : lstBelong) {
                     if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
-                        sql += " exists(select 1 from PartDetail o where o.pg.id=" + pg.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=obj.id)";
+                        sql += " and exists(select 1 from PartDetail o where o.pg.id=" + pg.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=obj.id)";
                         break;
                     }
                 }
             }
     	} else {
-    		sql += " 1=0 ";
+    		//sql += " and 1=0 ";
     	}
     	return sql;
 	}

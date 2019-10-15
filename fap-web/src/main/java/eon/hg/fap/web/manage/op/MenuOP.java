@@ -34,11 +34,17 @@ public class MenuOP extends TreeSort {
 	private void addParentMenuTree(List<Dto> lst, Menu node) {
 		if (node.getParent_id()!=null) {
 			Menu parent = menuService.getObjById(node.getParent_id());
-			List<Dto> parlist = parent.getChild();
-			if (!ContainsNode(parlist,node)) {
-				parlist.add(MenuData2Dto(node));
+			if (parent!=null) {
+				List<Dto> parlist = parent.getChild();
+				if (!ContainsNode(parlist, node)) {
+					parlist.add(MenuData2Dto(node));
+				}
+				addParentMenuTree(lst, parent);
+			} else {
+				if (!ContainsNode(lst,node)) {
+					lst.add(MenuData2Dto(node));
+				}
 			}
-			addParentMenuTree(lst,parent);
 		} else {
 			if (!ContainsNode(lst,node)) {
 				lst.add(MenuData2Dto(node));
@@ -139,7 +145,7 @@ public class MenuOP extends TreeSort {
 		sortMenuList(lstTree);
 		for (Dto dto : lstTree) {
 			List<Dto> childs = (List<Dto>) dto.get("children");
-			if (childs.size()>0) {
+			if (childs!=null && childs.size()>0) {
 				sortAllMenuList(childs);
 			}
 		}

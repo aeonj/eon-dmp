@@ -103,6 +103,12 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
     <S extends T> S  update(S entity);
 
     /**
+     * 新增或更新一个对象，主要用于更新一个在persistenceContext之外的一个对象。根据ID值是否为空来判断是否新增还是更新，此保存不处理lastTime和rg_code等固定字段
+     * @param entity 需要更新的对象，该对象不需要在persistenceContext中。
+     */
+    <S extends T> S  mergeSave(S entity);
+
+    /**
      * 根据对象id删除一个对象，该对象类型为T,等同于deleteById
      * @param id 需要删除的对象的id。
      */

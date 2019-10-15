@@ -92,24 +92,27 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         for (UIManager uiManager : uiManagerList) {
             UIManager vf = uiManageDAO.getOne("ui_code",uiManager.getUi_code());
             if (vf!=null) {
-                uiManageDAO.remove(vf);
+                uiManager.setId(vf.getId());
             }
             UIManager uiparent = uiManageDAO.getBy(null, "ui_code", uiManager.getUi_code().substring(0, uiManager.getUi_code().length() - 3));
             uiManager.setParent_id(uiparent == null ? null : uiparent.getId());
-            uiManageDAO.save(uiManager);
+            uiManageDAO.mergeSave(uiManager);
         }
 
         //初始化菜单
         impTableJsonData(getClassPathStream("static/data/json/sys_menugroup.json"), (Map<String, Object> mapRecord) -> {
             MenuGroup menuGroup = BeanUtil.mapToBeanIgnoreCase(mapRecord, MenuGroup.class, true);
+            MenuGroup vf =menuGroupDAO.getOne("name",menuGroup.getName());
+            if (vf!=null) {
+                menuGroup.setId(vf.getId());
+            } else {
+                menuGroup.setId(null);
+                menuGroupDAO.save(menuGroup);
+            }
             Stack<Menu> stack = new Stack();
             impTableJsonData(getClassPathStream("static/data/json/sys_menu.json"), (Map<String, Object> mapMenu) -> {
                 if (mapMenu.get("mg_id").equals(mapRecord.get("id"))) {
                     Menu menu = BeanUtil.mapToBeanIgnoreCase(mapMenu, Menu.class, true);
-                    Menu mvf = menuDAO.getOne("menuCode",menu.getMenuCode());
-                    if (mvf!=null) {
-                        menuDAO.remove(mvf);
-                    }
                     menu.setMg(menuGroup);
 
                     if (CommUtil.isEmpty(mapMenu.get("parent_id"))) {
@@ -119,20 +122,18 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
                     }
                 }
             });
-            MenuGroup vf =menuGroupDAO.getOne("name",menuGroup.getName());
-            if (vf!=null) {
-                menuGroupDAO.remove(vf);
-            }
-            menuGroup.setId(null);
-            menuGroupDAO.save(menuGroup);
 
             while (!stack.isEmpty()) {
                 Menu menu = stack.pop();
                 System.out.println(menu.getMenuCode() + menu.getMenuName());
                 Long parent_id = menu.getId();
-                Menu save;
-                menu.setId(null);
-                save = menuDAO.save(menu);
+                Menu mvf = menuDAO.getOne("menuCode",menu.getMenuCode());
+                if (mvf!=null) {
+                    menu.setId(mvf.getId());
+                } else {
+                    menu.setId(null);
+                }
+                Menu save = menuDAO.mergeSave(menu);
                 //处理
                 List<Menu> childs = CollectionUtil.filter(menuGroup.getMenus(), (Menu child) -> (
                         child.getParent_id().longValue() == parent_id.longValue()
@@ -151,11 +152,10 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
             Element vf = elementDAO.getOne("ele_code",obj.getEle_code());
             if (vf==null) {
                 obj.setId(null);
-                elementDAO.save(obj);
             } else {
                 obj.setId(vf.getId());
-                elementDAO.update(obj);
             }
+            elementDAO.mergeSave(obj);
         });
 
         //初始化枚举值
@@ -164,11 +164,10 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
             Enumerate vf = enumerateDAO.getOne("field",obj.getField(),"code",obj.getCode());
             if (vf==null) {
                 obj.setId(null);
-                enumerateDAO.save(obj);
             } else {
                 obj.setId(vf.getId());
-                enumerateDAO.update(obj);
             }
+            enumerateDAO.mergeSave(obj);
         });
 
 

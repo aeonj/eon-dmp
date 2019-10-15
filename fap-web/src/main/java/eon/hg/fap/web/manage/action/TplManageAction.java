@@ -158,7 +158,7 @@ public class TplManageAction {
 			Dto rn = (Dto) lstEle.get(i);
 			List innerList = (List)rn.get("children");
 			lstV.add(rn);
-			if (innerList.size()>=0) {
+			if (innerList!=null && innerList.size()>=0) {
 				lstV.addAll(getRenderShowList((List)rn.get("children")));
 			}
 		}
