@@ -14,7 +14,7 @@ public interface IMenuGroupService {
 	 * @param instance
 	 * @return 是否保存成功
 	 */
-	boolean save(MenuGroup instance);
+	MenuGroup save(MenuGroup instance);
 	
 	/**
 	 * 根据一个ID得到MenuGroup
@@ -30,7 +30,7 @@ public interface IMenuGroupService {
 	 * @param id
 	 * @return
 	 */
-	boolean delete(Long id);
+	void delete(Long id);
 	
 	/**
 	 * 批量删除MenuGroup
@@ -38,7 +38,7 @@ public interface IMenuGroupService {
 	 * @param ids
 	 * @return
 	 */
-	boolean batchDelete(List<Long> ids);
+	void batchDelete(List<Long> ids);
 	
 	/**
 	 * 通过一个查询对象得到MenuGroup
@@ -61,7 +61,7 @@ public interface IMenuGroupService {
 	 * @param instance
 	 *            需要更新的MenuGroup
 	 */
-	boolean update(MenuGroup instance);
+	MenuGroup update(MenuGroup instance);
 	
 	/**
 	 * 
@@ -81,6 +81,6 @@ public interface IMenuGroupService {
 	 */
 	MenuGroup getObjByProperty(String construct, String propertyName, Object value);
 
-	boolean saveDirtyData(String insertdata, String updatedata, String removedata);
+	void saveDirtyData(String insertdata, String updatedata, String removedata);
 
 }

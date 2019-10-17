@@ -73,7 +73,9 @@ public class MenuManageAction extends BizAction {
     @RequestMapping("/menu_tree_mg.htm")
     public List<Dto> menu_tree_mg(Long mg_id) {
         QueryObject qo = new QueryObject();
-        qo.addQuery("obj.mg.id",new SysMap("mgid",mg_id),"=");
+        if (configService.getSysConfig().isDisplay_menu_group()) {
+            qo.addQuery("obj.mg.id", new SysMap("mgid", mg_id), "=");
+        }
         List<Menu> menus = this.menuService.find(qo);
         List<Dto> dtoList = menuOp.getCardMenuList(menus);
         return dtoList;
@@ -114,7 +116,20 @@ public class MenuManageAction extends BizAction {
                                        @RequestParam("mg_id") Long menuGroupId,
                                        @RequestParam("menuCode") String code) {
         if (CommUtil.isEmpty(menuGroupId)) {
-            return ErrTipMsg("请指定菜单组");
+            if (configService.getSysConfig().isDisplay_menu_group()) {
+                return ErrTipMsg("请指定菜单组");
+            } else {
+                List<MenuGroup> menuGroups = this.menuGroupService.find(new QueryObject());
+                if (menuGroups!=null && menuGroups.size()>0) {
+                    menuGroupId = menuGroups.get(0).getId();
+                } else {
+                    MenuGroup menuGroup = new MenuGroup();
+                    menuGroup.setName("系统管理");
+                    menuGroup.setType("MANAGE");
+                    menuGroup.setSequence(0);
+                    menuGroupId = this.menuGroupService.save(menuGroup).getId();
+                }
+            }
         }
         Menu vf = this.menuService.getObjByProperty(null, "menuCode", code);
         if (vf==null) {

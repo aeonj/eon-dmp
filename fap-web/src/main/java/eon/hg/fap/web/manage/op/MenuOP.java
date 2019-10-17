@@ -10,9 +10,11 @@ import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.model.primary.Menu;
 import eon.hg.fap.db.model.primary.MenuGroup;
+import eon.hg.fap.db.model.primary.Role;
 import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.service.IMenuGroupService;
 import eon.hg.fap.db.service.IMenuService;
+import eon.hg.fap.db.service.ISysConfigService;
 import eon.hg.fap.db.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,8 @@ import java.util.*;
 
 @Component
 public class MenuOP extends TreeSort {
+	@Autowired
+	private ISysConfigService sysConfigService;
 	@Autowired
 	private IUserService userService;
 	@Autowired
@@ -70,32 +74,66 @@ public class MenuOP extends TreeSort {
 
     public List<MenuGroup> getCardMgs() {
 		if (AeonConstants.SUPER_USER.equals(SecurityUserHolder.getOnlineUser().getUsername())) {
-			List<MenuGroup> menuGroups = this.menuGroupService.query("select obj from MenuGroup obj order by obj.sequence",null,-1,-1);
-			for (MenuGroup menuGroup : menuGroups) {
-				List<Dto> treeList = getCardMenuList(menuGroup.getMenus());
+			if (sysConfigService.getSysConfig().isDisplay_menu_group()) {
+				List<MenuGroup> menuGroups = this.menuGroupService.query("select obj from MenuGroup obj order by obj.sequence", null, -1, -1);
+				for (MenuGroup menuGroup : menuGroups) {
+					List<Dto> treeList = getCardMenuList(menuGroup.getMenus());
+					CommUtil.updateTreesLeaf(treeList);
+					String menuListJson = JsonHandler.toJson(treeList);
+					menuGroup.setMenujson(menuListJson);
+				}
+				return menuGroups;
+			} else {
+				List<Menu> menuList = this.menuService.query("select obj from Menu obj order by obj.sequence",null, -1,-1);
+				List<Dto> treeList = getCardMenuList(menuList);
 				CommUtil.updateTreesLeaf(treeList);
-				String menuListJson = JsonHandler.toJson(treeList);
-				menuGroup.setMenujson(menuListJson);
+				List<MenuGroup> menuGroupList = new ArrayList<>();
+				fillMenuGroupList(treeList, menuGroupList);
+				return menuGroupList;
 			}
-			return menuGroups;
 		} else {
 			List<User> list = this.userService.query("select user from User as user join fetch user.roles as role join fetch role.menus as menu where user.id=:id", new HashMap() {{
 				put("id", CommUtil.null2Long(SecurityUserHolder.getOnlineUser().getUserid()));
 			}}, -1, -1);
 			if (list != null && list.size() > 0) {
 				User user = list.get(0);
-				for (MenuGroup menuGroup : user.getMgs()) {
-					List<Dto> treeList = getCardMenuList(menuGroup.getAuthmenus());
+				if (sysConfigService.getSysConfig().isDisplay_menu_group()) {
+					for (MenuGroup menuGroup : user.getMgs()) {
+						List<Dto> treeList = getCardMenuList(menuGroup.getAuthmenus());
+						CommUtil.updateTreesLeaf(treeList);
+						String menuListJson = JsonHandler.toJson(treeList);
+						menuGroup.setMenujson(menuListJson);
+					}
+					return user.getMgs();
+				} else {
+					Set<Menu> menuSet = new HashSet<>();
+					for (Role role : user.getRoles()) {
+						menuSet.addAll(role.getMenus());
+					}
+					List<Dto> treeList = getCardMenuList(menuSet);
 					CommUtil.updateTreesLeaf(treeList);
-					String menuListJson = JsonHandler.toJson(treeList);
-					menuGroup.setMenujson(menuListJson);
+					List<MenuGroup> menuGroupList = new ArrayList<>();
+					fillMenuGroupList(treeList, menuGroupList);
+					return menuGroupList;
 				}
-				return user.getMgs();
 			} else {
 				return new ArrayList<>();
 			}
 		}
     }
+
+	private void fillMenuGroupList(List<Dto> treeList, List<MenuGroup> menuGroupList) {
+		for (Dto dtoGroup : treeList) {
+            MenuGroup mg = new MenuGroup();
+            mg.setId(dtoGroup.getLong("id"));
+            mg.setName(dtoGroup.getString("name"));
+            mg.setSequence(dtoGroup.getInteger("sequence"));
+            mg.setType("1");
+            mg.setIcons(dtoGroup.getString("iconcls"));
+            mg.setMenujson(JsonHandler.toJson(dtoGroup.get("children")));
+            menuGroupList.add(mg);
+        }
+	}
 
 	/**
 	 * 菜单管理左侧树
@@ -110,27 +148,32 @@ public class MenuOP extends TreeSort {
 		} else {
 			menus = userOp.getCurrRegion().getMenus();
 		}
-		List<Dto> lstTree = new ArrayList<Dto>();
-		for (Dto dto : getCardMenuList(menus)) {
-			List<MenuGroup> menuGroups = this.menuGroupService.query("select obj from MenuGroup obj join fetch obj.menus as menu where menu.id=:menuid",new HashMap() {{
-				put("menuid",dto.getLong("id"));
-			}}, -1,-1);
-			if (menuGroups!=null && menuGroups.size()==1) {
-				MenuGroup mg = menuGroups.get(0);
-				mg.getChild().add(dto);
-				addMgTree(lstTree,menuGroups.get(0));
+		List<Dto> lstTree;
+		if (sysConfigService.getSysConfig().isDisplay_menu_group()) {
+			lstTree = new ArrayList<Dto>();
+			for (Dto dto : getCardMenuList(menus)) {
+				List<MenuGroup> menuGroups = this.menuGroupService.query("select obj from MenuGroup obj join fetch obj.menus as menu where menu.id=:menuid", new HashMap() {{
+					put("menuid", dto.getLong("id"));
+				}}, -1, -1);
+				if (menuGroups != null && menuGroups.size() == 1) {
+					MenuGroup mg = menuGroups.get(0);
+					mg.getChild().add(dto);
+					addMgTree(lstTree, menuGroups.get(0));
 
+				}
 			}
-		}
-		//加载未挂载的菜单组
-		if (containAllMenuGroup) {
-			List<MenuGroup> menuGroups = this.menuGroupService.query("select obj from MenuGroup obj", new HashMap(), -1, -1);
-			for (MenuGroup mg : menuGroups) {
-				addMgTree(lstTree, mg);
+			//加载未挂载的菜单组
+			if (containAllMenuGroup) {
+				List<MenuGroup> menuGroups = this.menuGroupService.query("select obj from MenuGroup obj", new HashMap(), -1, -1);
+				for (MenuGroup mg : menuGroups) {
+					addMgTree(lstTree, mg);
+				}
 			}
-		}
 
-		sortMenuList(lstTree);
+			sortMenuList(lstTree);
+		} else {
+			lstTree = getCardMenuList(menus);
+		}
 
 		boolean isChecked = dtoParam.getString("selectmodel").equalsIgnoreCase("multiple") ;
 		if (isChecked) {

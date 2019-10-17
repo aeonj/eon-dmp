@@ -69,5 +69,6 @@ public class SysConfig extends IdEntity {
 	private int menu_tab = 1;  //功能样式  0:单页面 1:多页面
 	private Date updDate; //项目最新更新时间
 	private boolean db_reset=false;  //是否重置平台数据
+	private boolean display_menu_group=false;  //是否显示菜单组
 
 }

@@ -286,6 +286,15 @@ public class UserManageAction extends BizAction {
             user.setIs_deleted(true);
             user.getRoles().clear();
             user.setUserName("_" + user.getUsername());
+            boolean is_exists = true;
+            while (is_exists) {
+                User vf = this.userService.getObjByProperty(null, "userName", user.getUsername());
+                if (vf != null) {
+                    user.setUserName("_" + user.getUsername());
+                } else {
+                    is_exists = false;
+                }
+            }
             user.setMobile("_" + user.getMobile());
             user.setEmail("_" + user.getEmail());
             this.userService.update(user);

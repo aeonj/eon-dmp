@@ -26,8 +26,8 @@ public class MenuGroupServiceImpl implements IMenuGroupService {
      * @return 是否保存成功
      */
     @Override
-    public boolean save(MenuGroup instance) {
-        return false;
+    public MenuGroup save(MenuGroup instance) {
+        return this.menuGroupDAO.save(instance);
     }
 
     /**
@@ -48,8 +48,8 @@ public class MenuGroupServiceImpl implements IMenuGroupService {
      * @return
      */
     @Override
-    public boolean delete(Long id) {
-        return false;
+    public void delete(Long id) {
+        this.menuGroupDAO.remove(id);
     }
 
     /**
@@ -59,8 +59,10 @@ public class MenuGroupServiceImpl implements IMenuGroupService {
      * @return
      */
     @Override
-    public boolean batchDelete(List<Long> ids) {
-        return false;
+    public void batchDelete(List<Long> ids) {
+        for (Long id: ids) {
+            this.menuGroupDAO.remove(id);
+        }
     }
 
     /**
@@ -91,8 +93,8 @@ public class MenuGroupServiceImpl implements IMenuGroupService {
      * @param instance
      */
     @Override
-    public boolean update(MenuGroup instance) {
-        return false;
+    public MenuGroup update(MenuGroup instance) {
+        return this.menuGroupDAO.update(instance);
     }
 
     /**
@@ -120,7 +122,7 @@ public class MenuGroupServiceImpl implements IMenuGroupService {
 
     @Transactional
     @Override
-    public boolean saveDirtyData(String insertdata, String updatedata, String removedata) {
+    public void saveDirtyData(String insertdata, String updatedata, String removedata) {
         List<MenuGroup> inserts = JsonHandler.parseList(insertdata,MenuGroup.class);
         for (MenuGroup mg:inserts) {
             mg.setId(null);
@@ -133,6 +135,5 @@ public class MenuGroupServiceImpl implements IMenuGroupService {
         }
         List<MenuGroup> removes = JsonHandler.parseList(removedata,MenuGroup.class);
         this.menuGroupDAO.deleteAll(removes);
-        return true;
     }
 }
