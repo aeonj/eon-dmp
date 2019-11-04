@@ -40,7 +40,7 @@ eon:
     security:
       authType: token
       oauth2:
-        storeType: jwt         #TokenStore存储类别：jdbc,redis,jwt
+        storeType: redis         #TokenStore存储类别：jdbc,redis,jwt
     async:
       corePoolSize : 10
       maxPoolSize : 200

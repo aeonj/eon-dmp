@@ -3,15 +3,10 @@ server:
 spring:
   datasource:
     primary:
-      jdbc-url: jdbc:mysql://192.168.10.253:3306/cruise?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      jdbc-url: jdbc:mysql://192.168.10.253:3306/cruise_test?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
       username: root
       password: 123456
       driver-class-name: com.mysql.cj.jdbc.Driver
-    secondary:
-      jdbc-url: jdbc:oracle:thin:@192.168.10.252:1521:orcl
-      username: cruise
-      password: 123
-      driver-class-name: oracle.jdbc.OracleDriver
   application:
     name: 禾冠平台
   jpa:
@@ -25,8 +20,16 @@ spring:
           auto: update
         format_sql: true
         enable_lazy_load_no_trans: false     #支持全局实体的懒加载，但开销很大
+        cache:
+          use_query_cache: true
+          use_second_level_cache: true
+          provider_configuration_file_resource_path: ehcache.xml
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+  cache:
+    type: ehcache   #支持ehcache、redis
   redis:
-    database: 0
+    database: 11
     host: localhost
     port: 6379
     password:
@@ -68,7 +71,7 @@ security:
 eon:
   hg:
     security:
-      authType: token    #认证方式，session，token
+      authType: session    #认证方式，session，token
       oauth2:
         storeType: jdbc    #jdbc，redis，jwt几种模式，需要与授权服务器一致
         resourceId: oauth2-resource

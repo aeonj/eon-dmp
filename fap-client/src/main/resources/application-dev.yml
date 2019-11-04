@@ -32,7 +32,7 @@ spring:
           region:
             factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
   cache:
-    type: redis   #支持ehcache、redis
+    type: ehcache   #支持ehcache、redis
   redis:
     database: 1
     host: localhost

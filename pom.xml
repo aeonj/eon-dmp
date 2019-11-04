@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>eon.hg.fap</groupId>
 	<artifactId>fap-project</artifactId>
-	<version>2.0.1-SNAPSHOT</version>
+	<version>2.0.1-RELEASE</version>
 	<packaging>pom</packaging>
 	<name>fap-project</name>
 	<description>Platform project for Spring Boot</description>
@@ -95,10 +95,10 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<!--Redis和jdbc的Session共享-->
-		<dependency>
+		<!--dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-data-redis</artifactId>
-		</dependency>
+		</dependency-->
 		<!--dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-jdbc</artifactId>
