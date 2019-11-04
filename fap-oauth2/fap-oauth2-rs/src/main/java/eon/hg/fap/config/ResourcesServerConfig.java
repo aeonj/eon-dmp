@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConv
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.web.cors.CorsUtils;
 
 @Configuration
 @EnableResourceServer
@@ -55,6 +56,7 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
         http.headers().frameOptions().sameOrigin();
         http
                 .authorizeRequests()     //配置安全策略
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
                     @Override
                     public <O extends FilterSecurityInterceptor> O postProcess(O object) {
@@ -64,6 +66,8 @@ public class ResourcesServerConfig extends ResourceServerConfigurerAdapter {
                     }
                 })
                 .anyRequest().authenticated()
+                .and()
+                .cors()
                 .and()
                 .csrf()
                 .disable();

@@ -13,6 +13,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.provider.token.DefaultAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.DefaultUserAuthenticationConverter;
 import org.springframework.security.oauth2.provider.token.TokenStore;
@@ -20,10 +21,7 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Configuration
 @ConditionalOnProperty(
@@ -51,7 +49,11 @@ public class JwtTokenStoreConfig {
             public Authentication extractAuthentication(Map<String, ?> map) {
                 if (map.containsKey("uom")) {
                     Map mapUser = (Map)map.get("uom");
-                    Set<GrantedAuthority> grantedAuthoritySet = new HashSet<>((Collection) mapUser.get("authorities"));
+                    Set<GrantedAuthority> grantedAuthoritySet = new HashSet<>();
+                    for (LinkedHashMap hm : (Collection<LinkedHashMap>) mapUser.get("authorities")) {
+                        GrantedAuthority gAuth = new SimpleGrantedAuthority(Convert.toStr(hm.get("authority"),""));
+                        grantedAuthoritySet.add(gAuth);
+                    }
                     String userid = Convert.toStr(mapUser.get("userid"),"-1");
                     String username = Convert.toStr(mapUser.get("username"),"");
                     String password = Convert.toStr(mapUser.get("userid"));
