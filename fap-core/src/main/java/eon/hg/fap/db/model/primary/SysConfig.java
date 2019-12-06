@@ -5,6 +5,7 @@ import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
 import lombok.ToString;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -68,7 +69,11 @@ public class SysConfig extends IdEntity {
 	@Column(length = 2)
 	private int menu_tab = 1;  //功能样式  0:单页面 1:多页面
 	private Date updDate; //项目最新更新时间
+    @ColumnDefault("0")
 	private boolean db_reset=false;  //是否重置平台数据
+    @ColumnDefault("0")
 	private boolean display_menu_group=false;  //是否显示菜单组
+    @ColumnDefault("1")
+    private boolean default_sys_type=true;   //是否默认业务系统类型，涉及到首页跳转页面，设置为true，首页默认跳转到manage/index.htm
 
 }

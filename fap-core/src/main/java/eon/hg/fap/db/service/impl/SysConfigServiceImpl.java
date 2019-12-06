@@ -66,6 +66,7 @@ public class SysConfigServiceImpl extends AbstractCacheOperator implements ISysC
 		List<SysConfig> configs = this.sysConfigDao.findAll();
 		if (configs != null && configs.size() > 0) {
 			SysConfig sc = configs.get(0);
+			Globals.DEFAULT_SYS_TYPE = sc.isDefault_sys_type();
 			if (sc.getUploadFilePath() == null) {
 				sc.setUploadFilePath(Globals.UPLOAD_FILE_PATH);
 			}
@@ -158,6 +159,7 @@ public class SysConfigServiceImpl extends AbstractCacheOperator implements ISysC
             sc.setWebsiteLogo(logoIcon);
 			sc.setDb_reset(true);
 			this.save(sc);
+			Globals.DEFAULT_SYS_TYPE = sc.isDefault_sys_type();
 			return sc;
 		}
 	}

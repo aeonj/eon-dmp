@@ -4,9 +4,11 @@
 package eon.hg.fap.core.cache;
 
 import cn.hutool.crypto.SecureUtil;
+import eon.hg.fap.common.properties.PropertiesBean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The class AbstractCacheOperator.
@@ -15,6 +17,9 @@ import java.util.*;
  * @version dns1.0, Mar 2, 2013
  */
 public abstract class AbstractCacheOperator implements CacheOperator,java.io.Serializable {
+
+	@Autowired
+	PropertiesBean propertiesBean;
 
 	@Autowired
 	RedisPool redisPool;
@@ -27,8 +32,10 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 		if (cachePool.containsKey(cacheId)) {
 			cachePool.get(cacheId).clear();
 		}
-		if (redisPool.hasKey(cacheId)) {
-			redisPool.del(cacheId);
+		if ("redis".equals(propertiesBean.getCache_type())) {
+			if (redisPool.hasKey(cacheId)) {
+				redisPool.del(cacheId);
+			}
 		}
 	}
 
@@ -40,8 +47,10 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 			if (cachePool.containsKey(cacheId)) {
 				cachePool.get(cacheId).remove(key);
 			}
-			if (redisPool.hasKey(cacheId)) {
-				redisPool.hdel(cacheId, key);
+			if ("redis".equals(propertiesBean.getCache_type())) {
+				if (redisPool.hasKey(cacheId)) {
+					redisPool.hdel(cacheId, key);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -54,8 +63,10 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 			if (cachePool.containsKey(cacheId)) {
 				cachePool.remove(cacheId);
 			}
-			if (redisPool.hasKey(cacheId)) {
-				redisPool.del(cacheId);
+			if ("redis".equals(propertiesBean.getCache_type())) {
+				if (redisPool.hasKey(cacheId)) {
+					redisPool.del(cacheId);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -90,6 +101,9 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 	 */
 	@Override
 	public <T> T getCache(Object... params) throws Exception {
+		if ("ehcache".equals(propertiesBean.getCache_type())) {
+			return getPoolCache(params);
+		}
 		String cacheId = getCacheId(params);
 
 		String key = getKey(params);

@@ -9,6 +9,9 @@ public class PropertiesBean {
 
     public static String UPLOAD_FOLDER;
 
+    @Value("${spring.cache.type}")
+    private String cache_type;
+
     @Value("${eon.hg.file.upload_folder}")
     public void setUploadFolder(String uploadFolder) {
         if (StrUtil.isNotBlank(uploadFolder)) {
@@ -16,5 +19,9 @@ public class PropertiesBean {
         } else {
             PropertiesBean.UPLOAD_FOLDER = "D:/";
         }
+    }
+
+    public String getCache_type() {
+        return cache_type;
     }
 }
