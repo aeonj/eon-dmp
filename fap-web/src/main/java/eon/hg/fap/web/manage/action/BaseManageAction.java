@@ -1,7 +1,9 @@
 package eon.hg.fap.web.manage.action;
 
 import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.common.properties.SecurityProperties;
 import eon.hg.fap.core.annotation.Log;
+import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.LogType;
 import eon.hg.fap.core.mv.JModelAndView;
@@ -14,9 +16,15 @@ import eon.hg.fap.db.service.ISysConfigService;
 import eon.hg.fap.db.service.IUserConfigService;
 import eon.hg.fap.db.service.IUserService;
 import eon.hg.fap.security.SecurityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.security.web.DefaultRedirectStrategy;
+import org.springframework.security.web.RedirectStrategy;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,7 +32,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +40,8 @@ import java.util.Map;
  * @author AEON
  *
  */
-@Controller
+@Slf4j
+@RestController
 public class BaseManageAction extends BizAction{
 	@Autowired
 	private ISysConfigService configService;
@@ -43,15 +51,56 @@ public class BaseManageAction extends BizAction{
 	private IUserService userService;
 	@Autowired
 	SecurityManager securityManager;
+	@Autowired
+	SecurityProperties securityProperties;
+	//重定向策略
+	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+	//请求缓存session
+	private RequestCache requestCache = new HttpSessionRequestCache();
+
 
 	@RequestMapping("/")
-    public String index() {
+    public void index(HttpServletRequest request,
+						HttpServletResponse response) throws IOException {
 		if (Globals.DEFAULT_SYS_TYPE) {
-			return "redirect:manage/index.htm";
+			redirectStrategy.sendRedirect(request, response, "manage/index.htm");
 		} else {
-			return "redirect:index.htm";
+			redirectStrategy.sendRedirect(request, response, securityProperties.getIndex_url());
 		}
     }
+
+    @RequestMapping("/login.htm")
+	public void login(HttpServletRequest request,
+							HttpServletResponse response) throws IOException{
+		SavedRequest savedRequest = requestCache.getRequest(request,response);
+		if (savedRequest != null){
+			//获取 跳转url
+			String targetUrl = savedRequest.getRedirectUrl();
+			log.info("引发跳转的请求是:"+targetUrl);
+			boolean isAjaxRequest = false;
+			if(savedRequest.getHeaderNames().contains("x-requested-with") && "xmlhttprequest".equalsIgnoreCase(savedRequest.getHeaderValues("x-requested-with").get(0))) {
+                isAjaxRequest = true;
+			}
+			HttpSession session = request.getSession(false);
+			session.setAttribute("ajax_login", isAjaxRequest);
+
+
+			if (targetUrl.indexOf("/manage/") >= 0) {//判断是否为后台业务管理请求
+				targetUrl = "/manage/login.htm";
+				redirectStrategy.sendRedirect(request,response,targetUrl);
+			} else {
+				targetUrl = securityProperties.getLogin_url();
+				redirectStrategy.sendRedirect(request,response,targetUrl);
+			}
+		} else {
+            if (isAjaxRequest(request)) {
+                response.setStatus(AeonConstants.Ajax_Timeout);
+                setErrTipMsg("登录超时！",response);
+            } else {
+                redirectStrategy.sendRedirect(request, response, securityProperties.getLogin_url());
+            }
+		}
+	}
 
 	/**
 	 * 用户登录后去向控制，根据用户角色UserRole进行控制,该请求不纳入权限管理
@@ -63,70 +112,46 @@ public class BaseManageAction extends BizAction{
 	@Log(title = "用户登陆", type = LogType.LOGIN)
 	@RequestMapping("/login_success.htm")
 	public void login_success(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
+							 HttpServletResponse response) throws IOException {
 		if (SecurityUserHolder.getOnlineUser() != null) {
 			User user = this.userService.getObjById(CommUtil.null2Long(SecurityUserHolder
 					.getOnlineUser().getUserid()));
-			user.setLoginDate(new Date());
-			user.setLoginIp(CommUtil.getIpAddr(request));
-			user.setLoginCount(user.getLoginCount() + 1);
 			//此处在并发用户(同一用户在不同地址登录)比较多的情况下可能会更新失败 Row was updated or deleted by another transaction by aeon 2015.9.15
 			this.userService.update(user);
-			
+
 			//重新加载权限
 			if (this.securityManager.isResetAuthorities()) {
 				this.securityManager.loadUrlAuthorities();
 			}
 			HttpSession session = request.getSession(false);
 			session.setAttribute("user", user);
-			session.setAttribute("userName", user.getUsername());
 			session.setAttribute("rgCode", user.getRg_code());
-			session.setAttribute("lastLoginDate", new Date());// 设置登录时间
-			session.setAttribute("loginIp", CommUtil.getIpAddr(request));// 设置登录IP
-			session.setAttribute("login", true);// 设置登录标识
-			String role = user.getUserRole();
-			String url = CommUtil.getURL(request) + "/user_login_success.htm";
-			if (!CommUtil.null2String(
-					request.getSession(false).getAttribute("refererUrl"))
-					.equals("")) {
-				url = CommUtil.null2String(request.getSession(false)
-						.getAttribute("refererUrl"));
+			//获取 跳转url
+			String targetUrl = securityProperties.getIndex_url();
+			SavedRequest savedRequest = requestCache.getRequest(request,response);
+			if (savedRequest!=null) {
+				targetUrl = savedRequest.getRedirectUrl();
 			}
 			String login_role = (String) session.getAttribute("login_role");
-			//String login_role = user.getUserRole();
-			boolean ajax_login = CommUtil.null2Boolean(session
-					.getAttribute("ajax_login"));
-			if (ajax_login) {
-				write("success",response);
-			} else {
-				if (login_role.equalsIgnoreCase("manage") && role.indexOf("MANAGE") >= 0) {
-					url = CommUtil.getURL(request) + "/manage/index.htm";
+			if (login_role.equalsIgnoreCase("manage")) {
+				if (user.getUserRole().equals("MANAGE")) {
 					request.getSession(false).setAttribute("admin_login",
 							true);
+					targetUrl = CommUtil.getURL(request) + "/manage/index.htm";
 					Map dto = new HashMap();
-					dto.put("success", true);
-					dto.put("msg", "用户登录成功！");
-					dto.put("url", url);
-					dto.put("user_id", user.getId());
+					dto.put("success",true);
+					dto.put("userid", user.getId());
+					dto.put("url", targetUrl);
 					write(JsonHandler.toJson(dto),response);
-					return;
-				} else if (!CommUtil.null2String(
-						request.getSession(false).getAttribute("refererUrl"))
-						.equals("")) {
-					url = CommUtil.null2String(request.getSession(false)
-							.getAttribute("refererUrl"));
-					request.getSession(false).removeAttribute("refererUrl");
+				} else {
+					setErrTipMsg("该用户没有后台业务管理权限！",response);
 				}
-				
-				String userAgent = request.getHeader("user-agent");
-				if (userAgent != null && userAgent.indexOf("Mobile") > 0) {
-					url = CommUtil.getURL(request) + "/wap/index.htm?type=login";
-				}
-				response.sendRedirect(url);
+			} else {
+				redirectStrategy.sendRedirect(request,response,targetUrl);
 			}
+
 		} else {
-			String url = CommUtil.getURL(request) + "/index.htm";
-			response.sendRedirect(url);
+			setErrTipMsg("未成功登录！",response);
 		}
 
 	}
@@ -134,106 +159,33 @@ public class BaseManageAction extends BizAction{
 	/**
 	 * 用户成功退出后的URL导向
 	 * 
-	 * @param request
 	 * @param response
 	 * @throws IOException
 	 */
 	@RequestMapping("/logout_success.htm")
-	public void logout_success(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-//		boolean admin_login = CommUtil.null2Boolean(session
-//				.getAttribute("admin_login"));
-		boolean admin_login = true;
-		String targetUrl = CommUtil.getURL(request) + "/user/login.htm";
-		if (admin_login) {
-			targetUrl = CommUtil.getURL(request) + "/manage/login.htm";
-		}
-		String userAgent = request.getHeader("user-agent");
-		if (userAgent != null && userAgent.indexOf("Mobile") > 0) {
-			targetUrl = CommUtil.getURL(request) + "/wap/index.htm";
-		}
-		response.sendRedirect(targetUrl);
+	public void logout_success(HttpServletResponse response)  {
+		setOkTipMsg("退出登录成功！",response);
 	}
 
 	/**
 	 * 根据重定向登录标识，区分跳转和报错页面
-	 * @param request
 	 * @param response
 	 * @throws IOException
 	 * @author AEON
 	 */
 	@RequestMapping("/login_error.htm")
-	public void login_error(HttpServletRequest request,
-			HttpServletResponse response) throws IOException {
-		if (request.getSession(false).getAttribute("redirectlogin")!=null) {
-			String redirectlogin = request.getSession(false).getAttribute("redirectlogin").toString();
-			request.getSession(false).removeAttribute("redirectlogin");
-			response.sendRedirect(redirectlogin);
-		} else {
-			response.sendRedirect(CommUtil.getURL(request) + "/login_error_local.htm");
-		}
-	}
-	
-	@RequestMapping("/login_error_local.htm")
-	public ModelAndView login_error_local(HttpServletRequest request,
-                                          HttpServletResponse response) {
-		String login_role = (String) request.getSession(false).getAttribute(
-				"login_role");
-		ModelAndView mv = null;
-		String aeon_view_type = CommUtil.null2String(request.getSession(
-				false).getAttribute("aeon_view_type"));
-		//如果是wap端,跳转错误页面,重新登陆
-		String userAgent = request.getHeader("user-agent");
-		if (userAgent != null && userAgent.indexOf("Mobile") > 0) {
-					 mv = new JModelAndView("wap/common_error.html",
-								configService.getSysConfig(),
-								this.userConfigService.getUserConfig(), 1, request, response);
-					 mv.addObject("op_title", "登陆失败,请重新登陆");
-					 mv.addObject("url", CommUtil.getURL(request)
-								+ "/wap/pre_waplogin.htm");
-					return mv;
-			}
-		if (aeon_view_type != null && !aeon_view_type.equals("")) {
-			if (aeon_view_type.equals("weixin")) {
-				String store_id = CommUtil.null2String(request
-						.getSession(false).getAttribute("store_id"));
-				mv = new JModelAndView("weixin/error.html",
-						configService.getSysConfig(),
-						this.userConfigService.getUserConfig(), 1, request,
-						response);
-				mv.addObject("url", CommUtil.getURL(request)
-						+ "/weixin/index.htm?store_id=" + store_id);
-			}
-		} else {
-			if (login_role == null)
-				login_role = "public";
-			if (login_role.equalsIgnoreCase("manage")) {
-				Map dto = new HashMap();
-				dto.put("success", false);
-				dto.put("msg", "用户名或密码错误！");
-				dto.put("errorType", 3);
-				write(JsonHandler.toJson(dto),response);
-				return null;
-			}
-			if (login_role.equalsIgnoreCase("public")) {
-				mv = new JModelAndView("error.html",
-						configService.getSysConfig(),
-						this.userConfigService.getUserConfig(), 1, request,
-						response);
-				mv.addObject("url", CommUtil.getURL(request)
-						+ "/user/login.htm");
-			}
-		}
-		mv.addObject("op_title", "登录失败");
-		return mv;
+	public void login_error(HttpServletResponse response) throws IOException {
+		Map dto = new HashMap();
+		dto.put("success", false);
+		dto.put("msg", "用户名或密码错误！");
+		dto.put("errorType", 3);
+		write(JsonHandler.toJson(dto),response);
 	}
 	
 	@RequestMapping("/third_login.htm")
 	public void third_login(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		if (SecurityUserHolder.getOnlineUser()==null) {
-			request.getSession(false).removeAttribute("verify_code");
-			request.getSession(false).removeAttribute("bind");
 			response.sendRedirect(CommUtil.getURL(request)+"/iaeon_login.htm?username="
 					+ CommUtil.encode(request.getParameter("username"))
 					+ "&password=" + Globals.THIRD_ACCOUNT_LOGIN + request.getParameter("password")+"&login_role="+request.getParameter("login_role")+"&synclogin=0");
@@ -244,7 +196,7 @@ public class BaseManageAction extends BizAction{
 	public void third_logout(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		if (SecurityUserHolder.getOnlineUser()!=null) {
-			response.sendRedirect(CommUtil.getURL(request)+"/ixingyun_logout.htm?synclogout=0");
+			response.sendRedirect(CommUtil.getURL(request)+"/iaeon_logout.htm?synclogout=0");
 		}
 	}
 	
@@ -289,7 +241,7 @@ public class BaseManageAction extends BizAction{
 	 * @return
 	 */
 	@RequestMapping("/manage/login.htm")
-	public ModelAndView login(HttpServletRequest request,
+	public ModelAndView manage_login(HttpServletRequest request,
                               HttpServletResponse response) {
 		ModelAndView mv = new JModelAndView("login.html",
 				configService.getSysConfig(),

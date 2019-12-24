@@ -17,31 +17,25 @@ public @interface Log {
 	 * 
 	 * @return
 	 */
-	public String title() default "";
+	String title() default "";
 
 	/**
 	 * 
 	 * @return
 	 */
-	public String entityName() default "";
+	String entityName() default "";
 
 	/**
 	 * 
 	 * @return
 	 */
-	public LogType type();
+	LogType type();
 
 	/**
 	 * 方法描述
 	 * 
 	 * @return
 	 */
-	public String description() default "";
-
-	/**
-	 * 
-	 * @return
-	 */
-	public String ip() default "";
+	String description() default "";
 
 }

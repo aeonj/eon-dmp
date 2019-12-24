@@ -33,6 +33,7 @@ import java.io.IOException;
  * ，仅仅在构造函数中完成DnsAccessDeniedHandlerImpl的初始化工作即可
  * @author AEON
  */
+@Deprecated
 public class DnsSecurityExceptionFilter extends GenericFilterBean implements
         InitializingBean {
 	private AccessDeniedHandler accessDeniedHandler;

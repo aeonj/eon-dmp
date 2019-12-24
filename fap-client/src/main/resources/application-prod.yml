@@ -1,7 +1,14 @@
+server:
+  port: 8180
 spring:
   datasource:
     primary:
       jdbc-url: jdbc:mysql://localhost:3306/eon?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      username: root
+      password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    secondary:
+      jdbc-url: jdbc:mysql://localhost:3306/eon_2?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
       username: root
       password: root
       driver-class-name: com.mysql.cj.jdbc.Driver
@@ -10,14 +17,22 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
     generate-ddl: true
     properties:
       hibernate:
-        hbm2ddl:
-          auto: update
-        format_sql: true
+        format_sql: false
         enable_lazy_load_no_trans: false     #支持全局实体的懒加载，但开销很大
+        cache:
+          use_query_cache: true
+          use_second_level_cache: true
+          provider_configuration_file_resource_path: ehcache.xml
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+  cache:
+    type: ehcache   #支持ehcache、redis
   redis:
     database: 0
     host: localhost
@@ -42,7 +57,7 @@ spring:
   http:
     converters:
       preferred-json-mapper: fastjson
-security:
+#security:
 #  oauth2:
 #    client:
 #      clientId: cxj
@@ -60,7 +75,7 @@ security:
 #      check-token-access: http://localhost:8100/oauth/check_token
 logging:
   level:
-    root: debug
+    root: error
   path: /usr/local/logs/spring
 eon:
   hg:
@@ -69,12 +84,15 @@ eon:
       oauth2:
         storeType: jdbc    #jdbc，redis，jwt几种模式，需要与授权服务器一致
         resourceId: oauth2-resource
+      login_url: /manage/login.htm   #自定义登录地址
+      index_url: /portal/index.htm    #自定义首页地址
     async:
       corePoolSize : 10
       maxPoolSize : 200
       queueCapacity : 10
     hessian:
-      server-url: http://127.0.0.1:8080/vcf/remote/
+      server_url: http://127.0.0.1:8080/vcf/remote/
     file:
       upload_folder: /Users/aeon/Documents/uploadfile/
+
 

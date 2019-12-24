@@ -18,6 +18,6 @@ public class RelationMain extends IdEntity {
     private String name;  //关联名称
     @Column(length = 42,nullable = false)
     private String pri_ele;  //主控要素
-    @Column(length = 42,nullable = true)
+    @Column(length = 42,nullable = false)
     private String sec_ele;  //被控要素
 }

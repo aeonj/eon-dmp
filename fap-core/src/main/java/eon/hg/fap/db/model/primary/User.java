@@ -69,11 +69,6 @@ public class User extends IdEntity implements UserDetails {
 	private List<Menu> menus;
 	@Transient
 	private List<MenuGroup> mgs;
-	private Date lastLoginDate;// 上次登陆时间
-	private Date loginDate;// 登陆时间
-	private String lastLoginIp;// 上次登录IP
-	private String loginIp;// 登陆Ip
-	private int loginCount;// 登录次数
 	@OneToOne
 	private UserConfig config;
 	@Transient

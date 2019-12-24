@@ -830,16 +830,15 @@ Ext.onReady(function () {
             icon: Ext.MessageBox.QUESTION,
             fn: function (btn) {
                 if (btn == 'yes') {
-                    Ext.MessageBox.show({
-                        title: '请等待',
-                        msg: '正在注销...',
-                        width: 300,
-                        wait: true,
-                        waitConfig: {
-                            interval: 50
+                    Ext.Ajax.request({
+                        url : '/iaeon_logout.htm',
+                        success : function() {
+                            window.location.href = '/manage/login.htm';
+                        },
+                        failure : function(response) {
+
                         }
                     });
-                    window.location.href = '/iaeon_logout.htm';
                 }
             }
         });

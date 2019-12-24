@@ -29,7 +29,8 @@ public class Role extends IdEntity implements Comparable<Role>{
 	private String roleCode;   //角色编码
 	private String roleName;   //角色名称
 	private String type;// MANAGE为后台业务系统权限，PUBLIC为公众权限
-	private String info;// 角色说明
+	private String info;//
+	private Long parent_id;
 	private boolean builtin=false;// 是否内置角色
 	@ManyToMany(targetEntity = Menu.class, fetch = FetchType.LAZY)
 	@JoinTable(name = Globals.SYS_TABLE_SUFFIX + "role_menu", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "menu_id"))
@@ -101,6 +102,15 @@ public class Role extends IdEntity implements Comparable<Role>{
 	public void setInfo(String info) {
 		this.info = info;
 	}
+
+	public Long getParent_id() {
+		return parent_id;
+	}
+
+	public void setParent_id(Long parent_id) {
+		this.parent_id = parent_id;
+	}
+
 	/**
 	 * @return the menus
 	 */

@@ -14,6 +14,7 @@ import java.io.IOException;
  * @author AEON
  *
  */
+@Deprecated
 @Component
 public class LoginUrlEntryPoint implements AuthenticationEntryPoint {
 

@@ -85,6 +85,14 @@ public class BizAction {
 		outDto.put("msg", pMsg);
 		return outDto;
 	}
+
+	public boolean isAjaxRequest(HttpServletRequest request) {
+		if(request.getHeader("x-requested-with")!=null && "xmlhttprequest".equalsIgnoreCase(request.getHeader("x-requested-with"))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 	/**
 	 * 获取树形节点单击事件传到后台的节点唯一标识号 对应JS节点对象的ID属性,其Key值为:"node"

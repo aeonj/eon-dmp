@@ -1,6 +1,8 @@
 package eon.hg.fap.web.manage.action;
 
 import eon.hg.fap.common.util.metatype.Dto;
+import eon.hg.fap.core.annotation.Log;
+import eon.hg.fap.core.domain.LogType;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.query.support.IPageList;
@@ -68,6 +70,7 @@ public class ElementManageAction extends BizAction {
         }
     }
 
+    @Log(title = "要素修改", type = LogType.UPDATE, description = "完成了要素的修改")
     @SecurityMapping(title = "要素修改", value = "element:update")
     @PostMapping("/element_update.htm")
     public Dto element_update(@RequestParam Map<String, Object> mapPara,

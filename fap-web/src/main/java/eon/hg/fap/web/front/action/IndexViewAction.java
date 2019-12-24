@@ -13,6 +13,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Controller
 public class IndexViewAction {
@@ -23,29 +24,21 @@ public class IndexViewAction {
 	
 	@RequestMapping("/index.htm")
 	public ModelAndView index(HttpServletRequest request,
-                              HttpServletResponse response) {
-		if (Globals.DEFAULT_SYS_TYPE) {
-			ModelAndView mv = new JModelAndView("manage/index.html",
-					configService.getSysConfig(),
-					this.userConfigService.getUserConfig(), 0, request, response);
-			request.getSession(false).removeAttribute("verify_code");
-			return mv;
-		} else {
-			//默认跳转到登录页面 modify by aeon 2015.6.2
-			if (Globals.MUST_LOGIN_FLAG) {
-				if (SecurityUserHolder.getOnlineUser()==null) {
-					ModelAndView mv = new JModelAndView("login.html",
-							configService.getSysConfig(),
-							this.userConfigService.getUserConfig(), 1, request, response);
-					return mv;
-				}
+                              HttpServletResponse response) throws IOException {
+		//默认跳转到登录页面 modify by aeon 2015.6.2
+		if (Globals.MUST_LOGIN_FLAG) {
+			if (SecurityUserHolder.getOnlineUser()==null) {
+				ModelAndView mv = new JModelAndView("login.html",
+						configService.getSysConfig(),
+						this.userConfigService.getUserConfig(), 1, request, response);
+				return mv;
 			}
-			ModelAndView mv = new JModelAndView("index.html",
-					configService.getSysConfig(),
-					this.userConfigService.getUserConfig(), 1, request, response);
-			request.getSession(false).removeAttribute("verify_code");
-			return mv;
 		}
+		ModelAndView mv = new JModelAndView("index.html",
+				configService.getSysConfig(),
+				this.userConfigService.getUserConfig(), 1, request, response);
+		request.getSession(false).removeAttribute("verify_code");
+		return mv;
 	}
 
 	@RequestMapping("/jsload.htm")

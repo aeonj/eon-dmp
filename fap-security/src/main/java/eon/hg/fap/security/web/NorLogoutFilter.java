@@ -48,8 +48,6 @@ public class NorLogoutFilter extends LogoutFilter {
 		User u = (User) session.getAttribute("user");
 		if (u != null) {
 			User user = this.userService.getObjById(u.getId());
-			user.setLastLoginDate((Date) session.getAttribute("lastLoginDate"));
-			user.setLastLoginIp((String) session.getAttribute("loginIp"));
 			this.userService.update(user);
 			SysLog log = new SysLog();
 			log.setAddTime(new Date());

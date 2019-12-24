@@ -2,8 +2,7 @@ package eon.hg.fap.core.domain;
 
 /**
  * @author apple
- *
  */
 public enum LogType {
-	SAVE, REMOVE, LIST, VIEW, LOGIN, LOGOUT, RESTORE, IMPORT, SEND, UPDATEPWS, ROLE
+    LOGIN, LOGOUT, LIST, VIEW, INSERT, UPDATE, DELETE, SAVE, REMOVE, RESTORE, ERASE, CHECK, CANCEL, RETURN, SEND, PRINT, IMPORT, EXPORT
 }

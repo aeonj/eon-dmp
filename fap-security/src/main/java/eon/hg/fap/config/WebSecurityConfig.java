@@ -22,7 +22,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.access.ExceptionTranslationFilter;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -129,10 +128,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .exceptionHandling()
-                .authenticationEntryPoint(loginUrlEntryPoint)
+                //.authenticationEntryPoint(loginUrlEntryPoint)
                 .accessDeniedHandler(dnsAccessDeniedHandler);
         http.addFilterAt(eonLoginAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(dnsSecurityExceptionFilter(), ExceptionTranslationFilter.class);
+        //http.addFilterAfter(dnsSecurityExceptionFilter(), ExceptionTranslationFilter.class);
         //http.authenticationProvider(authenticationProvider());
     }
 

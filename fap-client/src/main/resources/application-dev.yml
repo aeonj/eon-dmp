@@ -1,5 +1,8 @@
 server:
   port: 8180
+  servlet:
+    session:
+      timeout: 60s
 spring:
   datasource:
     primary:
@@ -17,12 +20,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
     generate-ddl: true
     properties:
       hibernate:
-        hbm2ddl:
-          auto: update
         format_sql: true
         enable_lazy_load_no_trans: false     #支持全局实体的懒加载，但开销很大
         cache:
@@ -84,12 +87,14 @@ eon:
       oauth2:
         storeType: jwt    #jdbc，redis，jwt几种模式，需要与授权服务器一致
         resourceId: oauth2-resource
+      login_url: /manage/login.htm   #自定义登录地址
+      index_url: /portal/index.htm    #自定义首页地址
     async:
       corePoolSize : 10
       maxPoolSize : 200
       queueCapacity : 10
     hessian:
-      server-url: http://127.0.0.1:8080/vcf/remote/
+      server_url: http://127.0.0.1:8080/vcf/remote/
     file:
       upload_folder: /Users/aeon/Documents/uploadfile/
 

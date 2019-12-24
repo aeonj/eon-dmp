@@ -33,14 +33,12 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
-		// 状态， admin表示后台业务系统，public表示公众用户
+		// 状态， manage表示后台业务系统，public表示公众用户
 		String login_role = request.getParameter("login_role");
 		if (login_role == null || login_role.equals(""))
 			login_role = "public";
 		HttpSession session = request.getSession();
 		session.setAttribute("login_role", login_role);
-		session.setAttribute("ajax_login",
-				CommUtil.null2Boolean(request.getParameter("ajax_login")));
 		boolean flag = true;
 		if (session.getAttribute("verify_code") != null) {
 			String code = request.getParameter("code") != null ? request
@@ -65,11 +63,14 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
 		} else {
 			String username = "";
 			if (CommUtil.null2Boolean(request.getParameter("encode"))) {
-				username = CommUtil.decode(obtainUsername(request)) + ","
-						+ login_role;
+				username = CommUtil.decode(obtainUsername(request));
 			} else
-				username = obtainUsername(request) + "," + login_role;
+				username = obtainUsername(request);
 			String password = obtainPassword(request);
+			if (session.getAttribute("third_password")!=null) {
+				password = password + session.getAttribute("third_password").toString();
+				session.removeAttribute("third_password");
+			}
 			username = username.trim();
 			UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
 					username, password);

@@ -75,5 +75,7 @@ public class SysConfig extends IdEntity {
 	private boolean display_menu_group=false;  //是否显示菜单组
     @ColumnDefault("1")
     private boolean default_sys_type=true;   //是否默认业务系统类型，涉及到首页跳转页面，设置为true，首页默认跳转到manage/index.htm
+    @ColumnDefault("1")
+    private boolean must_login_flag=true;   //是否默认业务系统类型，涉及到首页跳转页面，设置为true，首页默认跳转到manage/index.htm
 
 }

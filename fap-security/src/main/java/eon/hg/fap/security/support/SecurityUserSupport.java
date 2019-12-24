@@ -33,10 +33,6 @@ public class SecurityUserSupport implements UserDetailsService {
 			throws UsernameNotFoundException, DataAccessException {
 		String[] list = data.split(",");
 		String userName = list[0];
-		String loginRole = "public";
-		if (list.length == 2) {
-			loginRole = list[1];
-		}
         if (AeonConstants.SUPER_USER.equals(userName)) {
             User user = this.userService.getObjByProperty(null,"userName",userName);
             Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>() {{
@@ -64,20 +60,9 @@ public class SecurityUserSupport implements UserDetailsService {
                 Iterator<Role> roleIterator = user.getRoles().iterator();
                 while (roleIterator.hasNext()) {
                     Role role = roleIterator.next();
-                    //根据类型加载用户权限
-                    if (loginRole.equalsIgnoreCase("MANAGE")) {
-                        GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
-                                role.getAuthCode());
-                        authorities.add(grantedAuthority);
-                    } else {
-                        if (loginRole.equalsIgnoreCase("PUBLIC")) {
-                            if (role.getType().equals("PUBLIC")) {
-                                GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
-                                        role.getAuthCode());
-                                authorities.add(grantedAuthority);
-                            }
-                        }
-                    }
+                    GrantedAuthority grantedAuthority = new SimpleGrantedAuthority(
+                            role.getAuthCode());
+                    authorities.add(grantedAuthority);
                 }
             }
             user.setAuthorities(authorities);
