@@ -917,10 +917,11 @@ Ext.onReady(function () {
         frame: true,
         fileUpload: true,
         items: [{
-            fieldLabel: '请选择导入文件',
-            name: 'theFile',
+            fieldLabel: 'Excel文件',
+            xtype: 'filefield',
+            name: 'file',
             id: 'theFile',
-            inputType: 'file',
+            buttonText:'请上传附件',
             afterLabelTextTpl: [
                 '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
             ],
@@ -949,12 +950,12 @@ Ext.onReady(function () {
                     Ext.Msg.alert('提示', '请先选择您要导入的xls文件...');
                     return;
                 }
-                if (theFile.substring(theFile.length - 4, theFile.length) != ".xls") {
+                if (theFile.substring(theFile.length - 4, theFile.length) != ".xls" && theFile.substring(theFile.lastIndexOf("."), theFile.length) != ".xlsx") {
                     Ext.Msg.alert('提示', '您选择的文件格式不对,只能导入.xls或.xlsx文件!');
                     return;
                 }
                 importDataPanel.form.submit({
-                    url: 'basedata_import.htm',
+                    url: 'basedata_imp.htm',
                     waitTitle: '提示',
                     method: 'POST',
                     waitMsg: '正在处理数据,请稍候...',
@@ -963,14 +964,14 @@ Ext.onReady(function () {
                         store.reload();
                         // 获取对应树节点
                         refreshNode(null);
-                        Ext.MessageBox.alert('提示', action.result.msg);
+                        Ext.MessageBox.alert('提示', "导入成功");
                     },
                     failure: function (form, action) {
                         var msg = action.result.msg;
                         Ext.MessageBox.alert('提示', '保存失败:<br>' + msg);
                     },
                     params: {
-                        element_code: treeEle.getSource()
+                        source: treeEle.getSource()
                     }
                 });
             }

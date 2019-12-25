@@ -1,5 +1,6 @@
 package eon.hg.fap.web.manage.action;
 
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -32,6 +33,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -184,15 +186,17 @@ public class BaseDataAction {
 
     /**
      * Excel导入基础数据
-     *     注明：Excel第一行标题栏不设置别名，根据请求传回的metadata变量确定Excel对应的字段名
+     *     注明：1、Excel第一行标题栏设置为字段名，优先使用
+     *          2、Excel第一行标题栏设置为非字段名，根据请求传回的metadata变量确定Excel对应的字段名
+     *          3、请求传回的metadata变量，不传或空值则固定为code,name,parent_code
      * @param file excel文件
      * @param source 要素名称
-     * @param metadata 传回的逗号分隔的字段列表，不传或空值则固定为code,name,parent_code
+     * @param metadata 传回的逗号分隔的字段列表
      * @return
      */
     @SecurityMapping(title = "基础数据导入", value = "base_data:import")
-    @RequestMapping("basedata_imp_fix.htm")
-    public ResultBody basedata_imp_fix(@RequestParam("file") MultipartFile file, @RequestParam("source") String source,
+    @RequestMapping("basedata_imp.htm")
+    public ResultBody basedata_imp(@RequestParam("file") MultipartFile file, @RequestParam("source") String source,
             String metadata) {
         if (StrUtil.isBlank(metadata)) {
             metadata = "code,name,parent_code";
@@ -200,19 +204,35 @@ public class BaseDataAction {
         try {
             ExcelReader excelReader = ExcelUtil.getReader(file.getInputStream());
             String[] metaDatas = StrUtil.split(metadata,",");
-            List<List<Object>> cellsList = excelReader.read(1);
+            List<List<Object>> cellsList = excelReader.read();
 
             Element ele = elementOP.getEleSource(source);
             Class<BaseData> clz = (Class<BaseData>) Class.forName(ele.getClass_name());
 
+            boolean isFirst = true;
+            boolean isAlias = false;
             for (List<Object> rowList : cellsList) {
+                if (isFirst) {
+                    List<String> fields = new ArrayList<>();
+                    for (Object row : rowList) {
+                        if (!isAlias && "code".equals(row)) {
+                            isAlias = true;
+                        }
+                        fields.add(CommUtil.null2String(row));
+                    }
+                    if (isAlias) {
+                        metaDatas = ArrayUtil.toArray(fields,String.class);
+                    }
+                    isFirst = false;
+                    continue;
+                }
                 Dto rowDto = new HashDto();
                 for (int i=0; i<metaDatas.length; i++) {
                     rowDto.put(metaDatas[i],rowList.get(i));
                 }
                 BaseData baseData = WebHandler.toPo(rowDto,clz);
                 if (rowDto.containsKey("parent_code")) {
-                    BaseData bd = elementOP.getBaseDataByCode(source,rowDto.get("parent_code").toString());
+                    BaseData bd = elementOP.getBaseDataByCode(source,StrUtil.toString(rowDto.get("parent_code")));
                     if (bd==null) {
                         baseData.setParent_id(null);
                     } else {

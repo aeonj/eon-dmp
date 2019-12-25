@@ -68,7 +68,7 @@ public class SystemLogAdvice {
 	}
 
 	private void saveLog(JoinPoint joinPoint, HttpServletRequest request) throws Exception {
-		if (SecurityUserHolder.getCurrentUser() != null) {
+		if (SecurityUserHolder.getOnlineUser() != null) {
 			User user = SecurityUserHolder.getCurrentUser();
 			Method method = getMethod(joinPoint);
 			for (Annotation anno : method.getDeclaredAnnotations()) {
@@ -188,7 +188,7 @@ public class SystemLogAdvice {
 	@AfterThrowing(value = "execution(* eon.hg.*.web.manage..*.*(..))&&args(request,..) ", throwing = "exception")
 	public void exceptionLog(HttpServletRequest request, Throwable exception) {
 		if (Globals.SAVE_LOG) {
-			if (SecurityUserHolder.getCurrentUser() != null) {
+			if (SecurityUserHolder.getOnlineUser() != null) {
 				User user = SecurityUserHolder.getCurrentUser();
 				String current_ip = CommUtil.getIpAddr(request);// 获得本机IP
 				String ip_city = "未知地区";
