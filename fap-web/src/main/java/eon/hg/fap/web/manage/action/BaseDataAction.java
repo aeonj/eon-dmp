@@ -1,9 +1,14 @@
 package eon.hg.fap.web.manage.action;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
 import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.common.util.metatype.Dto;
+import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.body.PageBody;
 import eon.hg.fap.core.body.ResultBody;
+import eon.hg.fap.core.body.ResultCode;
 import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.query.QueryObject;
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -136,6 +142,92 @@ public class BaseDataAction {
             e.printStackTrace();
             return ResultBody.failed("要素类名未定义");
         }
+    }
+
+    /**
+     * Excel导入基础数据
+     *     注明：只支持Excel标题栏设置别名的Excel模板，设置的别名与基础数据字段对应
+     * @param file Excel文件
+     * @param source 要素名称
+     * @return
+     */
+    @SecurityMapping(title = "基础数据导入", value = "base_data:import")
+    @RequestMapping("basedata_imp_alias.htm")
+    public ResultBody basedata_imp_alias(@RequestParam("file") MultipartFile file, @RequestParam("source") String source) {
+        try {
+            ExcelReader excelReader = ExcelUtil.getReader(file.getInputStream());
+            List<Map<String,Object>> rowsList = excelReader.readAll();
+
+            Element ele = elementOP.getEleSource(source);
+            Class<BaseData> clz = (Class<BaseData>) Class.forName(ele.getClass_name());
+
+            for (Map<String,Object> rowMap : rowsList) {
+                BaseData baseData = WebHandler.toPo(rowMap,clz);
+                if (rowMap.containsKey("parent_code")) {
+                    BaseData bd = elementOP.getBaseDataByCode(source,CommUtil.null2String(rowMap.get("parent_code")));
+                    if (bd==null) {
+                        baseData.setParent_id(null);
+                    } else {
+                        baseData.setParent_id(bd.getId());
+                    }
+                }
+                baseData.setId(null);
+                baseData.setAddTime(new Date());
+                baseDataService.save(baseData);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultBody.failed(ResultCode.FAILED);
+        }
+        return ResultBody.success();
+    }
+
+    /**
+     * Excel导入基础数据
+     *     注明：Excel第一行标题栏不设置别名，根据请求传回的metadata变量确定Excel对应的字段名
+     * @param file excel文件
+     * @param source 要素名称
+     * @param metadata 传回的逗号分隔的字段列表，不传或空值则固定为code,name,parent_code
+     * @return
+     */
+    @SecurityMapping(title = "基础数据导入", value = "base_data:import")
+    @RequestMapping("basedata_imp_fix.htm")
+    public ResultBody basedata_imp_fix(@RequestParam("file") MultipartFile file, @RequestParam("source") String source,
+            String metadata) {
+        if (StrUtil.isBlank(metadata)) {
+            metadata = "code,name,parent_code";
+        }
+        try {
+            ExcelReader excelReader = ExcelUtil.getReader(file.getInputStream());
+            String[] metaDatas = StrUtil.split(metadata,",");
+            List<List<Object>> cellsList = excelReader.read(1);
+
+            Element ele = elementOP.getEleSource(source);
+            Class<BaseData> clz = (Class<BaseData>) Class.forName(ele.getClass_name());
+
+            for (List<Object> rowList : cellsList) {
+                Dto rowDto = new HashDto();
+                for (int i=0; i<metaDatas.length; i++) {
+                    rowDto.put(metaDatas[i],rowList.get(i));
+                }
+                BaseData baseData = WebHandler.toPo(rowDto,clz);
+                if (rowDto.containsKey("parent_code")) {
+                    BaseData bd = elementOP.getBaseDataByCode(source,rowDto.get("parent_code").toString());
+                    if (bd==null) {
+                        baseData.setParent_id(null);
+                    } else {
+                        baseData.setParent_id(bd.getId());
+                    }
+                }
+                baseData.setId(null);
+                baseData.setAddTime(new Date());
+                baseDataService.save(baseData);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResultBody.failed(ResultCode.FAILED);
+        }
+        return ResultBody.success();
     }
 
     @RequestMapping("/basedata_sync_memory.htm")
