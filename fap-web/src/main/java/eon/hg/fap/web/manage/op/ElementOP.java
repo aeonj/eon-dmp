@@ -203,9 +203,18 @@ public class ElementOP {
 	}
 	
 	private List<Dto> getTreeNodeList(Dto dtoParam, boolean hasChecked, boolean onlyname, boolean isfulldata) {
-		List<Dto> lstTree = new ArrayList<Dto>();
-		for (BaseData bd : queryTreeList(dtoParam)) {
-			addNodeChild(lstTree,bd,onlyname,isfulldata);
+		List<Dto> lstTree = new ArrayList<>();
+		boolean is_standard = false;
+		UserConfig userConfig = this.userConfigService.getUserConfig();
+		if (userConfig!=null) {
+			String codetype = userConfig.getElecode_type();
+			if (codetype!=null && codetype.equals("standard")) {
+				is_standard = true;
+			}
+		}
+		List<BaseData> bds = queryTreeList(dtoParam);
+		for (BaseData bd : bds) {
+			addNodeChild(lstTree,bd,onlyname,isfulldata,is_standard);
 		}
 		if (hasChecked) {
 			CommUtil.setCheckTreeList(lstTree,dtoParam.getString("checkids"));
@@ -283,34 +292,27 @@ public class ElementOP {
 		return result;
 	}
 	
-	private void addNodeChild(List<Dto> lst, BaseData node, boolean onlyname,boolean isfulldata) {
-
+	private void addNodeChild(List<Dto> lst, BaseData node, boolean onlyname,boolean isfulldata,boolean isStandard) {
+		log.info(node.toString());
 		if (node.getParent_id()!=null) {
 			BaseData parent = this.baseDataService.getObjById(node.getClass(),node.getParent_id());
 			if (parent==null) {
 				log.error("后台数据源错误，未找到父节点",node);
 			}
-			int idx = ContainsNode(parent.getChild(),node);
+			int idx = ContainsNode(parent.getChild(),node,isStandard);
 			if (idx!=-1) {
-				parent.getChild().add(idx,BaseData2Dto(node,onlyname,isfulldata));
+				parent.getChild().add(idx,BaseData2Dto(node,onlyname,isfulldata,isStandard));
 			}
-			addNodeChild(lst,parent,onlyname,isfulldata);
+			addNodeChild(lst,parent,onlyname,isfulldata,isStandard);
 		} else {
-			int idx = ContainsNode(lst,node);
+			int idx = ContainsNode(lst,node,isStandard);
 			if (idx!=-1) {
-				lst.add(idx,BaseData2Dto(node,onlyname,isfulldata));
+				lst.add(idx,BaseData2Dto(node,onlyname,isfulldata,isStandard));
 			}
 		}
 	}
-	
-	private int ContainsNode(List<Dto> lst, BaseData node) {
-		boolean is_standard = false;
-		if (this.userConfigService.getUserConfig()!=null) {
-			String codetype = this.userConfigService.getUserConfig().getElecode_type();
-			if (codetype!=null && codetype.equals("standard")) {
-				is_standard = true;
-			}
-		}
+
+	private int ContainsNode(List<Dto> lst, BaseData node,boolean is_standard) {
 		for (int i=0; i<lst.size(); i++) {
 			Dto dto = lst.get(i);
 			if (dto.getInteger("id").intValue()==node.getId().intValue()) {
@@ -328,16 +330,10 @@ public class ElementOP {
 		return lst.size();
 	}
 
-	private Dto BaseData2Dto(BaseData bd, boolean onlyname,boolean isfulldata) {
-		String code = bd.getCode();
+	private Dto BaseData2Dto(BaseData bd, boolean onlyname,boolean isfulldata,boolean is_standard) {
 		Dto dto = new HashDto();
 		dto.put("id", bd.getId());
-		if (this.userConfigService.getUserConfig()!=null) {
-			String codetype = this.userConfigService.getUserConfig().getElecode_type();
-			if (codetype!=null && codetype.equals("standard")) {
-				code = bd.getStandard_code();
-			}
-		}
+		String code = is_standard ? bd.getStandard_code() : bd.getCode();
 		dto.put("code", code);
 		dto.put("name", bd.getName());
 		if (onlyname) {
