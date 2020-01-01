@@ -293,9 +293,12 @@ public class ElementOP {
 	}
 	
 	private void addNodeChild(List<Dto> lst, BaseData node, boolean onlyname,boolean isfulldata,boolean isStandard) {
-		log.info(node.toString());
 		if (node.getParent_id()!=null) {
-			BaseData parent = this.baseDataService.getObjById(node.getClass(),node.getParent_id());
+			BaseData parent = node.getTree_parent();
+			if (parent==null) {
+				parent = this.baseDataService.getObjById(node.getClass(), node.getParent_id());
+				node.setTree_parent(parent);
+			}
 			if (parent==null) {
 				log.error("后台数据源错误，未找到父节点",node);
 			}
