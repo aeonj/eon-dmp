@@ -8,8 +8,14 @@
     </#if>
     <script type="text/javascript">
         <#if (req_params["elecode"])??>
+            //基础数据要素名称
             var elecode = '${req_params["elecode"]}';
+            //基础数据名称
             var eletitle = '${req_params["eletitle"]}';
+        </#if>
+        //是否分级加载
+        <#if (req_params["ele_isfulllevel"])??>
+        var ele_isfulllevel = '${req_params["ele_isfulllevel"]}';
         </#if>
         ${httpInclude.includejs("fap:base_data.js")}
     </script>

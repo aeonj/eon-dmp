@@ -7,8 +7,11 @@
 package eon.hg.fap.web.manage.op;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ArrayUtil;
 import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.common.tools.tree.List2Tree;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.common.util.tools.StringUtils;
@@ -26,6 +29,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 基础数据操作类，用于对基础数据的查询等操作
@@ -191,35 +195,114 @@ public class ElementOP {
 				dto.put("permission", getPermissionSql(dto));
 			}
             dto.put("relations", getRelationSql(dto));
-			boolean isChecked = dto.getString("selectmodel").equalsIgnoreCase("multiple") ;
-			boolean onlyname = CommUtil.isNotEmpty(dto.get("onlyname")) && dto.getBoolean("onlyname");
-			boolean isfulldata = CommUtil.isNotEmpty(dto.get("isfulldata")) && dto.getBoolean("isfulldata");
 			//List<Dto> list = getChildNodeList(dto,1,isChecked);
-			List<Dto> list = getTreeNodeList(dto,isChecked,onlyname,isfulldata);
+			List<Dto> list = getTreeNodeList(dto);
 			return list;
 		} else {
 			return new ArrayList();
 		}
 	}
 	
-	private List<Dto> getTreeNodeList(Dto dtoParam, boolean hasChecked, boolean onlyname, boolean isfulldata) {
-		List<Dto> lstTree = new ArrayList<>();
-		boolean is_standard = false;
+	private List<Dto> getTreeNodeList(Dto dtoParam) {
+		List<BaseData> bds = queryTreeList(dtoParam);
+		ElementTreeDto treeDto = new ElementTreeDto();
+		treeDto.setChecked(dtoParam.getString("selectmodel").equalsIgnoreCase("multiple"));
+		treeDto.setOnlyName(CommUtil.isNotEmpty(dtoParam.get("onlyname")) && dtoParam.getBoolean("onlyname"));
+		treeDto.setFullData(CommUtil.isNotEmpty(dtoParam.get("isfulldata")) && dtoParam.getBoolean("isfulldata"));
+		treeDto.setStandard(false);
 		UserConfig userConfig = this.userConfigService.getUserConfig();
 		if (userConfig!=null) {
 			String codetype = userConfig.getElecode_type();
 			if (codetype!=null && codetype.equals("standard")) {
-				is_standard = true;
+				treeDto.setStandard(true);
 			}
 		}
-		List<BaseData> bds = queryTreeList(dtoParam);
-		for (BaseData bd : bds) {
-			addNodeChild(lstTree,bd,onlyname,isfulldata,is_standard);
+		String checkids = dtoParam.getString("checkids");
+		if (CommUtil.isNotEmpty(checkids)) {
+			String[] arr = checkids.split(",");
+			treeDto.setCheckids(arr);
 		}
-		if (hasChecked) {
-			CommUtil.setCheckTreeList(lstTree,dtoParam.getString("checkids"));
-		}
+
+		List2Tree<BaseData> tree = new List2Tree<BaseData>() {
+			@Override
+			protected Object getId(BaseData node) {
+				return node.getId();
+			}
+
+			@Override
+			protected Object getPid(BaseData node) {
+				return node.getParent_id();
+			}
+
+			@Override
+			protected void setText(BaseData node) {
+
+			}
+
+			@Override
+			protected List<BaseData> getChildren(BaseData node) {
+				return node.getChildren();
+			}
+
+			@Override
+			protected void setChildren(List<BaseData> nodes, BaseData node) {
+				node.setChildren(nodes);
+			}
+
+			@Override
+			protected BaseData getTopParent(Map<Object,BaseData> map, BaseData node) {
+				if (getPid(node)==null) {
+					return node;
+				} else {
+					BaseData parent = baseDataService.getObjById(node.getClass(), node.getParent_id());
+					if (parent!=null) {
+						map.put(getId(parent), parent);
+						if (getChildren(parent)==null) {
+							List<BaseData> ch = new ArrayList<>();
+							ch.add(node);
+							setChildren(ch, parent);
+						} else {
+							List<BaseData> ch = getChildren(parent);
+							ch.add(node);
+						}
+						return getTopParent(map, parent);
+					} else {
+						return node;
+					}
+				}
+			}
+		};
+		bds = tree.buildTree(bds,"code");
+		//转换为dto，并设置leaf和check属性
+		List<Dto> lstTree = ListBase2Dto(bds,treeDto);
+//		for (BaseData bd : bds) {
+//			addNodeChild(lstTree,bd, treeDto);
+//		}
+//		if (treeDto.isChecked) {
+//			CommUtil.setCheckTreeList(lstTree,dtoParam.getString("checkids"));
+//		}
 		return lstTree;
+	}
+
+	private List<Dto> ListBase2Dto(List<BaseData> bds, ElementTreeDto treeDto) {
+		List<Dto> treeList = new ArrayList<>();
+		if (CollectionUtil.isNotEmpty(bds)) {
+			for (BaseData bd : bds) {
+				Dto node = BaseData2Dto(bd,treeDto);
+				node.put("children",ListBase2Dto(bd.getChildren(),treeDto));
+				if (treeDto.isChecked) {
+					node.put("checked", ArrayUtil.containsIgnoreCase(treeDto.getCheckids(),bd.getId().toString()));
+				}
+				if (CollectionUtil.isEmpty(bd.getChildren())) {
+					node.remove("children");
+					node.put("leaf",true);
+				} else {
+					node.put("leaf",false);
+				}
+				treeList.add(node);
+			}
+		}
+		return treeList;
 	}
 	
 	private List<BaseData> queryTreeList(Dto dtoParam) {
@@ -283,7 +366,7 @@ public class ElementOP {
 	    		sql.append(" and obj.rg_code='").append(SecurityUserHolder.getRgCode()).append("'");
 	    	}
 	    }
-	    //sql.append(" order by obj.level,obj.code");
+	    //sql.append(" order by obj.code,obj.level");
 		return this.baseDataService.query(sql.toString(), null, -1, -1);
 	}
 	
@@ -292,7 +375,7 @@ public class ElementOP {
 		return result;
 	}
 	
-	private void addNodeChild(List<Dto> lst, BaseData node, boolean onlyname,boolean isfulldata,boolean isStandard) {
+	private void addNodeChild(List<Dto> lst, BaseData node, ElementTreeDto treeDto) {
 		if (node.getParent_id()!=null) {
 			BaseData parent = node.getTree_parent();
 			if (parent==null) {
@@ -302,15 +385,15 @@ public class ElementOP {
 			if (parent==null) {
 				log.error("后台数据源错误，未找到父节点",node);
 			}
-			int idx = ContainsNode(parent.getChild(),node,isStandard);
+			int idx = ContainsNode(parent.getChild(),node,treeDto.isStandard());
 			if (idx!=-1) {
-				parent.getChild().add(idx,BaseData2Dto(node,onlyname,isfulldata,isStandard));
+				parent.getChild().add(idx,BaseData2Dto(node,treeDto));
 			}
-			addNodeChild(lst,parent,onlyname,isfulldata,isStandard);
+			addNodeChild(lst,parent,treeDto);
 		} else {
-			int idx = ContainsNode(lst,node,isStandard);
+			int idx = ContainsNode(lst,node,treeDto.isStandard());
 			if (idx!=-1) {
-				lst.add(idx,BaseData2Dto(node,onlyname,isfulldata,isStandard));
+				lst.add(idx,BaseData2Dto(node,treeDto));
 			}
 		}
 	}
@@ -333,84 +416,27 @@ public class ElementOP {
 		return lst.size();
 	}
 
-	private Dto BaseData2Dto(BaseData bd, boolean onlyname,boolean isfulldata,boolean is_standard) {
+	private Dto BaseData2Dto(BaseData bd, ElementTreeDto treeDto) {
 		Dto dto = new HashDto();
 		dto.put("id", bd.getId());
-		String code = is_standard ? bd.getStandard_code() : bd.getCode();
+		String code = treeDto.isStandard() ? bd.getStandard_code() : bd.getCode();
 		dto.put("code", code);
 		dto.put("name", bd.getName());
-		if (onlyname) {
+		if (treeDto.isOnlyName()) {
 			dto.put("text", bd.getName());
 		} else {
-			dto.put("text", code+" "+bd.getName());
+			StringBuilder sb = new StringBuilder();
+			sb.append(bd.getCode()).append(" ").append(bd.getName());
+			dto.put("text", sb.toString());
 		}
         dto.put("children", bd.getChild());
-		if (isfulldata) {
+		if (treeDto.isFullData()) {
 			WebHandler.toMap(bd, dto);
 		}
 		dto.put("leaf", bd.isLeaf());
 		dto.put("level", bd.getLevel());
 		dto.put("treepath", bd.getTreepath());
 		return dto;
-	}
-
-	private List<Dto> getChildNodeList(Dto dto, int level_num, boolean hasChecked) {
-        List<Dto> list =findEleTree(dto);
-        for(Dto rn:list){
-        	dto.put("parent_id", rn.getString("id"));
-        	List<Dto> innerList =null;
-			if (CommUtil.isNotEmpty(dto.get("isfulllevel")) && !dto.getBoolean("isfulllevel")) {
-	        	dto.put("parent_id", rn.getString("id"));
-	            innerList =findEleTree(dto);
-			} else {
-	            innerList =getChildNodeList(dto,level_num+1,hasChecked);
-	            rn.put("level_num", level_num);
-	            rn.put("children", innerList);
-			}
-            if(hasChecked){
-            	rn.put("checked", false);
-            }
-            if(rn.getString("parent_id").equals('0')){
-            	rn.put("leaf", false);//第一级全部不是叶子
-            }else{
-            	rn.put("leaf", innerList==null || innerList.size()==0?true:false);
-            }
-        }
-        return list;
-
-	}
-
-	private List<Dto> findEleTree(Dto dtoParam) {
-		StringBuffer sql = new StringBuffer();
-		sql.append("select obj from ").append(dtoParam.getString("class_name")).append(" obj");
-		sql.append(" where obj.is_deleted=0 and obj.enabled=1");
-		if (CommUtil.isNotEmpty(dtoParam.get("parent_id"))) {
-			sql.append(" and obj.parent.id=").append(dtoParam.getString("parent_id"));
-	    }
-	    if (CommUtil.isNotEmpty(dtoParam.get("condition"))) {
-	    	sql.append(" and ").append(dtoParam.getString("condition"));
-	    }
-	    if (CommUtil.isNotEmpty(dtoParam.get("permission"))) {
-	    	sql.append(" and ").append(dtoParam.getString("permission"));
-	    }
-	    if (CommUtil.isExistsAttr(dtoParam.getString("class_name"), "rg_code")) {
-	    	sql.append(" and obj.rg_code='").append(SecurityUserHolder.getRgCode()).append("'");
-	    }
-	    sql.append(" order by obj.code");
-		List<BaseData> bds = this.baseDataService.query(sql.toString(), null, -1, -1);
-		List<Dto> lst = new ArrayList<Dto>();
-		for (BaseData bd :bds) {
-			Dto dto = new HashDto();
-			dto.put("id", bd.getId());
-			dto.put("code", bd.getCode());
-			dto.put("name", bd.getName());
-			dto.put("text", bd.getCode()+" "+bd.getName());
-			if (dto.getString("isfulldata").equals("true")) {
-				WebHandler.toMap(bd, dto);
-			}
-			lst.add(dto);
-		}
-		return lst;
 	}
 
 	private String getPermissionSql(Dto dto) {
@@ -529,5 +555,52 @@ public class ElementOP {
 		return false;
 	}
 
+	private class ElementTreeDto {
+		private boolean isChecked;
+		private boolean onlyName;
+		private boolean isFullData;
+		private boolean isStandard;
+		private String[] checkids;
+
+		public boolean isChecked() {
+			return isChecked;
+		}
+
+		public void setChecked(boolean checked) {
+			isChecked = checked;
+		}
+
+		public boolean isOnlyName() {
+			return onlyName;
+		}
+
+		public void setOnlyName(boolean onlyName) {
+			this.onlyName = onlyName;
+		}
+
+		public boolean isFullData() {
+			return isFullData;
+		}
+
+		public void setFullData(boolean fullData) {
+			isFullData = fullData;
+		}
+
+		public boolean isStandard() {
+			return isStandard;
+		}
+
+		public void setStandard(boolean standard) {
+			isStandard = standard;
+		}
+
+		public String[] getCheckids() {
+			return checkids;
+		}
+
+		public void setCheckids(String[] checkids) {
+			this.checkids = checkids;
+		}
+	}
 
 }

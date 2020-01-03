@@ -34,6 +34,8 @@ public abstract class BaseData extends IdEntity implements Serializable {
 	@Column
 	private String name;
 	@Transient
+	private String text;
+	@Transient
 	private List<Dto> child = new ArrayList<>();
 	@Column
 	private String treepath;
@@ -43,6 +45,8 @@ public abstract class BaseData extends IdEntity implements Serializable {
 	@Transient
     @JSONField(serialize = false)
 	private BaseData tree_parent;
+	@Transient
+	private List<BaseData> children;
 	@Column(name = "level_num")
 	private Byte level=1;
 	private boolean leaf=true;

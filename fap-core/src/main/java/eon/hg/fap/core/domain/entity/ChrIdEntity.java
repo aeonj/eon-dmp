@@ -23,8 +23,8 @@ public class ChrIdEntity implements Serializable {
 	@Id
 	@GeneratedValue(generator = "UUID")
 	@GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-	@Column(unique = true, nullable = false)
-	protected String chr_id;// 域模型id，这里为自增类型
+	@Column(name = "chr_id", unique = true, nullable = false, length = 38)
+	protected String id;// 域模型id，这里为自增类型
 	protected Date addTime;// 添加时间，这里为长时间格式
 	@Lock
 	protected boolean is_deleted;// 是否删除,默认为0未删除，-1表示删除状态
@@ -32,9 +32,9 @@ public class ChrIdEntity implements Serializable {
 	@Column(length=60)
 	protected String lastUser; //最后修改用户
 
-	public ChrIdEntity(String chr_id, Date addTime) {
+	public ChrIdEntity(String id, Date addTime) {
 		super();
-		this.chr_id = chr_id;
+		this.id = id;
 		this.addTime = addTime;
 	}
 
@@ -46,7 +46,7 @@ public class ChrIdEntity implements Serializable {
         if (!(obj instanceof ChrIdEntity))
             return false;
         final ChrIdEntity other = (ChrIdEntity) obj;
-         if(!this.getChr_id().equals(other.getChr_id()))
+         if(!this.getId().equals(other.getId()))
             return false;
         return true;
    } 
