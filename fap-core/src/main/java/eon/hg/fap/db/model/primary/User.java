@@ -83,8 +83,6 @@ public class User extends IdEntity implements UserDetails {
 	private int manageType=0;   //后台管理用户类别  0:普通用户 1:区域管理员
 	@Transient
 	private boolean is_f3_login = false;  //用于F3同步登录
-	@Transient
-	private Object context;
 
 	/**
 	 * 获取不重复的用户菜单

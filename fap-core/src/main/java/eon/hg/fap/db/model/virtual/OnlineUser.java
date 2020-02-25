@@ -12,12 +12,22 @@ public class OnlineUser extends User implements Serializable {
 
     private String userid;
 
+    private Object context;
+
     public String getUserid() {
         return userid;
     }
 
     public void setUserid(String userid) {
         this.userid = userid;
+    }
+
+    public Object getContext() {
+        return context;
+    }
+
+    public void setContext(Object context) {
+        this.context = context;
     }
 
     /**
