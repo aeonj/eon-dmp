@@ -1,8 +1,10 @@
 package eon.hg.fap.web.manage.action;
 
+import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
+import eon.hg.fap.common.util.tools.StringUtils;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.tools.JsonHandler;
@@ -150,8 +152,13 @@ public class BizAction {
 			}
 		}
 	}
-	
-	public void extGridFilter(String jsonOp, QueryObject qo) {
+
+	/**
+	 * 获取前端查询组件的条件，组装jpa条件语句
+	 * @param jsonOp
+	 * @param qo
+	 */
+	public QueryObject extGridFilter(String jsonOp, QueryObject qo) {
 		if (qo!=null && CommUtil.isNotEmpty(jsonOp)) {
 			List<Dto> lstField = JsonHandler.parseList(jsonOp);
 			Map<String,String> Q2Oper = jqGridOp();
@@ -160,10 +167,56 @@ public class BizAction {
 				String op = CommUtil.null2String(dto.get("op"));
 				String data = CommUtil.null2String(dto.get("data"));
 				if (!op.isEmpty() && !data.isEmpty()) {
-					qo.addQuery(field,"e_"+field,jqGridData(op,data),Q2Oper.get(op));
+					String alias = qo.getAlias();
+				    if (CommUtil.isNotEmpty(alias)) {
+                        qo.addQuery(alias+"."+field, "e_" + field, jqGridData(op, data), Q2Oper.get(op));
+                    } else {
+                        qo.addQuery(field, "e_" + field, jqGridData(op, data), Q2Oper.get(op));
+                    }
 				}
 			}
 		}
+		return qo;
+	}
+
+	/**
+	 * 获取前端查询组件的条件，用于组装不带参数的原生sql条件
+	 * @param jsonOp
+	 * @param qo
+	 */
+	public QueryObject extGridWhere(String jsonOp, QueryObject qo) {
+		if (qo!=null && CommUtil.isNotEmpty(jsonOp)) {
+			List<Dto> lstField = JsonHandler.parseList(jsonOp);
+			Map<String,String> Q2Oper = jqGridOp();
+			for (Dto dto : lstField) {
+				String field = CommUtil.null2String(dto.get("field"));
+				String op = CommUtil.null2String(dto.get("op"));
+				String type = CommUtil.null2String(dto.get("type"));
+				String data = CommUtil.null2String(dto.get("data"));
+				if (!op.isEmpty() && !data.isEmpty()) {
+					String alias = qo.getAlias();
+				    if (CommUtil.isNotEmpty(alias)) {
+                        qo.and(alias+"."+field, Q2Oper.get(op), extTypeConvert(type,jqGridData(op, data)));
+                    } else {
+                        qo.and(field, Q2Oper.get(op), extTypeConvert(type,jqGridData(op, data)));
+                    }
+				}
+			}
+		}
+		return qo;
+	}
+
+	private String extTypeConvert(String type, String val) {
+		if ("string".equals(type)) {
+			if (StrUtil.indexOf(val,'(')>0) {
+				return val.replace(" ("," ('").replace(") ","') ").replaceAll(",","','");
+			} else {
+				return StringUtils.quote(val);
+			}
+		} else if ("date".equals(type)) {
+			return StringUtils.quote(val);
+		}
+		return val;
 	}
 
 	private String jqGridData(String op, String val) {
