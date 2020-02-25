@@ -5,12 +5,12 @@
 	<parent>
 		<groupId>eon.hg.fap</groupId>
 		<artifactId>fap-project</artifactId>
-		<version>2.0.2-SNAPSHOT</version>
+		<version>2.0.3-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>eon.hg.fap</groupId>
 	<artifactId>fap-webservice</artifactId>
-	<version>2.0.2-SNAPSHOT</version>
+	<version>2.0.3-SNAPSHOT</version>
 	<name>fap-webservice</name>
 	<description>Webservice project for Spring Boot</description>
 
