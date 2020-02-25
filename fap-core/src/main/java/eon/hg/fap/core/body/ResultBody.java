@@ -24,7 +24,7 @@ public class ResultBody {
      * @return
      */
     public static ResultBody success() {
-        ResultBody resultBody = new ResultBody(ResultCode.SUCCESS.getCode());
+        ResultBody resultBody = new ResultBody(ResultCode.SUCCESS);
         resultBody.setSuccess(true);
         return resultBody;
     }

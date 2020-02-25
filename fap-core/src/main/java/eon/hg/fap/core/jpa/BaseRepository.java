@@ -21,6 +21,7 @@ public interface BaseRepository<T, ID extends Serializable> extends JpaRepositor
 
     T getOne(Object... properties) ;
 
+    @Deprecated
     T getBy(String construct, String propertyName, Object value) ;
 
     /**

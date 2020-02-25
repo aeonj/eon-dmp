@@ -8,7 +8,6 @@ package eon.hg.fap.web.manage.op;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.tools.tree.List2Tree;
@@ -115,10 +114,14 @@ public class ElementOP {
 					return list.get(0);
 				}
 			} else {
-				BaseData bd = getBaseDataById(source, Convert.toLong(value,-1l));
-				Dto dto = new HashDto();
-				BeanUtil.beanToMap(bd,dto,true,(key) -> (key.toLowerCase()));
-				return dto;
+				try {
+					BaseData bd = this.baseDataService.getObjById(Class.forName(class_name), CommUtil.null2Long(value));
+					Dto dto = new HashDto();
+					BeanUtil.beanToMap(bd,dto,true,(key) -> (key.toLowerCase()));
+					return dto;
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		return null;
@@ -173,12 +176,16 @@ public class ElementOP {
 				if (list!=null && list.size()>0) {
 					return list.get(0);
 				}
+			} else {
+				try {
+					BaseData bd = this.baseDataService.getObjByProperty(Class.forName(class_name), "code", value);
+					Dto dto = new HashDto();
+					BeanUtil.beanToMap(bd, dto, true, (key) -> (key.toLowerCase()));
+					return dto;
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
 			}
-		} else {
-			BaseData bd = getBaseDataByCode(source,value);
-			Dto dto = new HashDto();
-			BeanUtil.beanToMap(bd,dto,true,(key) -> (key.toLowerCase()));
-			return dto;
 		}
 		return null;
 	}
