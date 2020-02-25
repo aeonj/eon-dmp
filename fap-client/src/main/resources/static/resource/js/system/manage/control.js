@@ -98,6 +98,20 @@ Ext.override(Ext.tree.Column, {
 
 });
 
+Ext.define('Ext.vcf.Node',{
+    extend : 'Ext.data.Record',
+    fields:[{
+        name : 'id',
+        type : 'string'
+    }, {
+        name : 'code',
+        type : 'string'
+    }, {
+        name : 'name',
+        type : 'string'
+    }]
+});
+
 Ext.define('Ext.vcf.AssistTree.Loader', {
     extend : 'Ext.data.TreeStore',
     //tree : Ext.create('Ext.vcf.AssistTree.Tree'),
@@ -413,33 +427,24 @@ Ext.define('Ext.vcf.AssistTree', {
             return result;
         };
         this.getRootNode().cascadeBy(fn);
-        this.findChildNodesById(selnode.getPath(),isclick);
+        this.selectItemByNode(selnode);
     },
 
-    selectNodeByValue : function(value,isclick) {
+    selectNodeByValue : function(value) {
         var selNode;
-        if (typeof value == 'string') {
-            if (this.isCodeAsValue){
-
-            } else {
-                selNode = this.store.getNodeById(value);
-            }
+        if (this.isCodeAsValue){
+            selNode = this.store.findNode('code',value);
         } else {
-            selNode = value;
+            selNode = this.store.getNodeById(value);
         }
-        var treepath = selNode.getPath("id");
-        this.findChildNodesById(treepath,isclick);
+        this.selectItemByNode(selNode);
     },
-    findChildNodesById : function(path, isclick) {
+    selectItemByNode : function(node) {
         var tree = this;
-        // 展开路径,并在回调函数里面选择该节点
-        this.expandPath(path, 'id', '/', function(bSucess, oLastNode) {
-            if (typeof isclick != 'undefined' || !isclick) {
-                tree.getSelectionModel().select(oLastNode);
-            } else {
-                tree.fireEvent('itemclick', tree,oLastNode);
-            }
-        });
+        tree.getSelectionModel().select(node);
+        setTimeout(function() {
+            tree.fireEvent("itemclick",tree,node);
+        }, 0);
     },
     getCheckValues : function () {
         //检查是否被选定
@@ -491,6 +496,7 @@ Ext.define('Ext.vcf.ComboField',{
     //是否将编码作为值
     isCodeAsValue : false,
     isDirect : false,
+    validateOnBlur: false,
     forceSelection : true,
     triggerAction : 'all',
     initComponent : function() {
@@ -511,7 +517,7 @@ Ext.define('Ext.vcf.ComboField',{
             this.queryMode = 'remote';
             this.valueField = this.isCodeAsValue ? 'code' : 'id';
             this.displayField = 'name';
-            this.store = new Ext.data.Store({
+            this.store = new Ext.data.ArrayStore({
                 fields : ['id','code','name'],
                 url : this.url,
                 source : this.source,
@@ -554,6 +560,15 @@ Ext.define('Ext.vcf.ComboField',{
 
     getSource : function() {
         return this.source;
+    },
+
+    getNode: function () {
+        var me=this;
+        if (me.getSource()!='') {
+            return me.getSelectedRecord();
+        } else {
+            return null;
+        }
     },
 
     setCondition : function(value) {
@@ -608,7 +623,7 @@ Ext.define('Ext.vcf.ComboField',{
 
 });
 
-Ext.define('Ext.vcf.treefield', {
+Ext.define('Ext.vcf.TreeField', {
     extend: 'Ext.form.field.Picker',
     xtype : 'treefield',
     requires: [
@@ -651,6 +666,7 @@ Ext.define('Ext.vcf.treefield', {
     mode : 'local',
     triggerAction : 'all',
     selectedClass : '',
+    validateOnBlur: false,
 
     // all:所有结点都可选中
     // exceptRoot：除根结点，其它结点都可选（默认）
@@ -925,7 +941,7 @@ Ext.define('Ext.vcf.treefield', {
     },
 
     getNodeByCode : function(code) {
-        return this.store.getNodeById(code);
+        return this.store.findNode('code',code);
     },
 
     findTextById : function (root,id) {
@@ -962,6 +978,9 @@ Ext.define('Ext.vcf.treefield', {
                 var resultArray = Ext.JSON
                     .decode(response.responseText);
                 if (resultArray.length!=0) {
+                    var node = new Ext.vcf.Node();
+                    node.set(resultArray);
+                    combo.node = node;
                     if (combo.isCodeAsValue) {
                         combo.lastSelectionText = resultArray.code+' '+resultArray.name;
                         if (combo.hiddenField) {
@@ -986,6 +1005,7 @@ Ext.define('Ext.vcf.treefield', {
                     combo.setTreePath(treepath);
                 } else {
                     combo.setValue('');
+                    combo.node = null;
                 }
             },
             failure : function(response) {
@@ -1357,12 +1377,32 @@ Ext.define('Ext.vcf.FormPanel', {
         if (this.userDefined) {
             this.initUI();
         }
+    },
+    getDictionaryValues: function () {
+        var me=this,
+            fields=me.form.getFields(),
+        values = {};
+        for (var i = 0; i < fields.getCount(); i++) {
+            var field = fields.get(i);
+            if (field.source && field.source!='') {
+                var source = field.source.toLowerCase(),
+                    node = field.getNode();
+                values[source+'_id']= node.get('id');
+                values[source+'_code']= node.get('code');
+                values[source+'_name']= node.get('name');
+            } else {
+                values[field.getName()]=field.getSubmitValue();
+            }
+        }
+        return values;
     }
 });
 
 Ext.define('Ext.vcf.QueryPanel', {
     extend: 'Ext.vcf.FormPanel',
     xtype: 'querypanel',
+    //状态关键字state是否放进查询条件
+    contain_state: false,
     initComponent: function() {
         this.callParent();
     },
@@ -1372,13 +1412,33 @@ Ext.define('Ext.vcf.QueryPanel', {
             rules = [];
         for (var i = 0; i < fields.getCount(); i++) {
             var field = fields.get(i);
-            var meta = {field : field.getName(),op : field.logic, data : field.getSubmitValue()};
-            rules.push(meta);
+            if (me.contain_state || field.getName()!='state') {
+                var meta = {field: field.getName(), op: field.logic, data: field.getSubmitValue()};
+                rules.push(meta);
+            }
         }
         return rules;
     },
     getQueryString : function () {
         return Ext.encode(this.getQuery());
+    },
+    getState : function () {
+        var me=this,
+            field = me.form.findField('state');
+        if (field) {
+            return field.getSubmitValue();
+        } else {
+            return '';
+        }
+    },
+    //获取
+    getQueryParams : function () {
+        var me=this;
+        if (me.contain_state) {
+            return {querystr: me.getQueryString()};
+        } else {
+            return {querystr: me.getQueryString(), state: me.getState()};
+        }
     }
 });
 
@@ -1421,6 +1481,8 @@ Ext.define('Ext.vcf.TableGrid', {
     pageSize: 50,
     //是否读取界面视图配置
     userDefined: false,
+    //创建时加载数据
+    autoLoad: true,
     scrollable: true,
     region: 'center',
     margins: '3 3 3 3',
@@ -1522,12 +1584,14 @@ Ext.define('Ext.vcf.TableGrid', {
             me.bbar = bbar;
         }
 
-        this.callParent(arguments);
+        me.callParent(arguments);
         //this.addEvents('loadrelation', this);
-        if (!this.userDefined) {
-            me.store.load({
-                params: me.params
-            });
+        if (!me.userDefined) {
+            if (me.autoLoad) {
+                me.store.load({
+                    params: me.params
+                });
+            }
         } else {
             me.initUI();
         }
@@ -1908,84 +1972,237 @@ Ext.define('Ext.vcf.EditorTableGrid', {
 
 });
 
-//Ext.reg('editortablegrid', Ext.vcf.EditorTableGrid);
+Ext.define('Ext.vcf.CustomNumberField', {
+    xtype : 'custnumberfield',
+    requires: [
+    ],
+    alias : 'widget.CustNumberField',
+    extend : 'Ext.form.field.Text',
+    alternateClassName: 'Ext.vcf.CustomNumberField',
 
-/*
-Ext.apply(Ext.grid.GridPanel.prototype, {
-    moveUp: function() {
-        var d = this.getStore();
-        var c = this.getColumnModel();
-        var r = this.getSelectionModel().getSelections();
-        var idx;
-        if (r.length == 0) {
-            Ext.Msg.alert('提示', '请选择记录进行操作！');
-            return;
-        }
-        if (r.length == d.getCount())
-            return;
-        if (d.indexOf(r[0]) == 0)
-            return;
-        for (var i = 0; i < r.length; i++) {
-            idx = d.indexOf(r[i]) - 1;
-            d.remove(r[i]);
-            d.insert(idx, r[i]);
-        }
-        this.getSelectionModel().selectRow(idx);
-        this.reconfigure(d, c);
+    fieldLabel : '',
+
+    fieldStyle : {
+        "text-align":"right"
     },
-    moveDown: function() {
-        var d = this.getStore();
-        var c = this.getColumnModel();
-        var r = this.getSelectionModel().getSelections();
-        var idx;
-        var len = r.length;
-        if (len == 0) {
-            Ext.Msg.alert('提示', '请选择记录进行操作！');
-            return;
-        }
-        if (len == d.getCount())
-            return;
-        if (d.indexOf(r[len - 1]) == d.getCount() - 1)
-            return;
-        for (var i = 0; i < len; i++) {
-            idx = d.indexOf(r[len - i - 1]) + 1;
-            d.remove(r[len - i - 1]);
-            d.insert(idx, r[len - i - 1]);
-        }
-        this.getSelectionModel().selectRow(idx);
-        this.reconfigure(d, c);
-    }
-});
 
-Ext.apply(Ext.vcf.CustomNumberField.prototype, {
-    validateValue: function(value) {
-        if (!Ext.form.NumberField.superclass.validateValue.call(this, value)) {
-            return false;
+    minValue: Number.NEGATIVE_INFINITY,
+
+    maxValue: Number.MAX_VALUE,
+
+    minText : "数字最小为 {0}",
+
+    maxText : "数字最大为 {0}",
+
+    nanText : "{0} 不是一个有效数字",
+
+    /**
+     * 默认币种标志
+     */
+    prefixChar : '',
+
+    /**
+     * 后缀字符
+     */
+    suffixChar : '',
+
+    /**
+     * 数字格式
+     */
+    numberFormatter : '',
+
+    /**
+     * 是否使用红字提示
+     */
+    numberColored : true,
+
+    /**
+     * 小数允许
+     */
+    allowDecimals : false,
+
+    /**
+     * 负数允许
+     */
+    allowNegative : true,
+
+    baseChars : "0123456789",
+
+    decimalSeparator : '.',
+
+    /**
+     * 保留小数位数
+     */
+    decimalPrecision : 2,
+
+    value : 0,
+
+    _displayVal : 0,
+
+    _submitVal : 0,
+
+    listeners: {
+        'focus': function(_this, event, eOpts) {
+            if (this.editable) {
+                this.value = this._submitVal;
+                this.setRawValue(this.value);
+                this.focus(true, 100);
+            }
         }
-        if (value.length < 1) {
+    },
+
+    initComponent: function() {
+        this.setValue(this.value);
+        this.callParent(arguments);
+    },
+
+    setValue : function(v) {
+        var v = this.parseValue(v);
+        if (v) {
+        } else {
+            v = 0;
+        }
+        this._submitVal = this.fixPrecision(v);
+        if (this.numberFormatter != '') {
+            this._displayVal = this.prefixChar + ' ' + Ext.util.Format.number(this._submitVal, this.numberFormatter) + this.suffixChar;
+        } else {
+            this._displayVal = this.prefixChar + ' ' + this._submitVal + this.suffixChar;
+        }
+
+        arguments[0] = this._displayVal;
+        this.callParent(arguments);
+        if (this.numberColored) {
+            if (this._submitVal >= 0) {
+                this.setFieldStyle({
+                    "text-align":"right",
+                    "color" : 'BLACK'
+                });
+            } else {
+                this.setFieldStyle({
+                    "text-align":"right",
+                    "color" : 'RED'
+                });
+            }
+        }
+    },
+
+    beforeBlur : function() {
+        var v = this.parseValue(this.getRawValue());
+        this.setValue(v);
+    },
+
+    validateValue : function(value) {
+        value = this._submitVal == '' ? 0 : this._submitVal;
+        if(value.length < 1){ // if it's blank and textfield didn't flag it then it's valid
             return true;
         }
         value = String(value).replace(this.decimalSeparator, ".");
-        value = String(value).replace(",", "");
-        value = String(value).replace(this.prefixChar, "");
-        value = String(value).replace(this.suffixChar, "");
-        if (isNaN(value)) {
+        if(isNaN(value)){
             this.markInvalid(String.format(this.nanText, value));
             return false;
         }
         var num = this.parseValue(value);
-        if (num < this.minValue) {
+        if(num < this.minValue){
             this.markInvalid(String.format(this.minText, this.minValue));
             return false;
         }
-        if (num > this.maxValue) {
+        if(num > this.maxValue){
             this.markInvalid(String.format(this.maxText, this.maxValue));
             return false;
         }
         return true;
+    },
+
+    parseValue : function(value){
+        value = parseFloat(String(value).replace(this.decimalSeparator, "."));
+        return isNaN(value) ? '' : value;
+    },
+
+    fixPrecision : function(value){
+        var nan = isNaN(value);
+        if(!this.allowDecimals || this.decimalPrecision == -1 || nan || !value){
+            return nan ? '' : value;
+        }
+        return parseFloat(parseFloat(value).toFixed(this.decimalPrecision));
+    },
+
+    initEvents : function() {
+        var allowed = this.baseChars+'';
+        var pressAllowed = this.baseChars+'';
+        if (this.prefixChar != '') {
+            allowed += this.prefixChar;
+        }
+        if (this.suffixChar != '') {
+            allowed += this.suffixChar;
+        }
+        if (this.numberFormatter != '') {
+            allowed += ',:';
+        }
+        if(this.allowDecimals){
+            allowed += this.decimalSeparator;
+            pressAllowed += this.decimalSeparator;;
+        }
+        if(this.allowNegative){
+            allowed += "-";
+            pressAllowed += '-';
+        }
+        this.stripCharsRe = new RegExp('[^'+allowed+']', 'gi');
+        var keyPress = function(e){
+            var k = e.getKey();
+            if(!Ext.isIE && (e.isSpecialKey() || k == e.BACKSPACE || k == e.DELETE)){
+                return;
+            }
+            var c = e.getCharCode();
+            if(pressAllowed.indexOf(String.fromCharCode(c)) === -1){
+                e.stopEvent();
+            }
+        };
+        this.el.on("keypress", keyPress, this);
+        this.callParent(arguments);
+    },
+
+    constructor: function (config) {
+        this.callParent(arguments);
+    },
+
+    getSubmitValue : function() {
+        return this._submitVal == 0 ? 0 : this._submitVal;
     }
 });
-*/
+
+Ext.define('Ext.vcf.MoneyField', {
+    extend: 'Ext.vcf.CustomNumberField',
+    xtype: 'moneyfield',
+    currencyChar : '¥',
+    moneyFormatter: '0,000.00',
+    allowDecimals: true,
+    minText : "金额最小为 {0}",
+    maxText : "金额最大为 {0}",
+    nanText : "{0} 不是一个有效金额",
+    initComponent : function() {
+        Ext.apply(this, {
+            prefixChar: this.currencyChar,
+            suffixChar: '',
+            numberFormatter: this.moneyFormatter
+        });
+        this.callParent(arguments);
+    }
+});
+
+
+Ext.define('Ext.vcf.PercentField', {
+    extend: 'Ext.vcf.CustomNumberField',
+    xtype: 'percentfield',
+    allowDecimals: true,
+    percentChar : '%',
+    initComponent : function() {
+        Ext.apply(this, {
+            prefixChar: '',
+            suffixChar : this.percentChar
+        });
+        this.callParent(arguments);
+    }
+});
 
 Ext.define('Ext.vcf.LocateField', {
     extend: 'Ext.form.field.Text',
@@ -2026,11 +2243,9 @@ Ext.define('Ext.vcf.LocateField', {
     onSearchClick: function() {
         var me = this,
             value = me.getValue();
-        if (value.length > 0) {
-            me.fireEvent('locate',me);
-            me.getTrigger('clear').show();
-            me.updateLayout();
-        }
+        me.fireEvent('locate',me, value);
+        me.getTrigger('clear').show();
+        me.updateLayout();
     }
 });
 
@@ -2038,7 +2253,7 @@ Ext.define('Ext.vcf.LocateField', {
 
 Ext.define('Ext.vcf.Window', {
     extend: 'Ext.Window',
-    layout: 'fit',
+    //layout: 'fit',
     width: 400,
     autoHeight: true,
     resizable: true,

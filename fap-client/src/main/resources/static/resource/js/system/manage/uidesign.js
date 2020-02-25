@@ -415,7 +415,7 @@ function addGridByServer(comp, ray) {
                                 } else if (children[j].uiconf_field == 'store') {
                                     newField.renderer = eval('typeof ' + children[j].uiconf_value.replace('Store', 'Render') + '!=\'undefined\' ? ' + children[j].uiconf_value.replace('Store', 'Render') + ' : null');
                                 } else if (children[j].uiconf_field == 'enumData') {
-                                    eval('function ' + newField.dataIndex + 'EnumData() {return "' + children[j].uiconf_value + '"};');
+                                    eval('function ' + newField.dataIndex + 'EnumRender(v) {return enumRender(v,"' + children[j].uiconf_value + '")};');
                                     newField.renderer = eval('typeof ' + newField.dataIndex + 'EnumRender!=\'undefined\' ? ' + newField.dataIndex + 'EnumRender : null');
                                 } else if (children[j].uiconf_field == 'renderer') {
                                     newField.renderer = eval('typeof ' + children[j].uiconf_value + '!=\'undefined\' ? ' + children[j].uiconf_value + ' : null');
@@ -468,7 +468,9 @@ function addGridByServer(comp, ray) {
         //if (typeof comp.getBottomToolbar()!='undefined') {
         //    comp.getBottomToolbar().bind(store);
         //}
-        comp.store.reload(comp.params);
+        if (comp.autoLoad) {
+            comp.store.reload(comp.params);
+        }
     }
     if (typeof ray.main != 'undefined') {
         var ray_main = ray.main;
