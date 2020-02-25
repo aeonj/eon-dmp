@@ -48,9 +48,8 @@ public class UIConfServiceImpl implements IUIConfService {
 	}
 	
 	@Override
-	public UIConf getObjByProperty(String construct, String propertyName,
-			Object value) {
-		return this.uIConfDao.getBy(construct, propertyName, value);
+	public UIConf getObjByProperty(Object... fields) {
+		return this.uIConfDao.getOne(fields);
 	}
 
 	@Override

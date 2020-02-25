@@ -67,11 +67,10 @@ public interface IUIConfService {
 	
 	/**
 	 * 
-	 * @param propertyName
-	 * @param value
+	 * @param fields
 	 * @return
 	 */
-	UIConf getObjByProperty(String construct, String propertyName, Object value);
+	UIConf getObjByProperty(Object... fields);
 
     void deleteAll();
 }

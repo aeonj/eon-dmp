@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
+import eon.hg.fap.core.body.ResultBody;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
@@ -39,6 +40,8 @@ public class UIManageAction extends BizAction {
     private IUserConfigService userConfigService;
     @Autowired
     private IUIManagerService uiManagerService;
+    @Autowired
+    private IUIConfService uiConfService;
     @Autowired
     private IElementService elementService;
     @Autowired
@@ -240,7 +243,8 @@ public class UIManageAction extends BizAction {
                 }
             }
             if (!isfind) {
-                dsUiConfMain.remove(mapConfMain);
+                //dsUiConfMain.remove(mapConfMain);
+                iter.remove();
             }
         }
         //end added
@@ -292,7 +296,8 @@ public class UIManageAction extends BizAction {
                 }
             }
             if (!isfind) {
-                dsUiConfDetail.remove(mapConfDetail);
+                //dsUiConfDetail.remove(mapConfDetail);
+                iter.remove();
             }
         }
         //end added
@@ -321,7 +326,7 @@ public class UIManageAction extends BizAction {
      * @throws Exception
      */
     @RequestMapping("/swap_uicolcache.htm")
-    public void swap_uicolcache(@RequestParam Map<String, Object> inDto) throws Exception {
+    public @ResponseBody void swap_uicolcache(@RequestParam Map<String, Object> inDto) throws Exception {
         Dto swapDto = JsonHandler.parseDto((String)inDto.get("swap"));
         List<Map> dsDetail =uiManagerService.getPoolCache(new Object[]{"detail", httpSession.getId(), Convert.toStr(inDto.get("ui_id"))});
         if (dsDetail!=null) {
@@ -656,4 +661,29 @@ public class UIManageAction extends BizAction {
         this.baseUIService.reset();
     }
 
+    @SecurityMapping(title = "界面视图新增",value = "ui:insert")
+    @RequestMapping("/insert_uiconf.htm")
+    public @ResponseBody ResultBody insert_uiconf(@RequestParam Map<String,Object> mapPara,
+                                                  @RequestParam("uiconf_type") String uiconf_type,
+                                                  @RequestParam("uiconf_field") String uiconf_field) {
+        UIConf vf = this.uiConfService.getObjByProperty("uiconf_type", uiconf_type,"uiconf_field",uiconf_field);
+        if (vf == null) {
+            UIConf uiConf = WebHandler.toPo(mapPara, UIConf.class);
+            this.uiConfService.save(uiConf);
+            return ResultBody.success();
+        } else {
+            return ResultBody.failed();
+        }
+    }
+
+    @SecurityMapping(title = "界面视图新增",value = "ui:insert")
+    @RequestMapping("/delete_uiconf.htm")
+    public @ResponseBody ResultBody delete_uiconf(@RequestParam("uiconf_type") String uiconf_type,
+                                                  @RequestParam("uiconf_field") String uiconf_field) {
+        UIConf vf = this.uiConfService.getObjByProperty("uiconf_type", uiconf_type,"uiconf_field",uiconf_field);
+        if (vf != null) {
+            this.uiConfService.delete(vf.getId());
+        }
+        return ResultBody.success();
+    }
 }

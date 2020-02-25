@@ -53,7 +53,7 @@ public class UIManagerOP {
             rn.put("level_num", level_num);
             if (CommUtil.null2String(uidetail.getField_type()).equals("hidden")) {
                 rn.put("iconCls", "nodeNoIcon");
-            } else if (CommUtil.null2String(uidetail.getField_type()).equals("colmodel")) {
+            } else {
                 try {
                     boolean is_hidden = false;
                     List<UIConfDetail> uiConfDetails = uidetail.getConfs();
@@ -74,8 +74,6 @@ public class UIManagerOP {
                     e.printStackTrace();
                     rn.put("iconCls", "nodeYesIcon");
                 }
-            } else {
-                rn.put("iconCls", "nodeYesIcon");
             }
             List<Dto> innerList =getUIDetailTreeChildNodeList(dto,level_num+1,hasChecked);
             rn.put("children", innerList);

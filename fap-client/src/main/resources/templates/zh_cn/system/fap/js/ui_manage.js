@@ -1160,6 +1160,13 @@ Ext.onReady(function() {
                 region : 'center',
                 layout : 'fit',
                 title : '字段属性',
+                tools: [{
+                    type: 'plus',
+                    handler: addUIConf
+                },{
+                    type: 'minus',
+                    handler: delUIConf
+                }],
                 items : [ editColGrid ]
             } ]
         } ]
@@ -1633,6 +1640,152 @@ Ext.onReady(function() {
                         });
                     }
                 });
+    }
+    
+    function addUIConf() {
+        var combo_fieldtype = editColPanel.getForm().findField('field_type');
+        if (combo_fieldtype) {
+            if (combo_fieldtype.getValue()==null)
+                return;
+            var validstr = validCacheCol();
+            if (validstr == 'abort') {
+                return;
+            } else if (validstr == 'cache') {
+                disposeCacheCol();
+            }
+            var pnl_uiconf = Ext.create({
+                xtype: 'inputpanel',
+                padding: '0 12',
+                layout: 'form',
+                items: [{
+                    xtype: 'textfield',
+                    name: 'uiconf_field',
+                    fieldLabel: '属性名',
+                    allowBlank: false,
+                    anchor: '98%'
+                }, {
+                    xtype: 'textfield',
+                    name: 'uiconf_title',
+                    fieldLabel: '属性中文名',
+                    allowBlank: false,
+                    anchor: '98%'
+                }, {
+                    xtype: 'combofield',
+                    name: 'uiconf_datatype',
+                    enumData: 'string,boolean,object,int',
+                    fieldLabel: '属性值类型',
+                    allowBlank: false,
+                    anchor: '98%'
+                }, {
+                    xtype: 'textfield',
+                    name: 'ref_selmodel',
+                    fieldLabel: '属性值枚举',
+                    anchor: '98%'
+                }, {
+                    xtype: 'custnumberfield',
+                    name: 'order_no',
+                    fieldLabel: '排序号',
+                    anchor: '98%'
+                }, {
+                    xtype: 'hidden',
+                    name: 'uiconf_type',
+                    value: combo_fieldtype.getValue()
+                }]
+            });
+            var win = Ext.create('Ext.vcf.Window', {
+                title: '属性模板新增',
+                autoShow: true,
+                closeAction: 'destroy',
+                items: [{
+                    region: 'north',
+                    autoHeight: true,
+                    items: pnl_uiconf
+                }],
+                buttons : [ {
+                    text : '保存',
+                    iconCls : 'acceptIcon',
+                    handler: function () {
+                        if (pnl_uiconf.form.isValid()) {
+                            pnl_uiconf.form.submit({
+                                url: 'insert_uiconf.htm',
+                                waitTitle: '提示',
+                                method: 'POST',
+                                waitMsg: '正在处理数据,请稍候...',
+                                success: function (form, action) {
+                                    if (action.result.success) {
+                                        win[win.closeAction]();
+                                        // 刷新
+                                        //combo_fieldtype.fireEvent('select', combo_fieldtype);
+                                        treeCols.selectNodeByValue(seltreecolid);
+                                    } else {
+                                        Ext.MessageBox.alert('提示', action.result.msg);
+                                    }
+                                },
+                                failure: function (form, action) {
+                                    switch (action.failureType) {
+                                        case Ext.form.action.Action.SERVER_INVALID:
+                                            Ext.Msg.alert('提示', '数据保存失败:<br>' + action.result.msg);
+                                            break;
+                                        default:
+                                            Ext.Msg.alert('错误', '数据保存失败:<br>' + action.response.responseText);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }, {
+                    text : '关闭',
+                    iconCls : 'deleteIcon',
+                    handler : function () {
+                        win[win.closeAction]();
+                        treeCols.selectNodeByValue(seltreecolid);
+                    }
+                } ]
+            });
+        }
+    }
+    
+    function delUIConf() {
+        var combo_fieldtype = editColPanel.getForm().findField('field_type');
+        if (combo_fieldtype) {
+            if (combo_fieldtype.getValue()==null)
+                return;
+            var validstr = validCacheCol();
+            if (validstr == 'abort') {
+                return;
+            } else if (validstr == 'cache') {
+                disposeCacheCol();
+            }
+            Ext.MessageBox
+                .prompt(
+                    '删除确认',
+                    '<span style="color:red"><b>提示:</b>删除属性模版后将影响界面视图的列属性配置,请慎重.</span><br>请输入属性名称：',
+                    function (btn, text) {
+                        if (btn == 'ok') {
+                            Ext.Ajax.request({
+                                url: 'delete_uiconf.htm',
+                                success: function (response) {
+                                    var resultArray = Ext.util.JSON
+                                        .decode(response.responseText);
+                                    // 刷新
+                                    if (resultArray.success) {
+                                        //combo_fieldtype.fireEvent('select', combo_fieldtype);
+                                        treeCols.selectNodeByValue(seltreecolid);
+                                    } else {
+                                        Ext.MessageBox.alert('提示', resultArray.msg);
+                                    }
+                                },
+                                failure: function (response) {
+                                    Ext.Msg.alert('提示', "删除失败，失败原因：" + response.responseText);
+                                },
+                                params: {
+                                    uiconf_type: combo_fieldtype.getValue(),
+                                    uiconf_field: text
+                                }
+                            });
+                        }
+                    });
+        }
     }
 
 });
