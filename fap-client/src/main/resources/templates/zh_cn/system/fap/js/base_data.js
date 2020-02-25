@@ -548,6 +548,7 @@ Ext.onReady(function () {
             title: '<span class="commoncss">' + b_eletitle + '信息</span>',
             tools: [{
                 id: 'refresh',
+                type: 'refresh',
                 handler: function () {
                     treeEle.getStore().reload();
                 }
