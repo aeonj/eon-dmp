@@ -2,7 +2,9 @@ package eon.hg.fap.core.query.support;
 
 import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.query.PageObject;
+import eon.hg.fap.core.query.QueryBean;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +29,30 @@ public interface IQueryObject {
 	 * @return
 	 */
 	String getConstruct();
+
+	/**
+	 * 获取排序类型
+	 * @return
+	 */
+	String getOrder();
+
+	/**
+	 * 获取排序内容
+	 * @return
+	 */
+	String getOrderBy();
+
+	/**
+	 * 自定义对象
+	 * @return
+	 */
+	Object getObject();
+
+	/**
+	 * 自定义对象
+	 * @param object
+	 */
+	void setObject(Object object);
 
 	/**
 	 * 得到一个查询条件语句,其中参数用命名参数title=:title and id=:id
@@ -92,6 +118,28 @@ public interface IQueryObject {
 	 */
 	IQueryObject addQuery(String field, String para, Object obj,
                           String expression);
+
+	///////////////////////////F3/////////////////////////
+	IQueryObject and(String key, String operation, String value);
+
+	IQueryObject andPlusBracket(String key, String operation, String value);
+
+	IQueryObject or(String key, String operation, String value);
+
+	IQueryObject orPlusBracket(String key, String operation, String value);
+
+	IQueryObject addBracketFront();
+
+	IQueryObject addBracketBack();
+
+    String getAlias();
+
+    void setAlias(String alias);
+
+	String getCondionStr();
+
+	List<QueryBean> getWhereList();
+    ////////////////////////////F3/////////////////////////
 
 	/**
 	 * 清理所有查询条件、查询参数，用在一个方法中多次使用同一个QueryObject

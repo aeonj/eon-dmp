@@ -6,8 +6,7 @@ import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.query.support.IQueryObject;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 基础查询对象，封装基础查询条件，包括页大小、当前页、排序信息等
@@ -29,12 +28,18 @@ public class QueryObject implements IQueryObject {
 	protected Map params = new HashMap();
 
 	protected String queryString = "";
-	
+
 	protected String fetchs = "";
 
 	protected String nativeSql;   //原生sql语句
 
 	protected boolean isAllSql;    //是否全sql，包括条件也是sql
+
+	private String alias = "obj";
+
+	private WhereObject whereObj = new WhereObject();
+
+	private Object object;
 
 	public String getConstruct() {
 		return construct;
@@ -81,6 +86,14 @@ public class QueryObject implements IQueryObject {
 
 	public String getOrderBy() {
 		return orderBy;
+	}
+
+	public Object getObject() {
+		return object;
+	}
+
+	public void setObject(Object object) {
+		this.object = object;
 	}
 
 	public Integer getPageSize() {
@@ -299,28 +312,29 @@ public class QueryObject implements IQueryObject {
 	}
 
 	public String getQuery() {
-		customizeQuery();
-		if (StrUtil.isEmpty(queryString)) {
-			return "1=1 "+orderString();
-		} else {
-			String condition = queryString;
-			int iAnd = StrUtil.indexOfIgnoreCase(condition," and ");
-			if (iAnd!=-1) {
-				condition = condition.substring(iAnd+5);
-			}
-			return condition + orderString();
-		}
+		return getCondionStr() + whereObj.toString()+ orderString();
 	}
 
 	protected String orderString() {
-		String orderString = " ";
+		StringBuilder orderString = new StringBuilder();
 		if (this.getOrderBy() != null && !"".equals(getOrderBy())) {
-			orderString += " order by obj." + this.getOrderBy();
+			orderString.append(" order by ");
+			if (alias.equals("")) {
+				orderString.append(this.getOrderBy());
+			} else {
+				String[] orderArr = CommUtil.splitByChar(this.getOrderBy(),",");
+				for (int i=0;i<orderArr.length;i++) {
+					String order_ele = orderArr[i];
+					if (i>0)
+						orderString.append(",");
+					orderString.append(alias).append(".").append(order_ele.trim());
+				}
+			}
 		}
 		if (this.getOrderType() != null && !"".equals(getOrderType())) {
-			orderString = orderString + " " + getOrderType();
+			orderString.append(" ").append(getOrderType());
 		}
-		return orderString;
+		return orderString.toString();
 	}
 
 	public Map getParameters() {
@@ -374,6 +388,67 @@ public class QueryObject implements IQueryObject {
 		return this;
 	}
 
+	/**
+	 * 继承于F3
+	 * @return
+	 */
+	public IQueryObject and(String key, String operation, String value) {
+		whereObj.and(key,operation,value);
+		return this;
+	}
+
+	public IQueryObject andPlusBracket(String key, String operation, String value) {
+		whereObj.andPlusBracket(key,operation,value);
+		return this;
+	}
+
+	public IQueryObject or(String key, String operation, String value) {
+		whereObj.or(key,operation,value);
+		return this;
+	}
+
+	public IQueryObject orPlusBracket(String key, String operation, String value) {
+		whereObj.orPlusBracket(key,operation,value);
+		return this;
+	}
+
+	public IQueryObject addBracketFront() {
+		whereObj.addBracketFront();
+		return this;
+	}
+
+	public IQueryObject addBracketBack() {
+		whereObj.addBracketBack();
+		return this;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
+	public List<QueryBean> getWhereList() {
+		return whereObj.getWhereList();
+	}
+
+	public String getCondionStr() {
+		customizeQuery();
+		String condition = queryString;
+		if (StrUtil.isEmpty(queryString)) {
+			return "1=1 ";
+		} else {
+			int iAnd = StrUtil.indexOfIgnoreCase(condition," and ");
+			if (iAnd!=-1) {
+				condition = condition.substring(iAnd+5);
+			}
+			return condition;
+		}
+	}
+	///////////////////F3结束
+
 	@Override
 	public IQueryObject clearQuery() {
 		// TODO Auto-generated method stub
@@ -396,6 +471,132 @@ public class QueryObject implements IQueryObject {
 	@Override
 	public void autoFilterRg(boolean filter) {
 		this.params.put("allrg", !filter);
+	}
+
+	private class WhereObject {
+		private List<QueryBean> whereList;
+
+		public void addWhereList(QueryBean bean) {
+			if (whereList == null) {
+				whereList = new ArrayList();
+			}
+			whereList.add(bean);
+		}
+
+		public WhereObject and(String key, String operation, String value) {
+			QueryBean bean = new QueryBean();
+			bean.setRelation("and");
+			bean.setBracketFront(false);
+			bean.setKey(key);
+			bean.setOperation(operation);
+			bean.setValue(value);
+			bean.setBracketBack(false);
+			addWhereList(bean);
+			return this;
+		}
+
+		public WhereObject andPlusBracket(String key, String operation, String value) {
+			QueryBean bean = new QueryBean();
+			bean.setRelation("and");
+			bean.setBracketFront(true);
+			bean.setKey(key);
+			bean.setOperation(operation);
+			bean.setValue(value);
+			bean.setBracketBack(false);
+			addWhereList(bean);
+			return this;
+		}
+
+		public WhereObject or(String key, String operation, String value) {
+			QueryBean bean = new QueryBean();
+			bean.setRelation("or");
+			bean.setBracketFront(false);
+			bean.setKey(key);
+			bean.setOperation(operation);
+			bean.setValue(value);
+			bean.setBracketBack(false);
+			addWhereList(bean);
+			return this;
+		}
+
+		public WhereObject orPlusBracket(String key, String operation, String value) {
+			QueryBean bean = new QueryBean();
+			bean.setRelation("or");
+			bean.setBracketFront(true);
+			bean.setKey(key);
+			bean.setOperation(operation);
+			bean.setValue(value);
+			bean.setBracketBack(false);
+			addWhereList(bean);
+			return this;
+		}
+
+		public WhereObject addBracketFront() {
+			QueryBean bean = new QueryBean();
+			bean.setBracketFront(true);
+			bean.setOnlyBracket(true);
+			addWhereList(bean);
+			return this;
+		}
+
+		public WhereObject addBracketBack() {
+			QueryBean bean = new QueryBean();
+			bean.setBracketBack(true);
+			bean.setOnlyBracket(true);
+			addWhereList(bean);
+			return this;
+		}
+
+		public List<QueryBean> getWhereList() {
+			return whereList;
+		}
+
+		public void setWhereList(List<QueryBean> whereList) {
+			this.whereList = whereList;
+		}
+
+		public String toString() {
+			if (whereList == null || whereList.size() == 0) {
+				return "";
+			}
+
+			StringBuffer sb = new StringBuffer();
+			for (QueryBean bean : whereList) {
+				if (bean.isOnlyBracket()) {
+					sb.append(" ");
+					sb.append(bean.isBracketFront() ? "(" : "");
+					sb.append(bean.isBracketBack() ? ")" : "");
+					sb.append(" ");
+				} else if (alias.equals("")) {
+					sb.append(" ");
+					sb.append(bean.getRelation());
+					sb.append(" ");
+					sb.append(bean.isBracketFront() ? "(" : "");
+					sb.append(" ");
+					sb.append(bean.getKey());
+					sb.append(" ");
+					sb.append(bean.getOperation());
+					sb.append(" ");
+					sb.append(bean.getValue());
+					sb.append(bean.isBracketBack() ? ")" : "");
+					sb.append(" ");
+				} else {
+					sb.append(" ");
+					sb.append(bean.getRelation());
+					sb.append(" ");
+					sb.append(bean.isBracketFront() ? "(" : "");
+					sb.append(" ");
+					sb.append(getAlias() + "." + bean.getKey());
+					sb.append(" ");
+					sb.append(bean.getOperation());
+					sb.append(" ");
+					sb.append(bean.getValue());
+					sb.append(bean.isBracketBack() ? ")" : "");
+					sb.append(" ");
+				}
+			}
+			return sb.toString();
+		}
 	}
 
 }
