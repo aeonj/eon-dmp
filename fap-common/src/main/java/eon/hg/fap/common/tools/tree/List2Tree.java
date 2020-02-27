@@ -8,6 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 根据list转换为树结构
+ * @param <N>
+ * @author aeon
+ */
 public abstract class List2Tree<N> {
 
     /**

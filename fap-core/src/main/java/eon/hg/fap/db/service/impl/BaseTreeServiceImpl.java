@@ -2,6 +2,7 @@ package eon.hg.fap.db.service.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.crypto.SecureUtil;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.core.cache.AbstractCacheOperator;
@@ -17,6 +18,7 @@ import eon.hg.fap.db.model.primary.PartGroup;
 import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.service.IBaseTreeService;
 import eon.hg.fap.db.service.ISysConfigService;
+import eon.hg.fap.third.IRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,8 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
 
     @Autowired
     private ISysConfigService configService;
+    @Autowired(required = false)
+    private IRelation relation;
 
     @Resource
     ElementDao elementDAO;
@@ -42,23 +46,23 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
     public String getKey(Object... params) throws Exception {
         if (params != null && params.length > 0) {
             Dto parameters = (Dto) params[0];
-            String sResult ="#eleset=";
-            if (CommUtil.isNotEmpty(parameters.get("source"))) {
-                sResult += parameters.getString("source");
-                sResult += "|"+ SecurityUserHolder.getOnlineUser().getUserid();
-                if (CommUtil.isNotEmpty(parameters.get("isfulldata"))) {
-                    sResult += "|"+parameters.getString("isfulldata");
-                }
-                if (CommUtil.isNotEmpty(parameters.get("ispermission"))) {
-                    sResult += "|"+parameters.getString("ispermission");
-                }
-                if (CommUtil.isNotEmpty(parameters.get("isfulllevel"))) {
-                    sResult += "|"+parameters.getString("isfulllevel");
-                }
-                if (CommUtil.isNotEmpty(parameters.get("selectmodel")) && parameters.getString("selectmodel").equals("multiple")) {
-                    sResult += "|"+parameters.getString("selectmodel");
-                }
-            }
+            String sResult ="#eleset="+ SecureUtil.md5(parameters.toString());
+//            if (CommUtil.isNotEmpty(parameters.get("source"))) {
+//                sResult += parameters.getString("source");
+//                sResult += "|"+ SecurityUserHolder.getOnlineUser().getUserid();
+//                if (CommUtil.isNotEmpty(parameters.get("isfulldata"))) {
+//                    sResult += "|"+parameters.getString("isfulldata");
+//                }
+//                if (CommUtil.isNotEmpty(parameters.get("ispermission"))) {
+//                    sResult += "|"+parameters.getString("ispermission");
+//                }
+//                if (CommUtil.isNotEmpty(parameters.get("isfulllevel"))) {
+//                    sResult += "|"+parameters.getString("isfulllevel");
+//                }
+//                if (CommUtil.isNotEmpty(parameters.get("selectmodel")) && parameters.getString("selectmodel").equals("multiple")) {
+//                    sResult += "|"+parameters.getString("selectmodel");
+//                }
+//            }
             return sResult;
         }
         throw new Exception(getCacheId());
@@ -186,7 +190,7 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
     }
 
     public String getRelationSql(Dto dto) {
-        String sql = "";
+        StringBuilder sql = new StringBuilder();
         //要素关联关系
         if (CommUtil.isNotEmpty(dto.get("relationfilter"))) {
             boolean existsSqlCondition = false;
@@ -205,24 +209,32 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
                         existsSqlCondition = true;
                         Dto dtoRm = lst.get(0);
                         if (System.getProperty("aeonDao.db").equals("oracle")) {
-                            Element ele = this.elementDAO.getOne("ele_code",dto.getString("source"));
+                            Element ele = this.elementDAO.getOne("ele_code",secSource);
                             String table_name = ele.getEle_source();
-                            sql += "and e.id in (select et.id from " + table_name + " et connect by prior et.parent_id=et.id\n" +
-                                    " start with et.id in (select r.sec_ele_value from " +Globals.SYS_TABLE_SUFFIX + "relation_detail r where r.main_id=" + Convert.toStr(dtoRm.get("id")) +
-                                    " and pri_ele_value='" + priValue + "'))";
+                            sql.append(" and e.id in (select et.id from ").append(table_name).append(" et connect by prior et.parent_id=et.id start with et.id in (select r.sec_ele_value from ").append(Globals.SYS_TABLE_SUFFIX).append("relation_detail r where r.main_id=").append(Convert.toStr(dtoRm.get("id")))
+                                    .append(" and pri_ele_value='").append(priValue).append("'))");
                         } else {
-                            sql += " and e.id in (select r.sec_ele_value from " +Globals.SYS_TABLE_SUFFIX + "relation_detail r where r.main_id=" + Convert.toStr(dtoRm.get("id")) +
-                                    " and pri_ele_value='" + priValue + "')";
+                            sql.append(" and e.id in (select r.sec_ele_value from ").append(Globals.SYS_TABLE_SUFFIX).append("relation_detail r where r.main_id=").append(Convert.toStr(dtoRm.get("id")))
+                                    .append(" and pri_ele_value='").append(priValue).append("')");
+                        }
+                    } else {
+                        //找不到关联关系，找外部关联对象
+                        if (relation!=null) {
+                            String sqlThird =relation.getRelationSql(priSource,secSource,priValue);
+                            if (StrUtil.isNotBlank(sqlThird)) {
+                                existsSqlCondition = true;
+                                sql.append(sqlThird);
+                            }
                         }
                     }
 
                 }
             }
             if (!existsSqlCondition) {
-                sql = " and 1=0";
+                sql.append(" and 1=0");
             }
         }
-        return sql;
+        return sql.toString();
     }
 
     private List findEleTree(Dto dtoParam) {

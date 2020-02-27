@@ -256,6 +256,12 @@ public class ElementOP {
 				node.setChildren(nodes);
 			}
 
+			/**
+			 * 本方法为支持结果集只有叶子节点的情况，需要从仓库载入父亲节点的情况
+			 * @param map
+			 * @param node
+			 * @return
+			 */
 			@Override
 			protected BaseData getTopParent(Map<Object,BaseData> map, BaseData node) {
 				if (getPid(node)==null) {

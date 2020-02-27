@@ -12,7 +12,9 @@ import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.model.primary.Element;
+import eon.hg.fap.db.model.primary.RelationMain;
 import eon.hg.fap.db.service.*;
+import eon.hg.fap.third.IRelation;
 import eon.hg.fap.web.manage.dto.CodeStoreTagDto;
 import eon.hg.fap.web.manage.dto.EleRenderTagDto;
 import eon.hg.fap.web.manage.dto.HtmlTagDto;
@@ -57,6 +59,8 @@ public class TplManageAction {
 	private TplManageOp tplOp;
 	@Autowired
 	private MenuOP menuOP;
+	@Autowired(required = false)
+	private IRelation relation;
 
 	@RequestMapping("/html_tag.htm")
 	public ModelAndView html_tag(HttpServletRequest request,
@@ -73,7 +77,11 @@ public class TplManageAction {
 		String urlSecurity = pHelper.getValue("urlSecurity", "1");
 		mv.addObject("urlSecurity", urlSecurity);
 		mv.addObject("ajaxErrCode", AeonConstants.Ajax_Timeout);
-		mv.addObject("relationList", relationMainService.query("select obj from RelationMain obj",null,-1,1));
+		List<RelationMain> relationMains =relationMainService.query("select obj from RelationMain obj", null, -1, -1);
+		if (relation!=null) {
+			relationMains.addAll(relation.getRelationList());
+		}
+		mv.addObject("relationList", relationMains);
 		return mv;
 	}
 
