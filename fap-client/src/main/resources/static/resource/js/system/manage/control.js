@@ -652,7 +652,7 @@ Ext.define('Ext.vcf.TreeField', {
     /**
      * 是否启用要素关系控制
      */
-    isRelation : false,
+    isRelation : undefined,
     /**
      * 是否获取基础数据表所有字段信息，这样可以在node.attributes属性集获取扩展字段值
      * 默认为false，只获取id,code,name,text,leaf等节点字段值

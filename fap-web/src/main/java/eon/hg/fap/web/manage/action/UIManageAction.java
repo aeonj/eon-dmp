@@ -503,6 +503,11 @@ public class UIManageAction extends BizAction {
                     uiconfdetail.setId(null);
                     uidetail.getConfs().add(uiconfdetail);
                     uiconfdetail.setUi_detail(uidetail);
+                    if ("hidden".equals(uiconfdetail.getUiconf_field()) && "true".equals(uiconfdetail.getUiconf_value())) {
+                        uidetail.setHidden(Byte.valueOf("1"));
+                    } else {
+                        uidetail.setHidden(Byte.valueOf("0"));
+                    }
                 }
             }
         }
@@ -533,6 +538,11 @@ public class UIManageAction extends BizAction {
             List<Map> dsUiConfDetail = uiManagerService.getPoolCache(new Object[]{"confdetail", httpSession.getId(), uidetail.getUi_detail_id()});
             for (UIConfDetail uiconfdetail : disposeRecordState(uidetail.getConfs(),dsUiConfDetail,UIConfDetail.class)) {
                 uiconfdetail.setUi_detail(uidetail);
+                if ("hidden".equals(uiconfdetail.getUiconf_field()) && "true".equals(uiconfdetail.getUiconf_value())) {
+                    uidetail.setHidden(Byte.valueOf("1"));
+                } else {
+                    uidetail.setHidden(Byte.valueOf("0"));
+                }
             }
         }
         uiManagerService.update(uimanager);

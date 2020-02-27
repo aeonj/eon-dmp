@@ -14,8 +14,22 @@ Ext.override(Ext.vcf.FormPanel, {
                 addUIByServer(comp, resultArray);
                 //comp.add(childcomp);
                 //comp.doComponentLayout();
-                if (comp instanceof (Ext.vcf.FormPanel) === true)
-                    comp.fireEvent('afterLoadUI', this.ownerField);
+                if (comp.doResult) {
+                    comp.doResult();
+                }
+                if (comp instanceof (Ext.vcf.QueryPanel) === true) {
+                    if (comp.stateChange) {
+                        var state = comp.getForm().findField('state');
+                        if (state) {
+                            state.on('select',function (field) {
+                                comp.stateChange(field);
+                            })
+                        }
+                    }
+                }
+                if (comp.hasListeners.afterloadui) {
+                    comp.fireEvent('afterloadui', comp);
+                }
             },
             failure: function (response) {
 
@@ -135,16 +149,16 @@ function addUIByServer(comp, ray, pos) {
         elenames = [];
     if (typeof ray.detail != 'undefined') {
         var ray_detail = ray.detail;
-        var downcol=0,lastcol = 0;
+        var downcol=0,lastcol = -1;
         //计算最后一行控件，用以设置padding底间距
         if (typeof comp.lastitems == 'undefined') {
-            for (var k = ray_detail.length - 1; k >= 0; k--) {
-                if (ray_detail[k].field_type != 'hidden') {
+            for (var k = 0; k<ray_detail.length; k++) {
+                if (ray_detail[k].field_type != 'hidden' && ray_detail[k].hidden!=1) {
                     downcol = downcol + ray_detail[k].cols;
                 }
-                if (downcol > ray_detail[k].total_column) {
-                    lastcol = k;
-                    break;
+                if (downcol>ray_detail[k].total_column) {
+                    downcol = ray_detail[k].cols;
+                    lastcol = k-1;
                 }
             }
         } else {
@@ -189,34 +203,6 @@ function addUIByServer(comp, ray, pos) {
                     if (children[j].uiconf_field=='source') {
                         elenames.push({source:children[j].uiconf_value,compname:items.name});
 
-                        //判断是否在要素维护关系里面
-                        var relamanager = eon_relation_ele || [];
-                        //遍历要素关联关系静态对象
-                        for (var m=0; m<relamanager.length; m++) {
-                            if (relamanager[m].prisource == children[j].uiconf_value) {
-                                //作为主控要素
-                                var secs = [];
-                                //载入已实例化的被控要素
-                                for (var n=0; n<elenames.length; n++) {
-                                    if (elenames[n].source==relamanager[m].secsource) {
-                                        secs.push({secsource : elenames[n].source, seccompname : elenames[n].compname});
-                                    }
-                                }
-                                relations.push({prisource:children[j].uiconf_value,pricompname:items.name,secs:secs});
-                            }
-                            if (relamanager[m].secsource == children[j].uiconf_value) {
-                                //作为被控要素
-                                for (var n=0; n<relations.length; n++) {
-                                    if (relations[n].prisource==relamanager[m].prisource) {
-                                        relations[n].secs.push({
-                                            secsource: children[j].uiconf_value,
-                                            seccompname: items.name
-                                        });
-                                    }
-                                }
-                            }
-                        }
-
                     }
                 }
 
@@ -227,11 +213,15 @@ function addUIByServer(comp, ray, pos) {
                         ];
                         items.labelStyle = micolor;
                     }
+                } else if (!Ext.isEmpty(items.readOnly)) {
+                    if (items.readOnly == true) {
+                        items.fieldStyle = 'cursor: default; pointer-events: none; color: black !important; background: #F6F6F6;';
+                    }
                 }
                 if (comp.getLayout().type=='form') {
                     comp.add(Ext.create(items));
                     isonecol = true;
-                } else if (ray_detail[i].field_type == 'hidden') {
+                } else if (ray_detail[i].field_type == 'hidden' || items.hidden) {
                     comp.add(Ext.create(items));
                 } else {
                     var colWidth = (initcol + ray_detail[i].cols >= ray_detail[i].total_column) ? ((ray_detail[i].total_column - initcol) / ray_detail[i].total_column) : ray_detail[i].cols / ray_detail[i].total_column;
@@ -301,25 +291,63 @@ function addUIByServer(comp, ray, pos) {
                 }
             }
             if (ray_main[j].uiconf_field=='isRelation' && ray_main[j].uiconf_value == 'true') {
+                //判断是否在要素维护关系里面
+                var relamanager = eon_relation_ele || [];
+                elenames.forEach(function(ele) {
+                    var secs = [];
+                    //作为主控要素遍历要素关联关系静态对象
+                    for (var m=0; m<relamanager.length; m++) {
+                        if (relamanager[m].prisource == ele.source) {
+                            //载入已实例化的被控要素
+                            for (var n = 0; n < elenames.length; n++) {
+                                if (elenames[n].source == relamanager[m].secsource) {
+                                    secs.push({secsource: elenames[n].source, seccompname: elenames[n].compname});
+                                }
+                            }
+                        }
+                    }
+                    if (secs.length>0) {
+                        relations.push({prisource: ele.source, pricompname: ele.compname, secs: secs});
+                    }
+                });
+
+                //设置控件关联控制属性
+                for (var i=0; i<relations.length; i++) {
+                    var secs = relations[i].secs;
+                    for (var k=0; k<secs.length; k++) {
+                        var sec_comp = comp.getForm().findField(secs[k].seccompname);
+                        if (sec_comp) {
+                            if (typeof sec_comp.isRelation=='undefined') {
+                                sec_comp.isRelation = true;
+                            }
+                        }
+                    }
+                }
+
                 //relations = [{prisource:'BK',pricompname:'bk_id',secs : [{secsource:'BKA',seccompname:'parent_id'}]}];
                 for (var i=0; i<relations.length; i++) {
                     var pri_comp = comp.getForm().findField(relations[i].pricompname);
                     if (pri_comp) {
-                        var secs = relations[i].secs;
+                        pri_comp.ownerPanel = comp;
+                        pri_comp.relationCtl = relations[i];
 
-                        var pri_source = relations[i].prisource;
                         pri_comp.on('select', function (picker, node) {
+                            var pnl_comp=picker.ownerPanel,
+                                secs = picker.relationCtl.secs;
                             for (var k=0; k<secs.length; k++) {
-                                var sec_comp = comp.getForm().findField(secs[k].seccompname);
-                                if (sec_comp) {
+                                var sec_comp = pnl_comp.getForm().findField(secs[k].seccompname);
+                                if (sec_comp && sec_comp.isRelation) {
                                     sec_comp.reset();
                                 }
                             }
                         });
                         pri_comp.on('afterchange', function (picker, value, oldvalue) {
+                            var pnl_comp=picker.ownerPanel,
+                                secs = picker.relationCtl.secs,
+                                pri_source = picker.relationCtl.prisource;
                             for (var k=0; k<secs.length; k++) {
-                                var sec_comp = comp.getForm().findField(secs[k].seccompname);
-                                if (sec_comp) {
+                                var sec_comp = pnl_comp.getForm().findField(secs[k].seccompname);
+                                if (sec_comp && sec_comp.isRelation) {
                                     if (containsArray(sec_comp.getRelations(), pri_source, 'source')) {
                                         var index = -1;
                                         for (var j = 0; j < sec_comp.getRelations().length; j++) {

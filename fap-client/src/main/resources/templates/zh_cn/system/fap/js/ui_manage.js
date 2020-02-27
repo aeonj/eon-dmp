@@ -41,11 +41,12 @@ Ext.onReady(function() {
                     preview.removeAll();
                     var resultArray = Ext.util.JSON
                         .decode(response.responseText);
-                    var previewinput = Ext.create('Ext.form.Panel',{
-                        labelAlign : 'right',
-                        labelWidth : 80,
-                        bodyStyle: 'padding:5px 5px 5px 5px', // 表单元素和表单面板的边距
-                        frame : false,
+                    var previewinput = Ext.create('Ext.vcf.FormPanel',{
+                        fieldDefaults: {
+                            labelAlign: 'left',
+                            labelWidth: 100,
+                            msgTarget: 'side'
+                        },
                         isPreview : true
                     });
                     addUIByServer(previewinput, resultArray);
