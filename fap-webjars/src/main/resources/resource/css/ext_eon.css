@@ -1,0 +1,99 @@
+.eon-fieldset-default {
+    border: 1px solid #b5b8c8;
+    padding: 0 0px;
+    margin: 0 0 10px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    border-radius: 4px;
+}
+.eon-ie8 .eon-fieldset-default {
+    padding-top: 0;
+}
+.eon-ie8 .eon-fieldset-body-default {
+    padding-top: 0;
+}
+.eon-fieldset-header-default {
+    padding: 0 3px 1px;
+    line-height: 14px;
+}
+.eon-fieldset-header-default > .eon-fieldset-header-text {
+    font: normal 11px/14px tahoma, arial, verdana, sans-serif;
+    color: #15428b;
+    padding: 1px 0;
+}
+.eon-fieldset-header-checkbox-default {
+    margin: 2px 3px 1px 0;
+    line-height: 14px;
+}
+.eon-fieldset-header-tool-default {
+    margin: 1px 3px 0 0;
+    padding: 0;
+}
+.eon-fieldset-header-tool-default > .eon-tool-img {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+    opacity: 1;
+    height: 15px;
+    width: 15px;
+}
+.eon-fieldset-header-tool-default > .eon-tool-toggle {
+    background-position: 0 -60px;
+}
+.eon-fieldset-header-tool-default.eon-tool-over > .eon-tool-toggle {
+    background-position: -15px -60px;
+}
+.eon-fieldset-header-tool-default.eon-focus {
+    outline: 1px solid red;
+}
+.eon-fieldset-default.eon-fieldset-collapsed {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    -ms-border-radius: 0;
+    -o-border-radius: 0;
+    border-radius: 0;
+    border-width: 1px 1px 0 1px;
+    border-left-color: transparent;
+    border-right-color: transparent;
+}
+.eon-fieldset-default.eon-fieldset-collapsed .eon-tool-toggle {
+    background-position: 0 -75px;
+}
+.eon-fieldset-default.eon-fieldset-collapsed .eon-tool-over > .eon-tool-toggle {
+    background-position: -15px -75px;
+}
+.x-form-text-default.x-form-text-expand {
+    color: #404040;
+}
+.x-form-expand-wrap .x-form-trigger-wrap {
+    border: 0;
+}
+.x-form-expand-wrap .x-form-trigger-wrap .x-form-text {
+    border: 2px solid;
+    border-color: #737b8c;
+    height: 24px;
+}
+.gridspan {
+    width: 96%;
+    margin: 0px auto;
+}
+
+.gridspan .gridbtn {
+    text-align: center;
+    text-decoration:none;
+    display: block;
+    float: left;
+    margin-right: 5px;
+    padding: 0 5px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background: #f3f3f3;
+    transition: all 0.5s ease 0s
+}
+
+.gridspan a:Hover {
+    border: 1px solid #7BD0F3;
+    background: #7BD0F3;
+    color: #fff;
+    display: block;
+}
