@@ -12,6 +12,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,6 +25,7 @@ import java.util.UUID;
  *
  */
 public class FileHandler {
+
 
 
 	/**
@@ -54,20 +56,24 @@ public class FileHandler {
 				saveFileName = saveFileName + "." + extend;
 			}
 			float fileSize = Float.valueOf(file.getSize());// 返回文件大小，单位为k
-			List<String> errors = new java.util.ArrayList<>();
 			boolean flag = false;
-			if (extendes == null) {
-				extendes = new String[] { "jpg", "jpeg", "gif", "bmp", "tbi",
-						"png" };
-			}
-			for (String s : extendes) {
-				if (extend.toLowerCase().equals(s))
-					flag = true;
+			if (extendes == null || extendes.length==0) {
+				flag = true;
+			} else {
+				for (String s : extendes) {
+					if (extend.toLowerCase().equals(s))
+						flag = true;
+				}
 			}
 			if (flag) {
 				byte[] bytes = file.getBytes();
 				Path paths = Paths.get(PropertiesBean.UPLOAD_FOLDER + saveFilePathName
 						+ saveFileName);
+				try {
+					Files.createDirectories(paths.getParent());
+				} catch (FileAlreadyExistsException e) {
+
+				}
 				Files.write(paths, bytes);
 
 				if (isImg(extend)) {
@@ -88,22 +94,23 @@ public class FileHandler {
 				map.put("fileName", saveFileName);
 				map.put("filePath", PropertiesBean.UPLOAD_FOLDER + saveFilePathName);
 				map.put("fileSize", fileSize);
-				map.put("error", errors);
 				map.put("oldName", file.getOriginalFilename());
 				// System.out.println("上传结束，生成的文件名为:" + fileName);
+				return map;
 			} else {
 				// System.out.println("不允许的扩展名");
-				errors.add("不允许的扩展名");
+				map.put("error","不允许的扩展名");
 			}
 		} else {
-			map.put("width", 0);
-			map.put("height", 0);
-			map.put("mime", "");
-			map.put("fileName", "");
-			map.put("filePath", "");
-			map.put("fileSize", 0.0f);
-			map.put("oldName", "");
+			map.put("error","文件为空");
 		}
+		map.put("width", 0);
+		map.put("height", 0);
+		map.put("mime", "");
+		map.put("fileName", "");
+		map.put("filePath", "");
+		map.put("fileSize", 0.0f);
+		map.put("oldName", "");
 		return map;
 	}
 

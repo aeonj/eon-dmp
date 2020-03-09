@@ -4,7 +4,6 @@ import eon.hg.fap.core.domain.LogType;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 

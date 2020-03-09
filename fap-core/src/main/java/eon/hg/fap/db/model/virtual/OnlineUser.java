@@ -12,6 +12,8 @@ public class OnlineUser extends User implements Serializable {
 
     private String userid;
 
+    private String cookie;
+
     private Object context;
 
     public String getUserid() {
@@ -20,6 +22,14 @@ public class OnlineUser extends User implements Serializable {
 
     public void setUserid(String userid) {
         this.userid = userid;
+    }
+
+    public String getCookie() {
+        return cookie;
+    }
+
+    public void setCookie(String cookie) {
+        this.cookie = cookie;
     }
 
     public Object getContext() {

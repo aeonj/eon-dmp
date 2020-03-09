@@ -6,7 +6,7 @@ import eon.hg.fap.core.license.VerifyLicense;
  * 常量表
  * 
  */
-public interface AeonConstants {
+public class AeonConstants {
 	/**
 	 * XML文档风格<br>
 	 * 0:节点属性值方式
@@ -195,4 +195,5 @@ public interface AeonConstants {
 	public static final String UI_CODE_RULE = "3-3-3";
 
 	public static VerifyLicense VLicense = new VerifyLicense();
+
 }

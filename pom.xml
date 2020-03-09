@@ -196,6 +196,7 @@
 		<module>fap-webservice</module>
 		<module>fap-oauth2</module>
 		<module>fap-client</module>
+		<module>fap-webjars</module>
 	</modules>
 
 </project>

@@ -4,6 +4,8 @@ import cn.hutool.core.util.StrUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+
 @Component
 public class PropertiesBean {
 
@@ -15,6 +17,9 @@ public class PropertiesBean {
     @Value("${eon.hg.file.upload_folder}")
     public void setUploadFolder(String uploadFolder) {
         if (StrUtil.isNotBlank(uploadFolder)) {
+            if (!uploadFolder.endsWith(File.separator)) {
+                uploadFolder = uploadFolder+File.separator;
+            }
             PropertiesBean.UPLOAD_FOLDER = uploadFolder;
         } else {
             PropertiesBean.UPLOAD_FOLDER = "D:/";
