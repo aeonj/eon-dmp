@@ -47,18 +47,18 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         //初始化界面视图
         String path = ResourceUtils.getURL("classpath:").getPath();
         uiConfDAO.deleteAll();
-        impTableJsonData(getClassPathStream("static/data/json/sys_uiconf.json"), (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_uiconf.json"), (Map<String, Object> mapRecord) -> {
             UIConf uiConf = WebHandler.toPo(mapRecord, UIConf.class);
             uiConf.setId(null);
             uiConfDAO.save(uiConf);
         });
         List<UIManager> uiManagerList = new ArrayList<>();
-        impTableJsonData(getClassPathStream("static/data/json/sys_uimanager.json"), (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_uimanager.json"), (Map<String, Object> mapRecord) -> {
             UIManager uiManager = BeanUtil.mapToBeanIgnoreCase(mapRecord, UIManager.class, true);
-            impTableJsonData(getClassPathStream("static/data/json/sys_uidetail.json"), (Map<String, Object> mapDetail) -> {
+            impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_uidetail.json"), (Map<String, Object> mapDetail) -> {
                 if (mapDetail.get("ui_id").equals(mapRecord.get("id"))) {
                     UIDetail uiDetail = BeanUtil.mapToBeanIgnoreCase(mapDetail, UIDetail.class, true);
-                    impTableJsonData(getClassPathStream("static/data/json/sys_uiconf_detail.json"), (Map<String, Object> mapConfDetail) -> {
+                    impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_uiconf_detail.json"), (Map<String, Object> mapConfDetail) -> {
                         UIConfDetail uiConfDetail = BeanUtil.mapToBeanIgnoreCase(mapConfDetail, UIConfDetail.class, true);
                         if (mapConfDetail.get("ui_detail_id").equals(mapDetail.get("id"))) {
                             uiDetail.getConfs().add(uiConfDetail);
@@ -100,7 +100,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         }
 
         //初始化菜单
-        impTableJsonData(getClassPathStream("static/data/json/sys_menugroup.json"), (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_menugroup.json"), (Map<String, Object> mapRecord) -> {
             MenuGroup menuGroup = BeanUtil.mapToBeanIgnoreCase(mapRecord, MenuGroup.class, true);
             MenuGroup vf =menuGroupDAO.getOne("name",menuGroup.getName());
             if (vf!=null) {
@@ -110,7 +110,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
                 menuGroupDAO.save(menuGroup);
             }
             Stack<Menu> stack = new Stack();
-            impTableJsonData(getClassPathStream("static/data/json/sys_menu.json"), (Map<String, Object> mapMenu) -> {
+            impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_menu.json"), (Map<String, Object> mapMenu) -> {
                 if (mapMenu.get("mg_id").equals(mapRecord.get("id"))) {
                     Menu menu = BeanUtil.mapToBeanIgnoreCase(mapMenu, Menu.class, true);
                     menu.setMg(menuGroup);
@@ -147,7 +147,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         });
 
         //初始化要素
-        impTableJsonData(getClassPathStream("static/data/json/sys_element.json"), (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_element.json"), (Map<String, Object> mapRecord) -> {
             Element obj = BeanUtil.mapToBeanIgnoreCase(mapRecord, Element.class, true);
             Element vf = elementDAO.getOne("ele_code",obj.getEle_code());
             if (vf==null) {
@@ -159,7 +159,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
         });
 
         //初始化枚举值
-        impTableJsonData(getClassPathStream("static/data/json/sys_enumerate.json"), (Map<String, Object> mapRecord) -> {
+        impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_enumerate.json"), (Map<String, Object> mapRecord) -> {
             Enumerate obj = BeanUtil.mapToBeanIgnoreCase(mapRecord, Enumerate.class, true);
             Enumerate vf = enumerateDAO.getOne("field",obj.getField(),"code",obj.getCode());
             if (vf==null) {

@@ -2212,6 +2212,7 @@ Ext.define('Ext.vcf.PercentField', {
     extend: 'Ext.vcf.CustomNumberField',
     xtype: 'percentfield',
     allowDecimals: true,
+    allowNegative: false,
     percentChar : '%',
     initComponent : function() {
         Ext.apply(this, {

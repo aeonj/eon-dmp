@@ -15,9 +15,9 @@ public class GlobalAdvice {
     @ExceptionHandler(ResultException.class)
     public ResponseEntity<ResultBody> ResultErrorHandler(ResultException exception) {
         if (exception.getBody()==null) {
-            return new ResponseEntity(ResultBody.failed(exception.getMsg()), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(ResultBody.failed(exception.getMsg()), HttpStatus.OK);
         } else {
-            return new ResponseEntity(exception.getBody(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity(exception.getBody(), HttpStatus.OK);
         }
     }
 }

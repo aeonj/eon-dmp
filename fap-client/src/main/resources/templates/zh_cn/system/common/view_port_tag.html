@@ -6,7 +6,7 @@
 
 <div id="layoutTreeDiv" class="x-hidden"  ></div>
 <div id="layout_previewDiv" class="x-hidden"  >
-	<img src="${webPath}/resource/style/system/manage/images/theme/layout/${uconfig.layout}.jpg" />
+	<img src="/webjars/eon_fap/resource/style/system/manage/images/theme/layout/${uconfig.layout}.jpg" />
 </div>
 <script type="text/javascript">
     var default_theme = '${uconfig.theme}';
@@ -27,7 +27,7 @@
                 closeAllTabsText : '关闭所有标签页'
             }),
             items:[{
-                title:"<img align='top' class='IEPNG' src='${webPath}/resource/image/ext/user.png'/>我的工作台",
+                title:"<img align='top' class='IEPNG' src='/webjars/eon_fap/resource/image/ext/user.png'/>我的工作台",
                 listeners: {
                     activate: function(comp){
                     	Ext.getCmp('centerPanel').setTitle('${viewporttag.centerTitle} -> 我的工作台');
@@ -162,7 +162,7 @@
                 else endIeStatus.click();
                 n = mainTabs.add({
                     id:id,
-                    title:"<img align='top' class='IEPNG' src='${webPath}/resource/image/ext/" + icon + "'/>" + name,
+                    title:"<img align='top' class='IEPNG' src='/webjars/eon_fap/resource/image/ext/" + icon + "'/>" + name,
                     closable:true,
                     layout:'fit',
                     listeners: {activate: function(){Ext.getCmp('centerPanel').setTitle(pathCh)}},
@@ -257,14 +257,14 @@
 <DIV id=loading>
 	<DIV class=loading-indicator><IMG style="MARGIN-RIGHT: 8px"
 									  height=32
-									  src="${webPath}/resource/style/common/images/ajax1.gif"
+									  src="/webjars/eon_fap/resource/style/common/images/ajax1.gif"
 									  width=36 align=absMiddle>正在初始化,请稍等...</DIV>
 </DIV>
 <div id="north">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%"
-		   height="46" background="${webPath}/resource/image/banner_background/${uconfig.theme}.png">
+		   height="46" background="/webjars/eon_fap/resource/image/banner_background/${uconfig.theme}.png">
 		<tr >
-			<#assign imgUrl=webPath+"/resource/style/system/manage/images/title_banner.png">
+			<#assign imgUrl=webPath+"/webjars/eon_fap/resource/style/system/manage/images/title_banner.png">
 			<#if (config.admin_manage_logo)??>
 			<#assign imgUrl=imageWebServer+"/"+(config.admin_manage_logo.path)+"/"+(config.admin_manage_logo.name)>
 		</#if>
@@ -296,7 +296,7 @@
 <div id="south" align="left">
 	<table class="banner" width="100%">
 		<tr>
-			<td width="65%"><nobr>&nbsp;<img class="IEPNG" src="${webPath}/resource/image/ext/comments2.png" />&nbsp;${tplOp.getWelcomeMsg()},${user.trueName}!&nbsp;帐户:${user.username}&nbsp;今天是:${dateweek}</nobr></td>
+			<td width="65%"><nobr>&nbsp;<img class="IEPNG" src="/webjars/eon_fap/resource/image/ext/comments2.png" />&nbsp;${tplOp.getWelcomeMsg()},${user.trueName}!&nbsp;帐户:${user.username}&nbsp;今天是:${dateweek}</nobr></td>
 			<td width="35%"><div align="right" <#if (user.username=='super')> onclick="javascript:supermenu();</#if>"><nobr>禾冠</nobr></div></td>
 		</tr>
 	</table>

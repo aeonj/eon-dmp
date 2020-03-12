@@ -10,14 +10,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 
 /**
  * 系统文件处理类
@@ -26,7 +30,17 @@ import java.util.UUID;
  */
 public class FileHandler {
 
+	public static String getAbsoluteFileName(String path, String name) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(PropertiesBean.UPLOAD_FOLDER).append(path).append(File.separator).append(name);
+		return sb.toString();
+	}
 
+	public static String getAbsoluteFilePath(String path) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(PropertiesBean.UPLOAD_FOLDER).append(path);
+		return sb.toString();
+	}
 
 	/**
 	 * saveFileToServer 上传文件保存到服务器
@@ -50,7 +64,7 @@ public class FileHandler {
 					.substring(file.getOriginalFilename().lastIndexOf(".") + 1)
 					.toLowerCase();
 			if (saveFileName == null || saveFileName.trim().equals("")) {
-				saveFileName = UUID.randomUUID().toString() + "." + extend;
+				saveFileName = generateFileName() + "." + extend;
 			}
 			if (saveFileName.lastIndexOf(".") < 0) {
 				saveFileName = saveFileName + "." + extend;
@@ -75,6 +89,7 @@ public class FileHandler {
 
 				}
 				Files.write(paths, bytes);
+				String fileMd5 = getByteMD5(bytes);
 
 				if (isImg(extend)) {
 					File img = new File(PropertiesBean.UPLOAD_FOLDER + saveFilePathName
@@ -94,6 +109,7 @@ public class FileHandler {
 				map.put("fileName", saveFileName);
 				map.put("filePath", PropertiesBean.UPLOAD_FOLDER + saveFilePathName);
 				map.put("fileSize", fileSize);
+				map.put("fileMd5", fileMd5);
 				map.put("oldName", file.getOriginalFilename());
 				// System.out.println("上传结束，生成的文件名为:" + fileName);
 				return map;
@@ -110,6 +126,7 @@ public class FileHandler {
 		map.put("fileName", "");
 		map.put("filePath", "");
 		map.put("fileSize", 0.0f);
+		map.put("fileMd5", "");
 		map.put("oldName", "");
 		return map;
 	}
@@ -275,4 +292,89 @@ public class FileHandler {
 
 		return bimage;
 	}
+
+	//获取文件的md5码
+	public static String getFileMD5(String file) {
+		return getFileMD5(new File(file));
+	}
+
+	public static String getFileMD5(File file) {
+		if (!file.isFile()) {
+			return null;
+		}
+		MessageDigest digest = null;
+		FileInputStream in = null;
+		byte buffer[] = new byte[1024];
+		int len;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+			in = new FileInputStream(file);
+			while ((len = in.read(buffer, 0, 1024)) != -1) {
+				digest.update(buffer, 0, len);
+			}
+			in.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		BigInteger bigInt = new BigInteger(1, digest.digest());
+		String md5 = bigInt.toString(16);
+		while (md5.length() < 32) md5 = "0" + md5;
+		return md5;
+	}
+	//获取byte数组的md5码
+	public static String getByteMD5(byte[] content) {
+		MessageDigest digest=null;
+		try {
+			digest = MessageDigest.getInstance("MD5");
+			digest.reset();
+			digest.update(content);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+		BigInteger bigInt = new BigInteger(1, digest.digest());
+		String md5 = bigInt.toString(16);
+		while (md5.length() < 32) md5 = "0" + md5;
+		return md5;
+
+	}
+
+	/**
+	 * 生成随机文件名
+	 * @return
+	 */
+	public static String generateFileName() {
+		String sources = "012345ABCD"; // 生成伪随机数
+		Random rand = new Random();
+		StringBuffer name = new StringBuffer();
+		for (int i = 0; i <= 6; i++) {
+
+			for (int j = 0; j < 6; j++) {
+				name.append(sources.charAt(rand.nextInt(9)) + "");
+			}
+		}
+		return name.toString() + (new Date().getTime());
+	}
+
+	/**
+	 * <p>
+	 * 获取文件扩展名
+	 * </p>
+	 *
+	 * @param filename
+	 * @return
+	 * @author FB
+	 * @since 2018-08-20
+	 */
+	public static String getFileSuffix(String filename) {
+		if ((filename != null) && (filename.length() > 0)) {
+			int dot = filename.lastIndexOf('.');
+			if ((dot > -1) && (dot < (filename.length() - 1))) {
+				return filename.substring(dot + 1);
+			}
+		}
+		return filename;
+	}
+
 }

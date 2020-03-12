@@ -13,7 +13,7 @@ function pageLoad() {
         } else {
             seltreeid = node.get('id');
         }
-        mainGrid.query({
+        mainGrid.queryData({
             menu_id: seltreeid
         });
     });

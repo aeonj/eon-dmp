@@ -9,7 +9,7 @@
 <link rel="shortcut icon" href="${websiteLogo}" />
 
 <#if htmltag.extDisabled == "false">
-<link rel="stylesheet" type="text/css" href="/resource/css/ext_icon.css"/>
+<link rel="stylesheet" type="text/css" href="/webjars/eon_fap/resource/css/ext_icon.css"/>
 
 <#if extMode == "debug">
 <link rel="stylesheet" type="text/css" href="/webjars/extjs/6.2.0/build/packages/ux/classic/${uconfig.theme}/resources/ux-all-debug.css"/>
@@ -41,17 +41,18 @@
 
 
 <#if htmltag.fcfEnabled == "true">
-<script type="text/javascript" src="${webPath}/resource/js/system/manage/FusionCharts.js"></script>
+<script type="text/javascript" src="/webjars/eon_fap/resource/js/system/manage/FusionCharts.js"></script>
 </#if>
 <#if extMode == "debug">
-<script type="text/javascript" src="${webPath}/resource/js/system/manage/control.js"></script>
-<script type="text/javascript" src="${webPath}/resource/js/system/manage/uidesign.js"></script>
+<script type="text/javascript" src="/webjars/eon_fap/resource/js/system/manage/control.js"></script>
+<script type="text/javascript" src="/webjars/eon_fap/resource/js/system/manage/uidesign.js"></script>
 <#else>
-<script type="text/javascript" src="${webPath}/resource/js/system/manage/control.min.js"></script>
-<script type="text/javascript" src="${webPath}/resource/js/system/manage/uidesign.min.js"></script>
+<script type="text/javascript" src="/webjars/eon_fap/resource/js/system/manage/control.min.js"></script>
+<script type="text/javascript" src="/webjars/eon_fap/resource/js/system/manage/uidesign.min.js"></script>
 </#if>
-<script type="text/javascript" src="${webPath}/resource/js/system/manage/aeon.js"></script>
-<#--<link rel="stylesheet" type="text/css" href="${webPath}/resource/css/aeon.css"/>-->
+<script type="text/javascript" src="/webjars/eon_fap/resource/js/system/manage/aeon.js"></script>
+<#--<link rel="stylesheet" type="text/css" href="/webjars/eon_fap/resource/css/aeon.css"/>-->
+<link rel="stylesheet" type="text/css" href="/webjars/eon_fap/resource/css/ext_eon.css"/>
 <script type="text/javascript">
   var ajaxErrCode = '${ajaxErrCode}';
   var micolor = 'color:${micolor};';
@@ -211,7 +212,7 @@ Ext.EventManager.on(window, 'load', function(){
 <DIV id=loading>
 <DIV class=loading-indicator><IMG style="MARGIN-RIGHT: 5px" 
 	height=16
-	src="${webPath}/resource/style/common/images/ajax.gif"
+	src="/webjars/eon_fap/resource/style/common/images/ajax.gif"
 	width=16 align=absMiddle>正在刷新页面,请稍等...</DIV>
 </DIV>
 </#if>

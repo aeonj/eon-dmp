@@ -12,12 +12,12 @@ function pageLoad() {
         selmgid = node.get('mgid');
         seltreetype = node.get('type');
         if (seltreetype=='1') {
-            mainGrid.query({
+            mainGrid.queryData({
                 menu_type: seltreetype,
                 parent_id: selmgid
             });
         } else {
-            mainGrid.query({
+            mainGrid.queryData({
                 menu_type: seltreetype,
                 parent_id: seltreeid
             });

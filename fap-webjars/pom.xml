@@ -19,7 +19,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <eon.targetDir>${project.build.outputDirectory}/META-INF/resources/webjars/eon_fap</eon.targetDir>
+        <eon.resource.targetDir>${project.build.outputDirectory}/META-INF/resources/webjars/eon_fap/resource</eon.resource.targetDir>
+        <eon.data.targetDir>${project.build.outputDirectory}/eon/hg/fap/data</eon.data.targetDir>
     </properties>
 
     <!--nexus仓库-->
@@ -64,8 +65,12 @@
     <build>
         <resources>
             <resource>
-                <directory>${project.basedir}/src/main/resources</directory>
-                <targetPath>${eon.targetDir}</targetPath>
+                <directory>${project.basedir}/src/main/resources/resource</directory>
+                <targetPath>${eon.resource.targetDir}</targetPath>
+            </resource>
+            <resource>
+                <directory>${project.basedir}/src/main/resources/data</directory>
+                <targetPath>${eon.data.targetDir}</targetPath>
             </resource>
         </resources>
     </build>

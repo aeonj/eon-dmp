@@ -1642,7 +1642,7 @@ Ext.onReady(function() {
                     }
                 });
     }
-    
+
     function addUIConf() {
         var combo_fieldtype = editColPanel.getForm().findField('field_type');
         if (combo_fieldtype) {
@@ -1745,7 +1745,7 @@ Ext.onReady(function() {
             });
         }
     }
-    
+
     function delUIConf() {
         var combo_fieldtype = editColPanel.getForm().findField('field_type');
         if (combo_fieldtype) {
