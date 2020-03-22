@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface SecurityMapping {
 
-	String[] value();//权限列表 权限组:权限格式，以:分隔
+	String[] value() default {};//权限列表 权限组:权限格式，以:分隔
 
 	String title() default "";// URL资源名称
 

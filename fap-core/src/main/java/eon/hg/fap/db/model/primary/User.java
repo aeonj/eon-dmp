@@ -93,7 +93,7 @@ public class User extends IdEntity implements UserDetails {
 			this.menus = new ArrayList<Menu>();
 			for (Role role : roles) {
 				for (Menu menu : role.getMenus()) {
-					if (this.getUsername().equals("super") || menu.getManageTypes().contains(String.valueOf(this.getManageType()))) {
+					if (AeonConstants.SUPER_USER.equals(this.getUsername()) || menu.getManageTypes().contains(String.valueOf(this.getManageType()))) {
 						if (!menus.contains(menu)) {
 							menus.add(menu);
 							if (menu.getMg()!=null) {

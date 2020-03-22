@@ -164,7 +164,7 @@ public class UserManageAction extends BizAction {
                          @RequestParam("password") String password,
                          @RequestParam("rolenodes") String roleids,
                          Long pg_id) {
-        if (CommUtil.null2String(userName).equalsIgnoreCase("super")) {
+        if (AeonConstants.SUPER_USER.equalsIgnoreCase(CommUtil.null2String(userName))) {
             return ErrTipMsg("super是系统内置用户，不允许维护");
         }
         if (CommUtil.isEmpty(password)) {
