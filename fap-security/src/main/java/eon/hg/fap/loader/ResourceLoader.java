@@ -2,6 +2,7 @@ package eon.hg.fap.loader;
 
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
+import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.db.model.primary.*;
 import eon.hg.fap.db.service.*;
@@ -71,17 +72,26 @@ public class ResourceLoader {
 							.query("select obj from Res obj where obj.value=:value",
 									params, -1, -1);
 					String permissionTitle = ((SecurityMapping) tag).title();
+					String[] perms = ((SecurityMapping) tag).value();
 					if (ress.size() == 0) {
 						Res res = new Res();
 						res.setValue(value+"*");
 						res.setAddTime(new Date());
 						res.setResName(permissionTitle);
 						res.setType("URL");
-						res.setPermission(ArrayUtil.join(((SecurityMapping) tag).value(),","));
+						res.setPermission(ArrayUtil.join(perms,","));
 						this.resService.save(res);
 						log.info("初始化资源："+res.getResName());
+					} else {
+						Res res = ress.get(0);
+						String str_perms = CommUtil.null2String(ArrayUtil.join(perms,","));
+						if (!str_perms.equals(res.getPermission())) {
+							res.setPermission(str_perms);
+							this.resService.update(res);
+							log.info("更新资源："+res.getResName());
+						}
 					}
-					for (String strtag: ((SecurityMapping) tag).value()) {
+					for (String strtag: perms) {
 						Permissions permissions = this.permissionsService.getObjByProperty(null,"value",strtag);
 						if (permissions==null) {
 							permissions = new Permissions();
@@ -102,10 +112,10 @@ public class ResourceLoader {
 		}
 		// 添加默认超级管理员并赋予所有权限
 		User user = this.userService.getObjByProperty(null, "userName",
-				"super");
+				AeonConstants.SUPER_USER);
 		if (user == null) {
 			user = new User();
-			user.setUserName("super");
+			user.setUserName(AeonConstants.SUPER_USER);
 			user.setUserRole("MANAGE");
 			user.setTrueName("超级管理员");
 			user.setRg_code(AeonConstants.SUPER_RG_CODE);
