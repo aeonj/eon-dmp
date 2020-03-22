@@ -8,6 +8,7 @@ import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.model.primary.Element;
 import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.service.IBaseTreeService;
+import eon.hg.fap.db.service.IGenericService;
 import eon.hg.fap.web.manage.op.ElementOP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,8 @@ public class DictionaryAction extends BizAction {
 	private ElementOP eleOp;
 	@Autowired
 	private IBaseTreeService baseTreeService;
+	@Autowired
+	private IGenericService genericService;
 
 	@RequestMapping("/ele_chk_tree.htm")
 	public String ele_chk_tree(@RequestParam Map<String, Object> map, String node) throws Exception {
@@ -83,6 +86,11 @@ public class DictionaryAction extends BizAction {
 		}
 	}
 
+	@RequestMapping("/icons_list.htm")
+	public String icons_list() {
+		List<Dto> dtoList = genericService.findDtoBySql("select icons from sys_icons order by icons");
+		return JsonHandler.toJson(dtoList);
+	}
 
 	@RequestMapping("/eleinfo_ajax_id.htm")
 	public String eleinfo_ajax_id(String source, String value) {
