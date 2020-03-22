@@ -92,6 +92,11 @@ public class SimpleGenericRepository<T, ID extends Serializable> implements Gene
 		return CommUtil.inListMapToDto(findBySql(nnq,params));
 	}
 
+	public List<Dto> findDtoBySql(final String nnq, final Object[] params,
+								  final int begin, final int max) {
+		return CommUtil.inListMapToDto(findBySql(nnq,params,begin,max));
+	}
+
 	public List<Map> findBySql(final String nnq, final Object[] params) {
         return findBySql(nnq,params,-1,-1);
     }

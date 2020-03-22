@@ -22,6 +22,8 @@ public interface GenericRepository<T, ID extends Serializable> extends Repositor
     List<Map> findBySql(final String nnq, final Map params,
                         final int begin, final int max);
     List<Dto> findDtoBySql(final String nnq, final Object[] params);
+    List<Dto> findDtoBySql(final String nnq, final Object[] params,
+                                  final int begin, final int max);
     List<Map> findBySql(final String nnq, final Object[] params);
     List<Map> findBySql(final String nnq, final Object[] params,
                         final int begin, final int max);
