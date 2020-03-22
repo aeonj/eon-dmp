@@ -36,6 +36,12 @@ public class Operate extends IdEntity {
 	@Column(length=42)
 	private String authkey;
 	private int sequence;// 排序
+	@Column(length=42)
+	private String iconCls;  //图标
+	@Column(length=42)
+	private String handler;  //Action入口函数
+	@Column(length=60)
+	private String states;  //对应状态，逗号分隔
 	private String remark;  //操作备注
 	@Transient
 	private Long info_id;   //用于授权

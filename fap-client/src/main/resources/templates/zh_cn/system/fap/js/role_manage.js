@@ -75,6 +75,7 @@ function pageLoad() {
         addPanel.reset();
         addWindow.show();
     }
+    this.addInit = addInit;
 
     function editInit() {
         editmode = 'edit';
@@ -93,8 +94,10 @@ function pageLoad() {
         addWindow.show();
         addPanel.getForm().loadRecord(record);
     }
+    this.editInit = editInit;
 
-    function saveData() {
+
+        function saveData() {
         var url = editmode=='add' ? 'role_save.htm' : 'role_update.htm';
         if (!addPanel.form.isValid()) {
             Ext.MessageBox.alert('提示', '请检查需要填写的录入项！');
@@ -151,5 +154,6 @@ function pageLoad() {
             }
         });
     }
+    this.delData = delData;
 }
 Ext.onReady(pageLoad);

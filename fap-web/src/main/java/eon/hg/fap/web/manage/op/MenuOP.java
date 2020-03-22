@@ -236,6 +236,7 @@ public class MenuOP extends TreeSort {
 		dto.put("scrollbar","");
 		dto.put("height",0);
 		dto.put("width",0);
+		dto.put("authkey",node.getAuthkey());
 		dto.put("type", "2");
 		dto.put("sequence", node.getSequence());
 		return dto;

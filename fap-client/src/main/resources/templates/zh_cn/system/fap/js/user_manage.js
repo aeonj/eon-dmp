@@ -963,7 +963,7 @@ Ext.onReady(function () {
             title: '<span class="commoncss">用户管理</span>',
             iconCls: 'userIcon',
             tools: [{
-                id: 'refresh',
+                type: 'refresh',
                 handler: function () {
                     userTree.getStore().reload()
                 }

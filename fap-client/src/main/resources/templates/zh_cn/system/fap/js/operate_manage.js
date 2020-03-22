@@ -6,12 +6,17 @@ function pageLoad() {
     });
     var seltreeid ='-1';
     var seltreetype = "1";
+    var selauthkey = '-1';
     treeMenu.on('itemclick',function(cmb,node) {
         seltreetype = node.get('type');
         if (seltreetype=='1') {
             seltreeid = '-1';
+            selauthkey = '-1';
         } else {
             seltreeid = node.get('id');
+            var authkey = node.get('authkey');
+            selauthkey = authkey.split(':')[0];
+            if (Ext.isEmpty(selauthkey)) selauthkey = '-1';
         }
         mainGrid.queryData({
             menu_id: seltreeid
@@ -48,9 +53,9 @@ function pageLoad() {
             region: 'west',
             title: '<span class="commoncss">菜单列表</span>',
             tools: [{
-                id: 'refresh',
+                type: 'refresh',
                 handler: function () {
-                    //treeMenu.getStore().reload();
+                    treeMenu.getStore().reload();
                 }
             }],
             width: 260,
@@ -168,6 +173,7 @@ function pageLoad() {
 
         addWindow.setTitle('新增操作');
         addPanel.reset();
+        addPanel.getForm().findField('authkey').setCondition("code like '"+selauthkey+"%'");
         addWindow.show();
     }
 
@@ -186,6 +192,7 @@ function pageLoad() {
         addWindow.setTitle('修改操作');
         addPanel.reset();
         addWindow.show();
+        addPanel.getForm().findField('authkey').setCondition("code like '"+selauthkey+"%'");
         addPanel.getForm().loadRecord(record);
     }
 

@@ -55,6 +55,7 @@ public class Menu extends IdEntity implements Comparable<Menu> {
 	private String manageTypes="0,1";   //用于菜单显示，与user实体类的manageType关联，0:普通用户 1:区域管理员
 	@Column(length = 60)
 	private String f_module_id;    //F3的功能ID
+	private Integer toolbar_index;  //工具栏所在位置序号
 
 	@Override
 	public int compareTo(Menu obj) {

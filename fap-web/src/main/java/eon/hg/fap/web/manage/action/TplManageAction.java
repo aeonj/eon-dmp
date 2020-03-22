@@ -10,9 +10,10 @@ import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
+import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.WebHandler;
-import eon.hg.fap.db.model.primary.Element;
-import eon.hg.fap.db.model.primary.RelationMain;
+import eon.hg.fap.db.model.primary.*;
+import eon.hg.fap.db.model.virtual.OnlineUser;
 import eon.hg.fap.db.service.*;
 import eon.hg.fap.third.IRelation;
 import eon.hg.fap.web.manage.dto.CodeStoreTagDto;
@@ -31,6 +32,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,6 +53,8 @@ public class TplManageAction {
 	private IBaseTreeService baseTreeService;
 	@Autowired
 	private IRelationMainService relationMainService;
+	@Autowired
+	private IMenuService menuService;
 	@Autowired
 	private EnumerateOP enumOP;
 	@Autowired
@@ -175,11 +179,47 @@ public class TplManageAction {
 
 	@RequestMapping("/ui_grant_tag.htm")
 	public ModelAndView ui_grant_tag(HttpServletRequest request,
-                                     HttpServletResponse response) {
+                                     HttpServletResponse response, Long menu_id) {
 		ModelAndView mv = new JModelAndView("common/ui_grant_tag.html",
 				configService.getSysConfig(),
 				this.userConfigService.getUserConfig(), 0, request, response);
-		List grantList = new ArrayList();
+		List<Operate> grantList = new ArrayList<>();
+		Integer toolIndex = 0;
+		//加载角色功能权限
+		if (CommUtil.isNotEmpty(menu_id)) {
+		OnlineUser onlineUser = SecurityUserHolder.getOnlineUser();
+		if (AeonConstants.SUPER_USER.equals(onlineUser.getUsername())) {
+			Menu menu = this.menuService.getObjById(menu_id);
+			toolIndex = menu.getToolbar_index();
+			for (Operate operate : menu.getOperates()) {
+				grantList.add(operate);
+			}
+		} else {
+			User user = this.userService.getObjById(CommUtil.null2Long(SecurityUserHolder.getOnlineUser().getUserid()));
+
+			for (Role role : user.getRoles()) {
+				for (RoleOperate ro : role.getOperates()) {
+					Menu menu =ro.getOperate().getMenu();
+					if (menu.getId().equals(menu_id)) {
+						toolIndex = menu.getToolbar_index();
+						grantList.add(ro.getOperate());
+					}
+				}
+			}
+		}
+		}
+		Collections.sort(grantList, (arg0, arg1) -> {
+            int hits0 = arg0.getSequence();
+            int hits1 = arg1.getSequence();
+            if (hits1 < hits0) {
+                return 1;
+            } else if (hits1 == hits0) {
+                return 0;
+            } else {
+                return -1;
+            }
+        });
+		mv.addObject("toolbarIndex", toolIndex);
 		mv.addObject("grantList", grantList);
 		return mv;
 	}
