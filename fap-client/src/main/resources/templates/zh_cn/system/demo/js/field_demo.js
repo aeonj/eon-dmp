@@ -41,9 +41,8 @@ Ext.onReady(function () {
             xtype: 'combofield',
             enumData: '1#包含+2#左包含+3#右包含+4#等于',
             editable: true,
-            readOnly: true,
-            value:'1',
-            fieldStyle: 'cursor: default; pointer-events: none; color: black !important; background: #F6F6F6;',
+            value:'1,2,3',
+            multiSelect:true,
             forceSelection: false,
             anchor: '100%' // 宽度百分比
         }, {

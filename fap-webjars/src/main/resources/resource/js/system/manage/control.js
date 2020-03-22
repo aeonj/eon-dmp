@@ -494,37 +494,42 @@ Ext.define('Ext.vcf.ComboField',{
     editable : false,
     //是否将编码作为值
     isCodeAsValue : false,
+    //是否从后台读取数据，不使用缓存
     isDirect : false,
+    //多选使用逗号分隔
+    multiStringVal : true,
     validateOnBlur: false,
     forceSelection : true,
     triggerAction : 'all',
     initComponent : function() {
+        var me = this;
         //if (Ext.isDefined(this.name)){
         //    if (!Ext.isDefined(this.hiddenName)) {
         //        this.hiddenName = this.name;
         //    }
         //this.name = undefined;
         //}
-        if (this.source=='') {
-            if (typeof this.store == 'undefined') {
-                this.store = new Ext.data.Store({
+        if (me.source=='') {
+            if (typeof me.store == 'undefined') {
+                me.store = new Ext.data.Store({
                     fields : ['value', 'text'],
-                    data : this.getEnumData()
+                    data : me.getEnumData()
                 });
             }
         } else {
-            this.queryMode = 'remote';
-            this.valueField = this.isCodeAsValue ? 'code' : 'id';
-            this.displayField = 'name';
-            this.store = new Ext.data.ArrayStore({
+            me.queryMode = 'remote';
+            me.valueField = this.isCodeAsValue ? 'code' : 'id';
+            me.displayField = 'name';
+            me.store = new Ext.data.ArrayStore({
+                autoLoad : true,
                 fields : ['id','code','name'],
-                url : this.url,
-                source : this.source,
-                condition : this.condition,
-                isDirect : this.isDirect,
+                url : me.url,
+                source : me.source,
+                condition : me.condition,
+                isDirect : me.isDirect,
                 proxy : {
                     type : 'ajax',
-                    url : this.url,
+                    url : me.url,
                     reader : {
                         type : 'json'
                     }
@@ -540,15 +545,47 @@ Ext.define('Ext.vcf.ComboField',{
                 }
             });
         };
-        this.callParent(arguments);
+
+        if (me.multiSelect) {
+            me.listConfig = {
+                itemTpl: Ext.create('Ext.XTemplate',
+                    '<input type=checkbox>{'+me.displayField+'}'),
+                onItemSelect: function (record) {
+                    var node = this.getNode(record);
+                    if (node) {
+                        Ext.fly(node).addCls(this.selectedItemCls);
+
+                        var checkboxs = node.getElementsByTagName("input");
+                        if (checkboxs != null) {
+                            var checkbox = checkboxs[0];
+                            checkbox.checked = true;
+                        }
+                    }
+                },
+                listeners: {
+                    itemclick: function (view, record, item, index, e, eOpts) {
+                        var isSelected = view.isSelected(item);
+                        var checkboxs = item.getElementsByTagName("input");
+                        if (checkboxs != null) {
+                            var checkbox = checkboxs[0];
+                            if (!isSelected) {
+                                checkbox.checked = true;
+                            } else {
+                                checkbox.checked = false;
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        me.callParent(arguments);
         //隐藏项ID赋值
         if (!Ext.isIE) {
-            if (typeof this.hiddenId=='undefined') {
-                this.hiddenId = this.id+'_sub';
+            if (typeof me.hiddenId=='undefined') {
+                me.hiddenId = me.id+'_sub';
             }
         }
-        if (this.queryMode == 'remote')
-            this.store.reload();
     },
     setSource : function(value) {
         this.source = value;
@@ -617,8 +654,26 @@ Ext.define('Ext.vcf.ComboField',{
             }
         }
         return r;
+    },
+    getSubmitValue: function() {
+        var value = this.getValue();
+        if (Ext.isEmpty(value)) {
+            value = '';
+        }
+        if (this.multiSelect && this.multiStringVal) {
+            value = value.join();
+        }
+        return value;
+    },
+    setValue: function(val) {
+        var value = val;
+        if (this.multiSelect && this.multiStringVal) {
+            if (!Ext.isArray(val)) {
+                value = val.split(',');
+            }
+        }
+        return Ext.vcf.ComboField.superclass.setValue.call(this, value);
     }
-
 
 });
 
