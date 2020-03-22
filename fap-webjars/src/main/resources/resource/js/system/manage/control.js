@@ -667,7 +667,7 @@ Ext.define('Ext.vcf.ComboField',{
     },
     setValue: function(val) {
         var value = val;
-        if (this.multiSelect && this.multiStringVal) {
+        if (this.multiSelect && this.multiStringVal && val!=null) {
             if (!Ext.isArray(val)) {
                 value = val.split(',');
             }

@@ -45,16 +45,23 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
     private ElementDao elementDAO;
     @Resource
     private EnumerateDao enumerateDAO;
+    @Resource
+    private IconsDao iconsDao;
 
     @Override
     public void initSysTable() throws Exception {
         //初始化界面视图
         String path = ResourceUtils.getURL("classpath:").getPath();
-        uiConfDAO.deleteAll();
+
         impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_uiconf.json"), (Map<String, Object> mapRecord) -> {
             UIConf uiConf = WebHandler.toPo(mapRecord, UIConf.class);
-            uiConf.setId(null);
-            uiConfDAO.save(uiConf);
+            UIConf uvf = uiConfDAO.getOne("uiconf_type", uiConf.getUiconf_type(),"uiconf_field",uiConf.getUiconf_field());
+            if (uvf==null) {
+                uiConf.setId(null);
+            } else {
+                uiConf.setId(uvf.getId());
+            }
+            uiConfDAO.mergeSave(uiConf);
         });
         List<UIManager> uiManagerList = new ArrayList<>();
         impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_uimanager.json"), (Map<String, Object> mapRecord) -> {
@@ -200,6 +207,18 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
                 obj.setId(vf.getId());
             }
             enumerateDAO.mergeSave(obj);
+        });
+
+        //初始化图标值
+        impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_icons.json"), (Map<String, Object> mapRecord) -> {
+            Icons obj = BeanUtil.mapToBeanIgnoreCase(mapRecord,Icons.class,true);
+            Icons vf = iconsDao.getOne("icons",obj.getIcons());
+            if (vf==null) {
+                obj.setId(null);
+            } else {
+                obj.setId(vf.getId());
+            }
+            iconsDao.mergeSave(obj);
         });
 
 

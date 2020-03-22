@@ -3,12 +3,14 @@ package eon.hg.fap.web.manage.action;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
+import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.model.primary.Element;
+import eon.hg.fap.db.model.primary.Icons;
 import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.service.IBaseTreeService;
-import eon.hg.fap.db.service.IGenericService;
+import eon.hg.fap.db.service.IIconsService;
 import eon.hg.fap.web.manage.op.ElementOP;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +28,7 @@ public class DictionaryAction extends BizAction {
 	@Autowired
 	private IBaseTreeService baseTreeService;
 	@Autowired
-	private IGenericService genericService;
+	private IIconsService iconsService;
 
 	@RequestMapping("/ele_chk_tree.htm")
 	public String ele_chk_tree(@RequestParam Map<String, Object> map, String node) throws Exception {
@@ -87,9 +89,8 @@ public class DictionaryAction extends BizAction {
 	}
 
 	@RequestMapping("/icons_list.htm")
-	public String icons_list() {
-		List<Dto> dtoList = genericService.findDtoBySql("select icons from sys_icons order by icons");
-		return JsonHandler.toJson(dtoList);
+	public List<Icons> icons_list() {
+		return iconsService.find(new QueryObject());
 	}
 
 	@RequestMapping("/eleinfo_ajax_id.htm")

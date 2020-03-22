@@ -9,9 +9,9 @@ package eon.hg.fap.db.service.impl;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
-import eon.hg.fap.db.dao.primary.ElementDao;
-import eon.hg.fap.db.model.primary.Element;
-import eon.hg.fap.db.service.IElementService;
+import eon.hg.fap.db.dao.primary.IconsDao;
+import eon.hg.fap.db.model.primary.Icons;
+import eon.hg.fap.db.service.IIconsService;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -29,33 +29,33 @@ import java.util.Map;
  */
 @Service
 @Transactional
-@CacheConfig(cacheNames = Globals.DEFAULT_TABLE_SUFFIX+"element")
-public class ElementServiceImpl implements IElementService {
+@CacheConfig(cacheNames = Globals.DEFAULT_TABLE_SUFFIX+"Icons")
+public class IconsServiceImpl implements IIconsService {
 	@Resource
-	private ElementDao elementDao;
+	private IconsDao IconsDao;
 
-	@CachePut(key = "'ele_code-'+#element.ele_code")
+	@CachePut(key = "'icons-'+#Icons.icons")
 	@Override
-	public Element save(Element element) {
-		return this.elementDao.save(element);
+	public Icons save(Icons Icons) {
+		return this.IconsDao.save(Icons);
 	}
 
 	@Override
-	public Element getObjById(Long id) {
-		return this.elementDao.get(id);
+	public Icons getObjById(Long id) {
+		return this.IconsDao.get(id);
 	}
 
 	@CacheEvict(allEntries = true)
 	@Override
 	public void delete(Long id) {
-		this.elementDao.remove(id);
+		this.IconsDao.remove(id);
 	}
 
 	@CacheEvict(allEntries = true)
 	@Override
 	public void batchDelete(List<Long> ids) {
 		for (Long id : ids) {
-			this.elementDao.remove(id);
+			this.IconsDao.remove(id);
 		}
 	}
 
@@ -69,30 +69,29 @@ public class ElementServiceImpl implements IElementService {
 
 	@Override
 	public IPageList list(IQueryObject properties) {
-		return elementDao.list(properties);
+		return IconsDao.list(properties);
 	}
 
-	@CachePut(key = "'ele_code-'+#element.ele_code")
+	@CachePut(key = "'icons-'+#Icons.Icons")
 	@Override
-	public Element update(Element element) {
-		return this.elementDao.update(element);
+	public Icons update(Icons Icons) {
+		return this.IconsDao.update(Icons);
 	}
 
 	@Override
-	public List<Element> query(String query, Map params, int begin, int max) {
-		return this.elementDao.query(query, params, begin, max);
+	public List<Icons> query(String query, Map params, int begin, int max) {
+		return this.IconsDao.query(query, params, begin, max);
 	}
 	
-	public List<Element> find(IQueryObject properties) {
-		return this.elementDao.find(properties);
+	public List<Icons> find(IQueryObject properties) {
+		return this.IconsDao.find(properties);
 	}
 
 
 	@Cacheable(key = "#propertyName+'-'+#value")
 	@Override
-	public Element getObjByProperty(String construct, String propertyName,
-			Object value) {
-		return this.elementDao.getOne(propertyName, value);
+	public Icons getObjByProperty(Object... fields) {
+		return this.IconsDao.getOne(fields);
 	}
 
 }
