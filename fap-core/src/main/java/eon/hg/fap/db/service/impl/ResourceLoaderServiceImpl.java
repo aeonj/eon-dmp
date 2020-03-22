@@ -6,6 +6,8 @@ import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSONReader;
 import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.core.domain.virtual.SysMap;
+import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.tools.WebHandler;
 import eon.hg.fap.db.dao.primary.*;
 import eon.hg.fap.db.model.primary.*;
@@ -37,6 +39,8 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
     private MenuGroupDao menuGroupDAO;
     @Resource
     private MenuDao menuDAO;
+    @Resource
+    private OperateDao operateDAO;
     @Resource
     private ElementDao elementDAO;
     @Resource
@@ -94,7 +98,7 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
             if (vf!=null) {
                 uiManager.setId(vf.getId());
             }
-            UIManager uiparent = uiManageDAO.getBy(null, "ui_code", uiManager.getUi_code().substring(0, uiManager.getUi_code().length() - 3));
+            UIManager uiparent = uiManageDAO.getOne("ui_code", uiManager.getUi_code().substring(0, uiManager.getUi_code().length() - 3));
             uiManager.setParent_id(uiparent == null ? null : uiparent.getId());
             uiManageDAO.mergeSave(uiManager);
         }
@@ -115,6 +119,15 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
                     Menu menu = BeanUtil.mapToBeanIgnoreCase(mapMenu, Menu.class, true);
                     menu.setMg(menuGroup);
 
+                    //增加操作导入 add by eonook 2020.3.22
+                    impTableJsonData(getClassPathStream("eon/hg/fap/data/json/sys_operate.json"), (Map<String, Object> mapOperate) -> {
+                        if (mapOperate.get("menu_id").equals(mapMenu.get("id"))) {
+                            Operate operate = BeanUtil.mapToBeanIgnoreCase(mapOperate, Operate.class, true);
+                            operate.setMenu(menu);
+                            menu.getOperates().add(operate);
+                        }
+                    });
+
                     if (CommUtil.isEmpty(mapMenu.get("parent_id"))) {
                         stack.push(menu);
                     } else {
@@ -133,7 +146,26 @@ public class ResourceLoaderServiceImpl implements IResourceLoaderService {
                 } else {
                     menu.setId(null);
                 }
+                List<Operate> operateList = new ArrayList<>();
+                operateList.addAll(menu.getOperates());
+                menu.getOperates().clear();
                 Menu save = menuDAO.mergeSave(menu);
+
+                //增加操作导入 add by eonook 2020.3.22
+                for (Operate operate : operateList) {
+                    System.out.println("菜单信息："+menu.getMenuCode() + menu.getMenuName()+"  菜单操作："+operate.getName());
+                    QueryObject qo = new QueryObject();
+                    qo.addQuery("obj.menu.id", new SysMap("menu_id", menu.getId()), "=");
+                    qo.addQuery("obj.name", new SysMap("name", operate.getName()), "=");
+                    List<Operate> vfs = this.operateDAO.find(qo);
+                    if (vfs == null || vfs.size() == 0) {
+                        operate.setId(null);
+                    } else {
+                        operate.setId(vfs.get(0).getId());
+                    }
+                    this.operateDAO.mergeSave(operate);
+                }
+
                 //处理
                 List<Menu> childs = CollectionUtil.filter(menuGroup.getMenus(), (Menu child) -> (
                         child.getParent_id().longValue() == parent_id.longValue()
