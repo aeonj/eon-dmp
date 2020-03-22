@@ -8,44 +8,55 @@
     -o-border-radius: 4px;
     border-radius: 4px;
 }
+
 .eon-ie8 .eon-fieldset-default {
     padding-top: 0;
 }
+
 .eon-ie8 .eon-fieldset-body-default {
     padding-top: 0;
 }
+
 .eon-fieldset-header-default {
     padding: 0 3px 1px;
     line-height: 14px;
 }
+
 .eon-fieldset-header-default > .eon-fieldset-header-text {
     font: normal 11px/14px tahoma, arial, verdana, sans-serif;
     color: #15428b;
     padding: 1px 0;
 }
+
 .eon-fieldset-header-checkbox-default {
     margin: 2px 3px 1px 0;
     line-height: 14px;
 }
+
 .eon-fieldset-header-tool-default {
     margin: 1px 3px 0 0;
     padding: 0;
 }
+
 .eon-fieldset-header-tool-default > .eon-tool-img {
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
     opacity: 1;
     height: 15px;
     width: 15px;
 }
+
 .eon-fieldset-header-tool-default > .eon-tool-toggle {
     background-position: 0 -60px;
 }
+
 .eon-fieldset-header-tool-default.eon-tool-over > .eon-tool-toggle {
     background-position: -15px -60px;
 }
+
 .eon-fieldset-header-tool-default.eon-focus {
     outline: 1px solid red;
 }
+
 .eon-fieldset-default.eon-fieldset-collapsed {
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
@@ -56,23 +67,29 @@
     border-left-color: transparent;
     border-right-color: transparent;
 }
+
 .eon-fieldset-default.eon-fieldset-collapsed .eon-tool-toggle {
     background-position: 0 -75px;
 }
+
 .eon-fieldset-default.eon-fieldset-collapsed .eon-tool-over > .eon-tool-toggle {
     background-position: -15px -75px;
 }
+
 .x-form-text-default.x-form-text-expand {
     color: #404040;
 }
+
 .x-form-expand-wrap .x-form-trigger-wrap {
     border: 0;
 }
+
 .x-form-expand-wrap .x-form-trigger-wrap .x-form-text {
     border: 2px solid;
     border-color: #737b8c;
     height: 24px;
 }
+
 .gridspan {
     width: 96%;
     margin: 0px auto;
@@ -80,7 +97,7 @@
 
 .gridspan .gridbtn {
     text-align: center;
-    text-decoration:none;
+    text-decoration: none;
     display: block;
     float: left;
     margin-right: 5px;
@@ -96,4 +113,26 @@
     background: #7BD0F3;
     color: #fff;
     display: block;
+}
+
+.ux-icon-combo-icon {
+    background-repeat: no-repeat;
+    background-position: 0 50%;
+    width: 18px;
+    height: 14px;
+}
+
+.ux-icon-combo-input {
+    padding-left: 25px;
+}
+
+.x-form-text-wrap .ux-icon-combo-icon {
+    top: 8px;
+    left: 5px;
+}
+
+.ux-icon-combo-item {
+    background-repeat: no-repeat ! important;
+    background-position: 3px 50% ! important;
+    padding-left: 24px ! important;
 }

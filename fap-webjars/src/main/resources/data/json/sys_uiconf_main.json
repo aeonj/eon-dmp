@@ -1,5 +1,29 @@
 {
 "RECORDS":[
+  {
+    "ID":"12479",
+    "ADDTIME":"",
+    "IS_DELETED":"0",
+    "LASTTIME":"",
+    "LASTUSER":"",
+    "UICONF_DATATYPE":"boolean",
+    "UICONF_FIELD":"isRelation",
+    "UICONF_TITLE":"是否启用关联关系",
+    "UICONF_VALUE":"true",
+    "UI_MAIN_ID":"12478"
+  },
+  {
+    "ID":"11797",
+    "ADDTIME":"",
+    "IS_DELETED":"0",
+    "LASTTIME":"",
+    "LASTUSER":"",
+    "UICONF_DATATYPE":"boolean",
+    "UICONF_FIELD":"isRelation",
+    "UICONF_TITLE":"是否启用关联关系",
+    "UICONF_VALUE":"true",
+    "UI_MAIN_ID":"10789"
+  }
 
 ]
 }

@@ -471,7 +471,6 @@ Ext.define('Ext.vcf.AssistTree', {
 
 });
 
-
 Ext.define('Ext.vcf.ComboField',{
     extend : 'Ext.form.field.ComboBox',
     alias : 'vcf.combofield',
@@ -2223,6 +2222,10 @@ Ext.define('Ext.vcf.PercentField', {
     }
 });
 
+/**
+ * 定位控件
+ * @author eonook
+ */
 Ext.define('Ext.vcf.LocateField', {
     extend: 'Ext.form.field.Text',
     xtype: 'locatefield',
@@ -2268,7 +2271,145 @@ Ext.define('Ext.vcf.LocateField', {
     }
 });
 
+/**
+ * 图标控件
+ * @author eonook
+ */
+Ext.define('Ext.vcf.IconField',{
+    extend : 'Ext.form.field.ComboBox',
+    alias : 'vcf.iconfield',
+    xtype : 'iconfield',
+    validateOnBlur: false,
+    forceSelection : true,
+    triggerAction : 'all',
+    initComponent:function() {
+        var me = this;
 
+        Ext.apply(this, {
+            store: new Ext.data.ArrayStore({
+                autoLoad : true,
+                fields : ['icons'],
+                proxy : {
+                    type : 'ajax',
+                    url : '/manage/icons_list.htm',
+                    reader : {
+                        type : 'json'
+                    }
+                }
+            }),
+            queryMode: 'local',
+            displayField : 'icons',
+            valueField : 'icons',
+            iconClsField : 'icons',
+            tpl: Ext.create('Ext.XTemplate', '<table><tr><tpl for="."><td class="x-boundlist-item :qtip={icons}" ><img width=16 height=16 style="vertical-align: middle;" class="{icons}" /><span>{icons}</span></td><tpl if="xindex % 2 === 0"></tr><tr></tpl></tpl></tr></table>'),
+            // 模版显示在文本框内
+            displayTpl: Ext.create('Ext.XTemplate', '<tpl for=".">', '{icons}','</tpl>')
+
+        });
+
+        me.callParent(arguments);
+
+    },
+
+    onRender:function(ct, position) {
+        var me = this;
+        me.callParent(arguments);
+
+        me.inputWrap.applyStyles({position:'relative'});
+        me.inputEl.addCls('ux-icon-combo-input');
+
+
+        me.icon = Ext.core.DomHelper.append(me.inputEl.up('div.x-form-text-wrap'), {
+            tag: 'div', style:'position:absolute'
+        });
+
+    },
+
+    onBeforeSelect: function(list, record, recordIndex) {
+        this.setIconCls(record.get('icons'));
+    },
+
+    setIconCls:function(val) {
+        var me = this;
+        if (me.icon) me.icon.className = 'ux-icon-combo-icon ' + val;
+    },
+
+    setValue: function(value) {
+        var me = this;
+        me.callParent(arguments);
+        me.setIconCls(value);
+    }
+});
+
+Ext.override(Ext.container.Viewport,{
+    //是否触发ajax的afterloadui事件
+    loadOnShow: false,
+    initComponent: function() {
+        var me = this;
+        me.callParent(arguments);
+        me.ajaxLoaded = false;
+        me.toolLoaded = false;
+        me.toolLoading();
+
+        if (me.loadOnShow)
+            me.triggerLoading();
+    },
+    triggerLoading: function () {
+        if (!this.ajaxLoaded) {
+            var me = this,
+                comps = me.query('inputpanel, tablegrid');
+            var time = setInterval(function () {
+                var isLoaded = true;
+                for (var i = 0, len = comps.length; i < len; i++) {
+                    if (comps[i].isAjaxLoaded && !comps[i].isAjaxLoaded()) {
+                        isLoaded = false;
+                        break;
+                    }
+                }
+                if (isLoaded) {
+                    me.ajaxLoaded = true;
+                    clearInterval(time);
+                    if (me.hasListeners.afterloadui) {
+                        me.fireEvent('afterloadui', me);
+                    }
+                }
+            },100);
+        }
+    },
+    toolLoading: function () {
+        if (!this.toolLoaded) {
+            var me = this,
+                pnls = me.query('form,grid'),
+                dockPnl;
+            me.toolLoaded = true;
+            if (typeof main_action!='undefined') {
+                if (main_action.toolbarIndex==0) {
+                    dockPnl = me.child('panel');
+                } else {
+                    for (var i = 0; i < pnls.length; i++) {
+                        if (i + 1 == main_action.toolbarIndex) {
+                            dockPnl = pnls[i];
+                        }
+                    }
+                }
+                if (dockPnl) {
+                    var tbar = dockPnl.getDockedItems('toolbar[dock="top"]');
+                    if (!Ext.isEmpty(main_action.toolbar)) {
+                        if (Ext.isEmpty(tbar)) {
+                            dockPnl.addDocked([{
+                                xtype: 'toolbar',
+                                dock: 'top',
+                                items: main_action.toolbar
+                            }]);
+                        } else {
+                            tbar[0].add(main_action.toolbar);
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
 
 Ext.define('Ext.vcf.Window', {
     extend: 'Ext.window.Window',

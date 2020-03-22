@@ -19,8 +19,14 @@ Ext.override(Ext.vcf.FormPanel, {
                     if (comp.stateChange) {
                         var state = comp.getForm().findField('state');
                         if (state) {
+                            if (typeof main_action!='undefined') {
+                                main_action.onStateChange(state.getValue());
+                            }
                             state.on('select',function (field) {
                                 comp.stateChange(field);
+                                if (main_action) {
+                                    main_action.onStateChange(state.getValue());
+                                }
                             })
                         }
                     }

@@ -68,6 +68,12 @@ Ext.onReady(function () {
             isDirect: false,   //默认为false，指是否每次从数据库获取
             anchor: '100%'
         }, {
+            id:'iconfield',
+            fieldLabel: '图标框',
+            name: 'eleicon',
+            xtype: 'iconfield',
+            anchor: '100%'
+        }, {
             fieldLabel: '单选下拉树', // 标签
             name: 'singletree', // hiddenName:后台根据此hiddenName属性取值
             xtype: 'treefield',
