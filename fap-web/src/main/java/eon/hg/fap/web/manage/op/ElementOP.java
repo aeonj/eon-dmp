@@ -15,6 +15,7 @@ import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.common.util.tools.StringUtils;
 import eon.hg.fap.core.constant.AeonConstants;
+import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.core.tools.WebHandler;
@@ -128,6 +129,37 @@ public class ElementOP {
 	}
 
 	/**
+	 * 根据要素和Id，返回Map形式的基础数据，支持主键ID为字符串
+	 * @param source
+	 * @param value
+	 * @return
+	 */
+	public List getBaseDtoByIds(String source, String value) {
+		Element element = getEleSource(source);
+		if (element!=null) {
+			String class_name = element.getClass_name();
+			if (CommUtil.isEmpty(class_name)) {
+				StringBuffer sql = new StringBuffer();
+				sql.append("SELECT e.* ");
+				sql.append(" from ").append(element.getEle_source()).append(" e ");
+				sql.append(" where e.id in ("+value+")");
+				List<Dto> list = this.genericDao.findDtoBySql(sql.toString());
+				return list;
+			} else {
+				try {
+					QueryObject qo = new QueryObject();
+					qo.addQuery(" obj.id in ("+value+")",null);
+					List<BaseData> bds = this.baseDataService.find(Class.forName(class_name),qo);
+					return bds;
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * 根据要素和编码，返回BaseData形式的基础数据，不支持主键ID为字符串
 	 * @param source
 	 * @param value
@@ -182,6 +214,37 @@ public class ElementOP {
 					Dto dto = new HashDto();
 					BeanUtil.beanToMap(bd, dto, true, (key) -> (key.toLowerCase()));
 					return dto;
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * 根据要素和Code，返回Map形式的基础数据，支持主键ID为字符串
+	 * @param source
+	 * @param value
+	 * @return
+	 */
+	public List getBaseDtoByCodes(String source, String value) {
+		Element element = getEleSource(source);
+		if (element!=null) {
+			String class_name = element.getClass_name();
+			if (CommUtil.isEmpty(class_name)) {
+				StringBuffer sql = new StringBuffer();
+				sql.append("SELECT e.* ");
+				sql.append(" from ").append(element.getEle_source()).append(" e ");
+				sql.append(" where "+CommUtil.convertInSql("e.code",value));
+				List<Dto> list = this.genericDao.findDtoBySql(sql.toString());
+				return list;
+			} else {
+				try {
+					QueryObject qo = new QueryObject();
+					qo.addQuery(CommUtil.convertInSql("obj.code",value),null);
+					List<BaseData> bds = this.baseDataService.find(Class.forName(class_name),qo);
+					return bds;
 				} catch (ClassNotFoundException e) {
 					e.printStackTrace();
 				}

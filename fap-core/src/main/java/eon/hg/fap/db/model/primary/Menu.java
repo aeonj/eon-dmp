@@ -56,6 +56,7 @@ public class Menu extends IdEntity implements Comparable<Menu> {
 	@Column(length = 60)
 	private String f_module_id;    //F3的功能ID
 	private Integer toolbar_index;  //工具栏所在位置序号
+	private String ui_ids;    //对应界面视图，逗号分隔
 
 	@Override
 	public int compareTo(Menu obj) {

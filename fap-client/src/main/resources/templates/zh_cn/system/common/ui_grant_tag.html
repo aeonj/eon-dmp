@@ -4,12 +4,12 @@
         toolbarIndex : ${toolbarIndex!0},
         onStateChange : function(state) {
             var viewport = Ext.ComponentQuery.query('viewport');
-            if (viewport) {
+            if (!Ext.isEmpty(viewport)) {
             <#list grantList as grant>
                 <#if grant.cmptype=='1'>
-                    var tbr = viewport.lookupReference('main_tbr_${grant_index+1}');
+                    var tbr = viewport[0].down('#main_tbr_${grant_index+1}');
                 if (tbr) {
-                    var cmp_states = '${(grant.states)!}'.join();
+                    var cmp_states = '${(grant.states)!}'.split(',');
                     if (containsArray(cmp_states,state)) {
                         tbr.show();
                     } else {
@@ -23,14 +23,14 @@
     };
     <#list grantList as grant>
     <#if grant.cmptype=='1'>
-    main_action.toolbar.push({
-        text: '${grant.name}',
+        main_action.toolbar.push({
+            text: '${grant.name}',
             iconCls: '${(grant.iconCls)!}',
             <#if (grant.handler)?has_content>
             handler: function() { if (${grant.handler}) ${grant.handler}();},
             </#if>
-        reference:'main_tbr_${grant_index+1}'
-    });
+            id:'main_tbr_${grant_index+1}'
+        });
     </#if>
     </#list>
 </script>

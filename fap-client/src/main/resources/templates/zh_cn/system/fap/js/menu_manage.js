@@ -91,6 +91,20 @@ function pageLoad() {
             dataIndex: 'toolbar_index',
             width: 80
         }, {
+            header: '对应视图',
+            dataIndex : 'ui_ids',
+            renderer: function(value, cellmeta, record) {
+                cellmeta.attr = 'style="white-space:normal;"';
+                var codes = '',
+                    names = '',
+                    vals = value.split(',');
+                vals.forEach(function (ele) {
+                    names = names + UIIdRender(ele)+"|";
+                });
+                return '<span data-qtip="' + names + '">' + names + '</span>';
+            },
+            width: 180
+        }, {
             header: '排序',
             dataIndex: 'sequence',
             width: 60
@@ -111,6 +125,8 @@ function pageLoad() {
             name: 'authkey'
         }, {
             name: 'toolbar_index'
+        }, {
+            name: 'ui_ids'
         }, {
             name: 'sequence'
         }, {
@@ -174,7 +190,6 @@ function pageLoad() {
         layout : 'form',
         items : [{
             fieldLabel: '菜单编码',
-            emptyText: '请填写菜单编码',
             name: 'menuCode',
             afterLabelTextTpl: [
                 '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
@@ -184,7 +199,6 @@ function pageLoad() {
             anchor: '99%'
         },{
             fieldLabel: '菜单名称',
-            emptyText: '请填写菜单名称',
             name: 'menuName',
             afterLabelTextTpl: [
                 '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
@@ -196,7 +210,6 @@ function pageLoad() {
             fieldLabel: '上级菜单',
             name: 'parent_id',
             xtype: 'treefield',
-            emptyText: '请选择父级菜单',
             store : Ext.create('Ext.data.TreeStore', {
                 proxy: {
                     type: 'ajax',
@@ -219,18 +232,15 @@ function pageLoad() {
             anchor: '99%'
         },{
             fieldLabel: '请求地址',
-            emptyText: '请填写请求地址',
             name: 'request',
             anchor: '99%'
         },{
             fieldLabel: '请求参数',
-            emptyText: '请填写请求参数',
             name: 'params',
             anchor: '99%'
         },{
             xtype: 'treefield',
             fieldLabel: '权限关键字',
-            emptyText: '请选择权限关键字',
             toolTip: '权限关键字用于应用程序控制',
             isPermission: false,
             source: 'PMS',
@@ -241,24 +251,29 @@ function pageLoad() {
         },{
             xtype: 'iconfield',
             fieldLabel: '图标',
-            emptyText: '请填写菜单图标',
             name: 'icon',
             anchor: '99%'
         },{
             fieldLabel: '工具栏位置',
-            emptyText: '请填写菜单功能主页面的工具栏位置序号',
             name: 'toolbar_index',
             xtype: 'combofield',
             enumData: '0#页面顶端+1#第一个面板内+2#第二个面板内+3#第三个面板内+4#第四个面板内+5#第五个面板内',
             anchor: '99%'
         },{
+            fieldLabel: '关联界面视图',
+            name: 'ui_ids',
+            xtype: 'treefield',
+            source: 'UI',
+            isPermission: false,
+            selectNodeModel: 'leaf',
+            selectModel: 'multiple',
+            anchor: '99%'
+        },{
             fieldLabel: '排序号',
-            emptyText: '请填写菜单排序号',
             name: 'sequence',
             anchor: '99%'
         },{
             fieldLabel: '说明',
-            emptyText: '请填写菜单说明',
             name: 'info',
             anchor: '99%'
         }, {

@@ -1075,14 +1075,14 @@ Ext.define('Ext.vcf.TreeField', {
     requestTreeChkValue : function(combo,chkvalue) {
         //避免从后台返回数据延迟
         combo.value = chkvalue;
-        if (combo.hiddenField) {
-            combo.hiddenField.value = chkvalue;
+        if (combo.source=='') {
+            return;
         }
         //end
 
-        var dataurl = '../platform/dictionary.do?reqCode=getEleInfoByIds';
+        var dataurl = '/manage/eleinfo_ajax_ids.htm';
         if (combo.isCodeAsValue){
-            dataurl = '../platform/dictionary.do?reqCode=getEleInfoByCodes';
+            dataurl = '/manage/eleinfo_ajax_codes.htm';
         }
         Ext.Ajax.request({
             url : dataurl,
@@ -1241,7 +1241,7 @@ Ext.define('Ext.vcf.TreeField', {
         (oldvalue == null || oldvalue !== me.value) ? me.fireEvent('afterchange',
             me, me.value, oldvalue) : '';
 
-        return me;
+        return me.value;
     },
     getValue : function() {
         return typeof this.value != 'undefined' ? this.value : '';
@@ -1575,23 +1575,19 @@ Ext.define('Ext.vcf.TableGrid', {
         }
 
         if (typeof me.store == 'undefined') {
-            me.keyDataIndex = me.keyDataIndex || 'id';
-            if (typeof me.model != 'undefined') {
-
-            }
-            var model = Ext.create('Ext.data.Model', {
+            var model = me.model || Ext.create('Ext.data.Model', {
                 fields: me.fieldBase,
                 validators : me.validators,
-                idProperty : me.keyDataIndex
+                idProperty : me.keyDataIndex || 'id'
             });
             /**
              * 数据存储
              */
             me.store = Ext.create('Ext.data.Store',{
-                model : me.model || model,
+                model : model,
                 proxy : {
                     type : 'ajax',
-                    url : this.url,
+                    url : me.url,
                     actionMethods: {
                         read: 'POST' // Store设置请求的方法，与Ajax请求有区别
                     },

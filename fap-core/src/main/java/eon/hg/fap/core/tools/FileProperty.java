@@ -10,6 +10,12 @@ import java.io.File;
 
 public class FileProperty {
 
+    /**
+     * 根据关键字生成基于eon.hg.file.upload_folder属性配置的相对路径
+     * @param key
+     * @param isCreate
+     * @return
+     */
     public static String getUploadPath(String key, boolean isCreate) {
         StringBuilder paths = new StringBuilder();
         if (StrUtil.isNotBlank(key)) {
@@ -26,4 +32,15 @@ public class FileProperty {
         }
         return paths.toString();
     }
+
+    /**
+     * 根据关键字生成基于eon.hg.file.upload_folder属性配置的绝对路径
+     * @param key
+     * @param isCreate
+     * @return
+     */
+    public static String getAbsUploadPath(String key, boolean isCreate) {
+        return PropertiesBean.UPLOAD_FOLDER+getUploadPath(key,isCreate);
+    }
+
 }

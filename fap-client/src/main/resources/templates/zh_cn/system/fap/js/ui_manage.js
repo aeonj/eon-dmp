@@ -357,7 +357,7 @@ Ext.onReady(function() {
                 }, {
                     name : "servletpath",
                     fieldLabel : "服务路径",
-                    allowBlank : false,
+                    allowBlank : true,
                     anchor : '100%'
                 }, {
                     name : "total_column",

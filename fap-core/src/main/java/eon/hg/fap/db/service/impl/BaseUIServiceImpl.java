@@ -8,6 +8,8 @@ import eon.hg.fap.core.cache.AbstractCacheOperator;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.dao.primary.GenericDao;
+import eon.hg.fap.db.dao.primary.MenuDao;
+import eon.hg.fap.db.model.primary.Menu;
 import eon.hg.fap.db.service.IBaseUIService;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +19,10 @@ import java.util.Map;
 
 @Service
 public class BaseUIServiceImpl extends AbstractCacheOperator implements IBaseUIService {
-
     @Resource
-    GenericDao genericDao;
+    private MenuDao menuDao;
+    @Resource
+    private GenericDao genericDao;
 
     @Override
     public String getCacheId(Object... params) {
@@ -31,7 +34,12 @@ public class BaseUIServiceImpl extends AbstractCacheOperator implements IBaseUIS
         if (params != null && params.length > 0) {
             Map parameters = (Map) params[0];
             String sResult = "#ui=";
-            if (CommUtil.isNotEmpty(parameters.get("servletpath"))
+            if (CommUtil.isNotEmpty(parameters.get("menu_id"))
+                    && CommUtil.isNotEmpty(parameters.get("comp_id"))) {
+                sResult += parameters.get("menu_id") + "|"
+                        + parameters.get("comp_id");
+                return sResult;
+            } else if (CommUtil.isNotEmpty(parameters.get("servletpath"))
                     && CommUtil.isNotEmpty(parameters.get("comp_id"))) {
                 sResult += parameters.get("servletpath") + "|"
                         + parameters.get("comp_id");
@@ -50,7 +58,16 @@ public class BaseUIServiceImpl extends AbstractCacheOperator implements IBaseUIS
             try {
                 Map dto = (Map) params[0];
                 if (CommUtil.isEmpty(dto.get("ui_id"))) {
-                    List<Dto> lstUI = genericDao.findDtoBySql("select id as ui_id from "+ Globals.SYS_TABLE_SUFFIX+"uimanager where servletpath=:servletpath and comp_id=:comp_id",dto);
+                    List<Dto> lstUI = null;
+                    if (CommUtil.isNotEmpty(dto.get("menu_id"))) {
+                        Menu menu = menuDao.get(CommUtil.null2Long(dto.get("menu_id")));
+                        if (menu != null && CommUtil.isNotEmpty(menu.getUi_ids())) {
+                            lstUI = genericDao.findDtoBySql("select id as ui_id from "+ Globals.SYS_TABLE_SUFFIX+"uimanager where id in ("+menu.getUi_ids()+") and comp_id='"+CommUtil.null2String(dto.get("comp_id"))+"'");
+                        }
+                    }
+                    if (lstUI==null) {
+                        lstUI = genericDao.findDtoBySql("select id as ui_id from " + Globals.SYS_TABLE_SUFFIX + "uimanager where servletpath=? and comp_id=?", new Object[]{dto.get("servletpath"),dto.get("comp_id")});
+                    }
                     if (lstUI==null || lstUI.size()==0) {
                         throw new Exception("界面视图不存在，请检查！");
                     }

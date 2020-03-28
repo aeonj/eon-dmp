@@ -603,12 +603,12 @@ public class UIManageAction extends BizAction {
         return OkTipMsg("界面视图删除成功");
     }
 
-    @RequestMapping("ui_designer.htm")
+    @RequestMapping("/ui_designer.htm")
     public @ResponseBody String ui_designer(@RequestParam Map<String, Object> map) throws Exception{
         return baseUIService.getCache(new Object[]{map});
     }
 
-    @RequestMapping("uimain_designer.htm")
+    @RequestMapping("/uimain_designer.htm")
     public @ResponseBody String uimain_designer(String comp_id, String servletpath, Long ui_id) throws Exception{
         QueryObject qo = new QueryObject();
         if (CommUtil.isNotEmpty(comp_id)) {

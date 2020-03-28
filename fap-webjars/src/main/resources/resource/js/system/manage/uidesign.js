@@ -40,6 +40,7 @@ Ext.override(Ext.vcf.FormPanel, {
             },
             params: {
                 comp_id: comp.viewid || comp.getId(),
+                menu_id: MENU_ID || '',
                 servletpath: webServlet || '/'
             }
         });
@@ -101,6 +102,7 @@ Ext.override(Ext.vcf.TableGrid, {
                 },
                 params: {
                     comp_id: comp.viewid || comp.id,
+                    menu_id: MENU_ID || '',
                     servletpath: webServlet || '/'
                 }
             });
@@ -124,6 +126,7 @@ Ext.override(Ext.vcf.TableGrid, {
             },
             params: {
                 comp_id: comp.viewid || comp.getId(),
+                menu_id: MENU_ID || '',
                 servletpath: webServlet || '/'
             }
         });

@@ -105,4 +105,14 @@ public class DictionaryAction extends BizAction {
 		return JsonHandler.toJson(bd);
 	}
 	
+	@RequestMapping("/eleinfo_ajax_ids.htm")
+	public List eleinfo_ajax_ids(String source, String value) {
+		return this.eleOp.getBaseDtoByIds(source,value);
+	}
+
+	@RequestMapping("/eleinfo_ajax_codes.htm")
+	public List eleinfo_ajax_codes(String source, String value) {
+		return this.eleOp.getBaseDtoByCodes(source,value);
+	}
+
 }

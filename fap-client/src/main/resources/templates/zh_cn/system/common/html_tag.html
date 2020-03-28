@@ -58,7 +58,8 @@
   var micolor = 'color:${micolor};';
   var webContext = '${webPath}';
   var webServlet = '${servletPath}';
-  var MENU_ID = '${menu_id!""}';
+  <#assign menu_key='menu_id'>
+  var MENU_ID = '${(req_params[menu_key])!}';
   Ext.QuickTips.init();
   Ext.form.Field.prototype.msgTarget = 'qtip';
 
