@@ -1452,9 +1452,15 @@ Ext.define('Ext.vcf.FormPanel', {
             if (field.source && field.source!='') {
                 var source = field.source.toLowerCase(),
                     node = field.getNode();
-                values[source+'_id']= node.get('id');
-                values[source+'_code']= node.get('code');
-                values[source+'_name']= node.get('name');
+                if (typeof node!='undefined') {
+                    values[source + '_id'] = node.get('id');
+                    values[source + '_code'] = node.get('code');
+                    values[source + '_name'] = node.get('name');
+                } else {
+                    values[source + '_id'] = '';
+                    values[source + '_code'] = '';
+                    values[source + '_name'] = '';
+                }
             } else {
                 values[field.getName()]=field.getSubmitValue();
             }
