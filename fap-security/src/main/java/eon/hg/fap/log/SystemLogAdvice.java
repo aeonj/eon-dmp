@@ -149,7 +149,14 @@ public class SystemLogAdvice {
 								|| existsKeys(annotation.value(), "edit")
 								|| existsKeys(annotation.value(), "insert")
 								|| existsKeys(annotation.value(), "update")
-								|| existsKeys(annotation.value(), "delete")) {
+								|| existsKeys(annotation.value(), "delete")
+								|| existsKeys(annotation.value(), "audit")
+								|| existsKeys(annotation.value(), "unaudit")
+								|| existsKeys(annotation.value(), "check")
+								|| existsKeys(annotation.value(), "uncheck")
+								|| existsKeys(annotation.value(), "discard")
+								|| existsKeys(annotation.value(), "back")
+								|| existsKeys(annotation.value(), "make")) {
 							String option1 = "执行";
 							String option2 = "操作";
 							description.append("执行了【").append(annotation.title()).append("】操作");
