@@ -3,6 +3,7 @@ package eon.hg.fap.core.jpa.support;
 import cn.hutool.core.convert.Convert;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.AeonConstants;
+import eon.hg.fap.core.domain.entity.IdEntity;
 import eon.hg.fap.core.jpa.BaseRepository;
 import eon.hg.fap.core.query.PageObject;
 import eon.hg.fap.core.query.query.BasePageList;
@@ -257,27 +258,31 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
 
     @Transactional
     public <S extends T> S save(S entity) {
-        if (CommUtil.isExistsAttr(getDomainClass(), "rg_code")) {
-            Object obj = CommUtil.invokeGetMethod(entity, "rg_code");
-            if (CommUtil.isEmpty(obj) || CommUtil.null2String(obj).equals(AeonConstants.SUPER_RG_CODE)) {
-                CommUtil.invokeSetMethod(entity, "rg_code", SecurityUserHolder.getRgCode());
+        if (entity instanceof IdEntity) {
+            if (CommUtil.isExistsAttr(getDomainClass(), "rg_code")) {
+                Object obj = CommUtil.invokeGetMethod(entity, "rg_code");
+                if (CommUtil.isEmpty(obj) || CommUtil.null2String(obj).equals(AeonConstants.SUPER_RG_CODE)) {
+                    CommUtil.invokeSetMethod(entity, "rg_code", SecurityUserHolder.getRgCode());
+                }
             }
+            if (SecurityUserHolder.getOnlineUser() != null) {
+                CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getOnlineUser().getUsername());
+            }
+            CommUtil.invokeSetMethod(entity, "addTime", new Date());
+            CommUtil.invokeSetMethod(entity, "lastTime", new Date());
         }
-        if (SecurityUserHolder.getOnlineUser()!=null) {
-            CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getOnlineUser().getUsername());
-        }
-        CommUtil.invokeSetMethod(entity, "addTime", new Date());
-        CommUtil.invokeSetMethod(entity, "lastTime", new Date());
         entityManager.persist(entity);
         return entity;
     }
 
     @Transactional
     public <S extends T> S update(S entity) {
-        if (SecurityUserHolder.getOnlineUser()!=null) {
-            CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getOnlineUser().getUsername());
+        if (entity instanceof IdEntity) {
+            if (SecurityUserHolder.getOnlineUser() != null) {
+                CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getOnlineUser().getUsername());
+            }
+            CommUtil.invokeSetMethod(entity, "lastTime", new Date());
         }
-        CommUtil.invokeSetMethod(entity, "lastTime", new Date());
         return entityManager.merge(entity);
     }
 
