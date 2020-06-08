@@ -1,7 +1,7 @@
 function pageLoad() {
     var treeMenu = Ext.create('Ext.vcf.AssistTree',{
         rootVisible:false,
-        url : 'menu_tree_all.htm',
+        url : 'menu_tree_all.htm?all=true',
         renderTo : 'menuTreeDiv'
     });
     var seltreeid =null;
@@ -95,13 +95,35 @@ function pageLoad() {
             dataIndex : 'ui_ids',
             renderer: function(value, cellmeta, record) {
                 cellmeta.attr = 'style="white-space:normal;"';
-                var codes = '',
-                    names = '',
-                    vals = value.split(',');
-                vals.forEach(function (ele) {
-                    names = names + UIIdRender(ele)+"|";
-                });
-                return '<span data-qtip="' + names + '">' + names + '</span>';
+                if (value) {
+                    var codes = '',
+                        names = '',
+                        vals = value.split(',');
+                    vals.forEach(function (ele) {
+                        names = names + UIIdRender(ele) + "|";
+                    });
+                    return '<span data-qtip="' + names + '">' + names + '</span>';
+                } else {
+                    return value;
+                }
+            },
+            width: 180
+        }, {
+            header: 'json对象',
+            dataIndex : 'json_obj',
+            renderer: function(value, cellmeta, record) {
+                cellmeta.attr = 'style="white-space:normal;"';
+                if (value) {
+                    var codes = '',
+                        names = '',
+                        vals = value.split(',');
+                    vals.forEach(function (ele) {
+                        names = names + UIIdRender(ele) + "|";
+                    });
+                    return '<span data-qtip="' + names + '">' + names + '</span>';
+                } else {
+                    return value;
+                }
             },
             width: 180
         }, {
@@ -127,6 +149,8 @@ function pageLoad() {
             name: 'toolbar_index'
         }, {
             name: 'ui_ids'
+        }, {
+            name: 'json_obj'
         }, {
             name: 'sequence'
         }, {
@@ -273,8 +297,17 @@ function pageLoad() {
             name: 'sequence',
             anchor: '99%'
         },{
+            fieldLabel: 'json存储对象',
+            name: 'json_obj',
+            anchor: '99%'
+        },{
             fieldLabel: '说明',
             name: 'info',
+            anchor: '99%'
+        }, {
+            fieldLabel: '是否显示(启用)',
+            name: 'display',
+            xtype: 'chkfield',
             anchor: '99%'
         }, {
             name: 'mg_id',

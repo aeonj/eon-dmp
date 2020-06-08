@@ -187,7 +187,7 @@ public class RoleMenuAction extends BizAction {
     @RequestMapping("/rolemenu_menu_tree.htm")
     public List<Dto> menu_tree_all(Long role_id) {
         Dto dto = new HashDto();
-        List<Dto> dtoList = menuOP.getMenuTreeList(dto, true);
+        List<Dto> dtoList = menuOP.getMenuTreeList(dto, true, false);
         //roleService.query("select obj from role obj join fetch obj.menus where obj.id=:role_id",new HashMap(){{put("role_id",role_id);}},-1,-1);
         Role role = this.roleService.getObjById(role_id);
         List<Long> ids = new ArrayList<>();

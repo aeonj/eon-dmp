@@ -9,7 +9,6 @@ package eon.hg.fap.web.manage.action;
 
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.db.model.mapper.BaseData;
-import eon.hg.fap.db.model.primary.EleEnterprise;
 import eon.hg.fap.db.service.IBaseDataService;
 import eon.hg.fap.db.service.ISysConfigService;
 import eon.hg.fap.db.service.IUserConfigService;
@@ -55,7 +54,8 @@ public class DemoAction extends BizAction {
 
     @RequestMapping("/demo/enterprise.htm")
     public @ResponseBody BaseData enterprise(Long id) {
-        return this.baseDataService.getObjById(EleEnterprise.class, id);
+        //return this.baseDataService.getObjById(EleEnterprise.class, id);
+        return null;
     }
 
 

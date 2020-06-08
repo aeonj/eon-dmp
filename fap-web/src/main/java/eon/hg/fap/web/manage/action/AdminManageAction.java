@@ -1,5 +1,7 @@
 package eon.hg.fap.web.manage.action;
 
+import eon.hg.fap.core.security.SecurityUserHolder;
+import eon.hg.fap.db.model.virtual.OnlineUser;
 import eon.hg.fap.db.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +23,11 @@ public class AdminManageAction {
 
     @RequestMapping("/upgrate_table.htm")
     public void upgrate_table() throws Exception {
-        resourceLoaderService.initSysTable();
-        resourceLoaderService.upgrateSysTable();
+        OnlineUser user = SecurityUserHolder.getOnlineUser();
+        if (user!=null && user.getUsername().equals("super")) {
+            resourceLoaderService.initSysTable();
+            resourceLoaderService.upgrateSysTable();
+        }
     }
 
     @RequestMapping("/clear_redis_cache.htm")

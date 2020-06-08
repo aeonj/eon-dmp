@@ -6,6 +6,7 @@ import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.domain.entity.IdEntity;
+import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.model.primary.Menu;
@@ -56,16 +57,21 @@ public class MenuOP extends TreeSort {
 		}
 	}
 
+	public List<Dto> getCardMenuList(Collection<Menu> menus) {
+		return getCardMenuList(menus,false);
+	}
 	/**
 	 * 从底潮上遍历
 	 * @param menus
 	 * @return
 	 */
-	public List<Dto> getCardMenuList(Collection<Menu> menus) {
+	public List<Dto> getCardMenuList(Collection<Menu> menus, boolean displayAll) {
 		List<Dto> lstTree = new ArrayList<>();
 		for (Menu menu : menus) {
-			if (!ContainsNode(lstTree,menu)) {
-				addParentMenuTree(lstTree, menu);
+			if (displayAll || menu.isDisplay()) {
+				if (!ContainsNode(lstTree, menu)) {
+					addParentMenuTree(lstTree, menu);
+				}
 			}
 		}
 		sortAllMenuList(lstTree);
@@ -141,17 +147,17 @@ public class MenuOP extends TreeSort {
 	 * @param containAllMenuGroup 是否加载所有的菜单组
 	 * @return
 	 */
-	public List<Dto> getMenuTreeList(Dto dtoParam, boolean containAllMenuGroup) {
+	public List<Dto> getMenuTreeList(Dto dtoParam, boolean containAllMenuGroup, boolean displayAll) {
 		Collection<Menu> menus = null;
 		if (userOp.getCurrRegion()==null) {
-			menus = this.menuService.query("select obj from Menu obj",null,-1,-1);
+			menus = this.menuService.query("select obj from Menu obj", null, -1, -1);
 		} else {
 			menus = userOp.getCurrRegion().getMenus();
 		}
 		List<Dto> lstTree;
 		if (sysConfigService.getSysConfig().isDisplay_menu_group()) {
 			lstTree = new ArrayList<Dto>();
-			for (Dto dto : getCardMenuList(menus)) {
+			for (Dto dto : getCardMenuList(menus,displayAll)) {
 				List<MenuGroup> menuGroups = this.menuGroupService.query("select obj from MenuGroup obj join fetch obj.menus as menu where menu.id=:menuid", new HashMap() {{
 					put("menuid", dto.getLong("id"));
 				}}, -1, -1);
@@ -172,7 +178,7 @@ public class MenuOP extends TreeSort {
 
 			sortMenuList(lstTree);
 		} else {
-			lstTree = getCardMenuList(menus);
+			lstTree = getCardMenuList(menus,displayAll);
 		}
 
 		boolean isChecked = dtoParam.getString("selectmodel").equalsIgnoreCase("multiple") ;
@@ -212,7 +218,7 @@ public class MenuOP extends TreeSort {
 		dto.put("name", org.getName());
 		dto.put("text", org.getName());
 		dto.put("leaf", false);
-		dto.put("iconcls", org.getIcons());
+		dto.put("iconCls", org.getIcons());
 		dto.put("mgid", org.getId());
 		dto.put("children", org.getChild());
 		dto.put("type", "1");
@@ -226,7 +232,11 @@ public class MenuOP extends TreeSort {
 		dto.put("code", node.getMenuCode());
 		dto.put("name", node.getMenuName());
 		dto.put("text", node.getMenuName());
-		dto.put("iconcls",node.getIcon());
+		if (node.isDisplay()) {
+			dto.put("iconCls", node.getIcon());
+		} else {
+			dto.put("iconCls", "nodeNoIcon");
+		}
 		dto.put("leaf", false);
         dto.put("mgid", node.getMg().getId());
 		dto.put("children", node.getChild());

@@ -59,6 +59,7 @@ public class ElementServiceImpl implements IElementService {
 		}
 	}
 
+	@CacheEvict(allEntries = true)
 	@Override
 	public void batchDelete(String mulIds) {
 		String[] ids = mulIds.split(",");
@@ -72,7 +73,7 @@ public class ElementServiceImpl implements IElementService {
 		return elementDao.list(properties);
 	}
 
-	@CachePut(key = "'ele_code-'+#element.ele_code")
+	@CacheEvict(allEntries = true)
 	@Override
 	public Element update(Element element) {
 		return this.elementDao.update(element);
@@ -88,7 +89,7 @@ public class ElementServiceImpl implements IElementService {
 	}
 
 
-	@Cacheable(key = "#propertyName+'-'+#value")
+	@Cacheable(key = "'ele_code-'+#value", condition = "#propertyName eq 'ele_code'")
 	@Override
 	public Element getObjByProperty(String construct, String propertyName,
 			Object value) {

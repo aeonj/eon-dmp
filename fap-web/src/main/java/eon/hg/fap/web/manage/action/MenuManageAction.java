@@ -63,9 +63,10 @@ public class MenuManageAction extends BizAction {
 
     @SecurityMapping({"menu:view","operate:view"})
     @RequestMapping("/menu_tree_all.htm")
-    public List<Dto> menu_tree_all() {
+    public List<Dto> menu_tree_all(Boolean all) {
         Dto dto = new HashDto();
-        List<Dto> dtoList = menuOp.getMenuTreeList(dto, true);
+        all = all==null ? new Boolean(false) : all;
+        List<Dto> dtoList = menuOp.getMenuTreeList(dto, true, all);
         return dtoList;
     }
 
