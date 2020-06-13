@@ -58,8 +58,8 @@ public class ElementOP {
 
 	/**
 	 * 根据要素编码，获取要素信息
-	 * @param source
-	 * @return
+	 * @param source 要素名
+	 * @return Element
 	 */
 	public Element getEleSource(String source) {
 		return this.elementService.getObjByProperty(null, "ele_code", source);
@@ -67,9 +67,9 @@ public class ElementOP {
 
 	/**
 	 * 根据要素和Id，返回BaseData形式的基础数据，不支持主键ID为字符串
-	 * @param source
-	 * @param value
-	 * @return
+	 * @param source 要素名
+	 * @param value 基础数据id
+	 * @return BaseData
 	 */
 	public BaseData getBaseDataById(String source, Long value) {
 		Element element = getEleSource(source);
@@ -97,9 +97,9 @@ public class ElementOP {
 
 	/**
 	 * 根据要素和Id，返回Map形式的基础数据，支持主键ID为字符串
-	 * @param source
-	 * @param value
-	 * @return
+	 * @param source 要素名
+	 * @param value 基础数据id
+	 * @return Dto对象
 	 */
 	public Dto getBaseDtoById(String source, String value) {
 		Element element = getEleSource(source);
@@ -130,8 +130,8 @@ public class ElementOP {
 
 	/**
 	 * 根据要素和Id，返回Map形式的基础数据，支持主键ID为字符串
-	 * @param source
-	 * @param value
+	 * @param source 要素名
+	 * @param value 基础数据id，逗号分隔
 	 * @return
 	 */
 	public List getBaseDtoByIds(String source, String value) {
@@ -161,8 +161,8 @@ public class ElementOP {
 
 	/**
 	 * 根据要素和编码，返回BaseData形式的基础数据，不支持主键ID为字符串
-	 * @param source
-	 * @param value
+	 * @param source 要素名
+	 * @param value 基础数据code值
 	 * @return
 	 */
 	public BaseData getBaseDataByCode(String source, String value) {
@@ -191,8 +191,8 @@ public class ElementOP {
 
 	/**
 	 * 根据要素和编码，返回Map形式的基础数据，支持主键ID为字符串
-	 * @param source
-	 * @param value
+	 * @param source 要素名
+	 * @param value 基础数据code值
 	 * @return
 	 */
 	public Dto getBaseDtoByCode(String source, String value) {
@@ -224,8 +224,8 @@ public class ElementOP {
 
 	/**
 	 * 根据要素和Code，返回Map形式的基础数据，支持主键ID为字符串
-	 * @param source
-	 * @param value
+	 * @param source 要素名
+	 * @param value 基础数据code值集合，逗号分隔
 	 * @return
 	 */
 	public List getBaseDtoByCodes(String source, String value) {
