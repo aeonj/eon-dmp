@@ -29,7 +29,7 @@ public class QueryObject implements IQueryObject {
 
 	protected String queryString = "";
 
-	protected String fetchs = "";
+	protected String fetchs = ""; //在from表和where条件之间，用于懒加载fetch join 对象实现
 
 	protected String nativeSql;   //原生sql语句
 
@@ -37,7 +37,7 @@ public class QueryObject implements IQueryObject {
 
 	private String alias = "obj";
 
-	private WhereObject whereObj = new WhereObject();
+	private WhereObject whereObj = new WhereObject();  //组装sql条件的私有对象
 
 	private Object object;
 
@@ -126,6 +126,7 @@ public class QueryObject implements IQueryObject {
 	}
 
 	/**
+	 * 在from表和where条件之间，用于懒加载fetch join 对象实现
 	 * @param fetchs the fetchs to set
 	 */
 	public void setFetchs(String fetchs) {
@@ -312,7 +313,16 @@ public class QueryObject implements IQueryObject {
 	}
 
 	public String getQuery() {
-		return getCondionStr() + whereObj.toString()+ orderString();
+		String condionStr = getCondionStr() + getWhereStr();
+		if (StrUtil.isEmpty(condionStr)) {
+		    return "1=1 " + orderString();
+        } else {
+			int iAnd = StrUtil.indexOfIgnoreCase(condionStr, " and ");
+			if (iAnd != -1) {
+				condionStr = condionStr.substring(iAnd + 5);
+			}
+			return condionStr + orderString();
+		}
 	}
 
 	protected String orderString() {
@@ -388,6 +398,11 @@ public class QueryObject implements IQueryObject {
 		return this;
 	}
 
+	public String getCondionStr() {
+		customizeQuery();
+		return queryString;
+	}
+
 	/**
 	 * 继承于F3
 	 * @return
@@ -434,19 +449,10 @@ public class QueryObject implements IQueryObject {
 		return whereObj.getWhereList();
 	}
 
-	public String getCondionStr() {
-		customizeQuery();
-		String condition = queryString;
-		if (StrUtil.isEmpty(queryString)) {
-			return "1=1 ";
-		} else {
-			int iAnd = StrUtil.indexOfIgnoreCase(condition," and ");
-			if (iAnd!=-1) {
-				condition = condition.substring(iAnd+5);
-			}
-			return condition;
-		}
+	public String getWhereStr() {
+		return whereObj.toString();
 	}
+
 	///////////////////F3结束
 
 	@Override

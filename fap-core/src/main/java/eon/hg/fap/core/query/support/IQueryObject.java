@@ -136,10 +136,24 @@ public interface IQueryObject {
 
     void setAlias(String alias);
 
+	/**
+	 * 使用addQuery等方法产生的where条件
+	 * @return sql条件
+	 */
 	String getCondionStr();
 
+	/**
+	 * 使用and,or,andPlusBracket,orPlusBracket,addBracketFront,addBracketBack等方法产生的wherelist
+	 * @return sql条件列表
+	 */
 	List<QueryBean> getWhereList();
-    ////////////////////////////F3/////////////////////////
+
+	/**
+	 * 使用and,or,andPlusBracket,orPlusBracket,addBracketFront,addBracketBack等方法产生的where条件
+	 * @return sql条件
+	 */
+	String getWhereStr();
+	////////////////////////////F3/////////////////////////
 
 	/**
 	 * 清理所有查询条件、查询参数，用在一个方法中多次使用同一个QueryObject
