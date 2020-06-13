@@ -592,7 +592,11 @@ public class QueryObject implements IQueryObject {
 					sb.append(" ");
 					sb.append(bean.isBracketFront() ? "(" : "");
 					sb.append(" ");
-					sb.append(getAlias() + "." + bean.getKey());
+					if (StrUtil.contains(bean.getKey(),'.')) {
+						sb.append(bean.getKey());
+					} else {
+						sb.append(getAlias() + "." + bean.getKey());
+					}
 					sb.append(" ");
 					sb.append(bean.getOperation());
 					sb.append(" ");
