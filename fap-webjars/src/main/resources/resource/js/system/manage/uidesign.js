@@ -161,6 +161,19 @@ function addUIByServer(comp, ray, pos) {
     if (typeof ray.detail != 'undefined') {
         var ray_detail = ray.detail;
         var downcol=0,lastcol = -1;
+        var setOtherProp = function (colray, fieldtype) {
+            if (fieldtype == 'checkbox'
+                || fieldtype == 'chkfield'
+                || fieldtype == 'radiogroup') {
+                colray.data_type = 'number';
+            } else if (fieldtype == 'moneyfield' || fieldtype == 'percentfield' || fieldtype == 'custnumberfield') {
+                colray.data_type = 'number';
+            } else if (fieldtype == 'datefield' || fieldtype == 'datetimefield') {
+                colray.data_type = 'date';
+            } else {
+                colray.data_type = 'string';
+            }
+        };
         //计算最后一行控件，用以设置padding底间距
         if (typeof comp.lastitems == 'undefined') {
             for (var k = 0; k<ray_detail.length; k++) {
@@ -187,6 +200,7 @@ function addUIByServer(comp, ray, pos) {
             }
             items.xtype = ray_detail[i].field_type;
             items.logic = ray_detail[i].field_logic;
+            setOtherProp(items, items.xtype);
             var children = ray_detail[i].children;
             if (children && typeof children == 'object') {
                 for (var j = 0; j < children.length; j++) {

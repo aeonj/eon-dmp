@@ -1483,7 +1483,7 @@ Ext.define('Ext.vcf.QueryPanel', {
         for (var i = 0; i < fields.getCount(); i++) {
             var field = fields.get(i);
             if (me.contain_state || field.getName()!='state') {
-                var meta = {field: field.getName(), op: field.logic, data: field.getSubmitValue()};
+                var meta = {field: field.getName(), op: field.logic || '=', data: field.getSubmitValue(), type: field.data_type || 'string'};
                 rules.push(meta);
             }
         }
