@@ -8,6 +8,7 @@ import eon.hg.fap.common.util.tools.StringUtils;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.tools.JsonHandler;
+import lombok.val;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,8 +49,10 @@ public class BizAction {
 	 *            提示信息
 	 * @param response
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
+	 * @deprecated user {@link eon.hg.fap.core.body.ResultBody}
 	 */
+	@Deprecated
 	protected void setOkTipMsg(String pMsg, HttpServletResponse response) {
 		Dto outDto = new HashDto();
 		outDto.put("success",AeonConstants.TRUE);
@@ -57,6 +60,7 @@ public class BizAction {
 		write(JsonHandler.toJson(outDto), response);
 	}
 
+	@Deprecated
 	protected Dto OkTipMsg(String pMsg) {
 		Dto outDto = new HashDto();
 		outDto.put("success",AeonConstants.TRUE);
@@ -72,8 +76,10 @@ public class BizAction {
 	 *            提示信息
 	 * @param response
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
+	 * @deprecated user {@link eon.hg.fap.core.body.ResultBody}
 	 */
+	@Deprecated
 	protected void setErrTipMsg(String pMsg, HttpServletResponse response) {
 		Dto outDto = new HashDto();
 		outDto.put("success",AeonConstants.FALSE);
@@ -81,6 +87,7 @@ public class BizAction {
 		write(JsonHandler.toJson(outDto), response);
 	}
 
+	@Deprecated
 	protected Dto ErrTipMsg(String pMsg) {
 		Dto outDto = new HashDto();
 		outDto.put("success",AeonConstants.FALSE);
@@ -157,8 +164,20 @@ public class BizAction {
 	 * 获取前端查询组件的条件，组装jpa条件语句
 	 * @param jsonOp
 	 * @param qo
+	 * @deprecated use {@link #extGridJpa(String,QueryObject)}
 	 */
+	@Deprecated
 	public QueryObject extGridFilter(String jsonOp, QueryObject qo) {
+		return extGridJpa(jsonOp,qo);
+	}
+
+	/**
+	 * 获取前端查询组件的条件，组装jpa条件语句
+	 * @param jsonOp 从前端获取的json查询条件字符串，请参考前端控件QueryPanel
+	 * @param qo 查询条件对象
+	 * @version 2.0.3+
+	 */
+	public QueryObject extGridJpa(String jsonOp, QueryObject qo) {
 		if (qo!=null && CommUtil.isNotEmpty(jsonOp)) {
 			List<Dto> lstField = JsonHandler.parseList(jsonOp);
 			Map<String,String> Q2Oper = jqGridOp();
@@ -183,8 +202,20 @@ public class BizAction {
 	 * 获取前端查询组件的条件，用于组装不带参数的原生sql条件
 	 * @param jsonOp
 	 * @param qo
+	 * @deprecated use {@link #extGridSql(String,QueryObject)}
 	 */
+	@Deprecated
 	public QueryObject extGridWhere(String jsonOp, QueryObject qo) {
+		return extGridSql(jsonOp,qo);
+	}
+
+	/**
+	 * 获取前端查询组件的条件，用于组装不带参数的原生sql条件
+	 * @param jsonOp 从前端获取的json查询条件字符串，请参考前端控件QueryPanel
+	 * @param qo 查询条件对象
+	 * @version 2.0.3+
+	 */
+	public QueryObject extGridSql(String jsonOp, QueryObject qo) {
 		if (qo!=null && CommUtil.isNotEmpty(jsonOp)) {
 			List<Dto> lstField = JsonHandler.parseList(jsonOp);
 			Map<String,String> Q2Oper = jqGridOp();
@@ -194,12 +225,7 @@ public class BizAction {
 				String type = CommUtil.null2String(dto.get("type"));
 				String data = CommUtil.null2String(dto.get("data"));
 				if (!op.isEmpty() && !data.isEmpty()) {
-					String alias = qo.getAlias();
-				    if (CommUtil.isNotEmpty(alias)) {
-                        qo.and(alias+"."+field, Q2Oper.get(op), extTypeConvert(type,jqGridData(op, data)));
-                    } else {
-                        qo.and(field, Q2Oper.get(op), extTypeConvert(type,jqGridData(op, data)));
-                    }
+					qo.and(field, Q2Oper.get(op), extTypeConvert(type,jqGridData(op, data)));
 				}
 			}
 		}
