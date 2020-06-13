@@ -659,8 +659,7 @@ Ext.define('Ext.vcf.ComboField',{
         var value = this.getValue();
         if (Ext.isEmpty(value)) {
             value = '';
-        }
-        if (this.multiSelect && this.multiStringVal) {
+        } else if (this.multiSelect && this.multiStringVal) {
             value = value.join();
         }
         return value;
@@ -1452,7 +1451,7 @@ Ext.define('Ext.vcf.FormPanel', {
             if (field.source && field.source!='') {
                 var source = field.source.toLowerCase(),
                     node = field.getNode();
-                if (typeof node!='undefined') {
+                if (node) {
                     values[source + '_id'] = node.get('id');
                     values[source + '_code'] = node.get('code');
                     values[source + '_name'] = node.get('name');
@@ -1989,6 +1988,9 @@ Ext.define('Ext.vcf.EditorTableGrid', {
                     }),
                     'combox': new Ext.grid.CellEditor({
                         field: new Ext.vcf.ComboField({selectOnFocus: true, allowBlank: false})
+                    }),
+                    'tree': new Ext.grid.CellEditor({
+                        field: new Ext.vcf.TreeField({selectOnFocus: true, allowBlank: false})
                     }),
                     'date': new Ext.grid.CellEditor({
                         field: new Ext.form.field.Date({selectOnFocus: true, allowBlank: false})
