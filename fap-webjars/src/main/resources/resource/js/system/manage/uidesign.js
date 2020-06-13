@@ -77,8 +77,8 @@ Ext.override(Ext.vcf.TableGrid, {
                     var ray_main = resultArray;
                     var items = {};
                     for (var j = 0; j < ray_main.length; j++) {
-                        if (ray_main[j].uiconf_value.charAt(0) == '{' && ray_main[j].uiconf_value.charAt(ray_main[j].uiconf_value.length - 1) == '}') {
-                            items[ray_main[j].uiconf_field] = eval(ray_main[j].uiconf_value.substring(1, ray_main[j].uiconf_value.length - 1));
+                        if (ray_main[j].uiconf_value.slice(0, 2) == '{{' && ray_main[j].uiconf_value.slice(-2) == '}}') {
+                            items[ray_main[j].uiconf_field] = eval(ray_main[j].uiconf_value.slice(2, -2));
                         } else if (ray_main[j].uiconf_datatype == 'boolean') {
                             items[ray_main[j].uiconf_field] = (ray_main[j].uiconf_value == 'true');
                         } else if (ray_main[j].uiconf_datatype == 'int') {
@@ -190,8 +190,8 @@ function addUIByServer(comp, ray, pos) {
             var children = ray_detail[i].children;
             if (children && typeof children == 'object') {
                 for (var j = 0; j < children.length; j++) {
-                    if (children[j].uiconf_value.charAt(0) == '{' && children[j].uiconf_value.charAt(children[j].uiconf_value.length - 1) == '}') {
-                        items[children[j].uiconf_field] = eval(children[j].uiconf_value.substring(1, children[j].uiconf_value.length - 1));
+                    if (children[j].uiconf_value.slice(0,2) == '{{' && children[j].uiconf_value.slice(-2) == '}}') {
+                        items[children[j].uiconf_field] = eval(children[j].uiconf_value.slice(2, -2));
                     } else if (children[j].uiconf_datatype == 'boolean') {
                         items[children[j].uiconf_field] = (children[j].uiconf_value == 'true');
                     } else if (children[j].uiconf_datatype == 'int') {
@@ -285,8 +285,8 @@ function addUIByServer(comp, ray, pos) {
         var items = {};
         //console.log(typeof ray.main);
         for (var j = 0; j < ray_main.length; j++) {
-            if (ray_main[j].uiconf_value.charAt(0)=='{' && ray_main[j].uiconf_value.charAt(ray_main[j].uiconf_value.length-1)=='}') {
-                items[ray_main[j].uiconf_field] = eval(ray_main[j].uiconf_value.substring(1,ray_main[j].uiconf_value.length-1));
+            if (ray_main[j].uiconf_value.slice(0,2)=='{{' && ray_main[j].uiconf_value.slice(-2)=='}}') {
+                items[ray_main[j].uiconf_field] = eval(ray_main[j].uiconf_value.slice(2,-2));
             } else if (ray_main[j].uiconf_datatype == 'boolean') {
                 items[ray_main[j].uiconf_field] = (ray_main[j].uiconf_value == 'true');
             } else if (ray_main[j].uiconf_datatype == 'int') {
@@ -515,8 +515,8 @@ function addGridByServer(comp, ray) {
         var ray_main = ray.main;
         var items = {};
         for (var j = 0; j < ray_main.length; j++) {
-            if (ray_main[j].uiconf_value.charAt(0) == '{' && ray_main[j].uiconf_value.charAt(ray_main[j].uiconf_value.length - 1) == '}') {
-                items[ray_main[j].uiconf_field] = eval(ray_main[j].uiconf_value.substring(1, ray_main[j].uiconf_value.length - 1));
+            if (ray_main[j].uiconf_value.slice(0,2) == '{{' && ray_main[j].uiconf_value.slice(-2) == '}}') {
+                items[ray_main[j].uiconf_field] = eval(ray_main[j].uiconf_value.slice(2,-2));
             } else if (ray_main[j].uiconf_datatype == 'boolean') {
                 items[ray_main[j].uiconf_field] = (ray_main[j].uiconf_value == 'true');
             } else if (ray_main[j].uiconf_datatype == 'int') {
