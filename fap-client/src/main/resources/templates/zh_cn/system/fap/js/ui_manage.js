@@ -680,6 +680,7 @@ Ext.onReady(function() {
                 var resultArray = array['data'];
                 // editColGrid.stopEditing();
                 var storeAttr = editColGrid.store;
+                editColGrid.control_type = node.data.field_type;
                 storeAttr.removeAll();
                 for (var irec = 0; resultArray != null && irec < resultArray.length; irec++) {
                     var newrecord = new MyRecord();
@@ -756,6 +757,7 @@ Ext.onReady(function() {
                             var resultArray = array['data'];
                             //editColGrid.stopEditing();
                             var storeAttr = editColGrid.store;
+                            editColGrid.control_type = combo.getValue();
                             storeAttr.removeAll();
                             for (var irec = 0; resultArray != null && irec < resultArray.length; irec++) {
                                 var newrecord = new MyRecord();
@@ -1352,6 +1354,7 @@ Ext.onReady(function() {
                         var resultArray = array['data'];
                         //editUIGrid.stopEditing();
                         var storeAttr = editUIGrid.store;
+                        editColGrid.control_type = resultData.xtype;
                         storeAttr.removeAll();
                         for (var irec = 0; resultArray!=null && irec < resultArray.length; irec++) {
                             var newrecord = new MyRecord();

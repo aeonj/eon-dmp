@@ -112,14 +112,30 @@ Ext.define('Ext.vcf.ViewEditorTableGrid',{
         me.callParent(arguments);
     },
     getCellEditor : function(record){
-        var p = record,
+        var me = this,
+            store = me.store,
+            p = record,
             n = Ext.isEmpty(this.editDataIndex) ? 1 : p.data[this.editDataIndex],
             xtype = p.data['uiconf_datatype'],
+            field = p.data['uiconf_field'],
             ref = p.data['ref_selmodel'];
         if (n==1 || n==true) {
-            if(xtype=='string'){
+            if (field=='value' && me.control_type) {
+                if (me.control_type=='treefield') {
+                    for (var irec = 0; store!=null && irec < store.getCount(); irec++) {
+                        var rec_idx = store.getAt(irec);
+                        if (rec_idx.data['uiconf_field']=='source' && rec_idx.data['uiconf_value']) {
+                            var editor = me.editors.tree;
+                            editor.field.setSource(rec_idx.data['uiconf_value']);
+                            return editor;
+                        }
+                    }
+                } else {
+                    return me.editors.string;
+                }
+            } else if(xtype=='string'){
                 if (ref==null || ref=='') {
-                    var editor = this.editors.string;
+                    var editor = me.editors.string;
                     if (p.data['uiconf_field']=='anchor') {
                         editor.field.regex = /^-?\d+%$/;
                         editor.field.regexText = '值必须为百分比';
@@ -129,12 +145,12 @@ Ext.define('Ext.vcf.ViewEditorTableGrid',{
                     }
                     return editor;
                 } else {
-                    var editor = this.editors.combox;
+                    var editor = me.editors.combox;
                     editor.field.setEnumData(ref);
                     return editor;
                 }
             }else{
-                return this.editors[xtype];
+                return me.editors[xtype];
             }
         }
     }
