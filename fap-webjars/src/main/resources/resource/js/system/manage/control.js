@@ -2439,7 +2439,7 @@ Ext.override(Ext.container.Viewport,{
         if (!this.toolLoaded) {
             var me = this,
                 pnls = me.query('form,grid'),
-                dockPnl;
+                dockPnl;  //根据菜单配置查找到的工具栏所在panel
             me.toolLoaded = true;
             if (typeof main_action!='undefined') {
                 if (main_action.toolbarIndex==0) {
@@ -2453,6 +2453,7 @@ Ext.override(Ext.container.Viewport,{
                 }
                 if (dockPnl) {
                     var tbar = dockPnl.getDockedItems('toolbar[dock="top"]');
+                    //对应panel是否已设置工具栏
                     if (!Ext.isEmpty(main_action.toolbar)) {
                         if (Ext.isEmpty(tbar)) {
                             dockPnl.addDocked([{
