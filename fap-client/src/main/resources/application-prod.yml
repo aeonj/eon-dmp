@@ -3,14 +3,9 @@ server:
 spring:
   datasource:
     primary:
-      jdbc-url: jdbc:mysql://localhost:3306/eon?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      jdbc-url: jdbc:mysql://10.64.125.59:3306/portal?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
       username: root
-      password: root
-      driver-class-name: com.mysql.cj.jdbc.Driver
-    secondary:
-      jdbc-url: jdbc:mysql://localhost:3306/eon_2?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
-      username: root
-      password: root
+      password: 123456
       driver-class-name: com.mysql.cj.jdbc.Driver
   application:
     name: 禾冠平台

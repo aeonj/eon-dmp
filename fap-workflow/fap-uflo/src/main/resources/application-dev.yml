@@ -19,7 +19,7 @@ spring:
     name: 禾冠平台
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: auto
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
     show-sql: true
@@ -34,6 +34,7 @@ spring:
           provider_configuration_file_resource_path: ehcache.xml
           region:
             factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
   cache:
     type: redis   #支持ehcache、redis
   redis:
@@ -57,9 +58,6 @@ spring:
     charset: UTF-8 #编码格式
     settings:
       number_format: '0.##'   #数字格式化，无小数点
-  http:
-    converters:
-      preferred-json-mapper: fastjson
 #security:
 #  oauth2:
 #    client:
@@ -78,14 +76,14 @@ spring:
 #      check-token-access: http://localhost:8100/oauth/check_token
 logging:
   level:
-    root: error
+    root: info
   path: /usr/local/logs/spring
 eon:
   hg:
     security:
       authType: session    #认证方式，session，token
       oauth2:
-        storeType: jwt    #jdbc，redis，jwt几种模式，需要与授权服务器一致
+        storeType: redis    #jdbc，redis，jwt几种模式，需要与授权服务器一致
         resourceId: oauth2-resource
       login_url: /manage/login.htm   #自定义登录地址
       index_url: /portal/index.htm    #自定义首页地址

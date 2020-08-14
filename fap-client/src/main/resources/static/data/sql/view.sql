@@ -1,0 +1,1 @@
+select `sys_element`.`id` AS `id`,`sys_element`.`ele_code` AS `code`,`sys_element`.`ele_name` AS `name`,1 AS `level`,1 AS `leaf`,`sys_element`.`enabled` AS `enabled`,0 AS `parent_id`,`sys_element`.`class_name` AS `class_name`,`sys_element`.`ele_source` AS `ele_source` from `sys_element` where (`sys_element`.`ele_code` <> _utf8'ELE')
