@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>eon.hg.fap</groupId>
 	<artifactId>fap-project</artifactId>
-	<version>2.0.3-SNAPSHOT</version>
+	<version>2.1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>fap-project</name>
 	<description>Platform project for Spring Boot</description>
@@ -197,6 +197,7 @@
 		<module>fap-oauth2</module>
 		<module>fap-client</module>
 		<module>fap-webjars</module>
+		<module>fap-workflow</module>
 	</modules>
 
 </project>

@@ -164,6 +164,14 @@ public interface IQueryObject {
 	
 	void autoFilterRg(boolean filter);
 
+	/**
+	 * 在from表和where条件之间，用于懒加载fetch join 对象实现
+	 * 格式：1:join fetch   2:逗号分隔的列属性
+	 * @param fetchs the fetchs to set
+	 */
+	void setFetchs(String fetchs);
+
+
 	String getFetchs();
 
 

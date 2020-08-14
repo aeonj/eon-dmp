@@ -30,17 +30,17 @@ public class AccessoryServiceImpl implements IAccessoryService {
 	@Resource
 	private AccessoryDao accessoryDao;
 
-	@CachePut(key = "#accessory.id")
+	@CachePut(key = "'accessory-'+#accessory.id")
 	public Accessory save(Accessory accessory) {
 		return this.accessoryDao.save(accessory);
 	}
 
-	@Cacheable(key = "#id")
+	@Cacheable(key = "'accessory-'+#id")
 	public Accessory getObjById(Long id) {
 		return this.accessoryDao.get(id);
 	}
 
-	@CacheEvict(key = "#id")
+	@CacheEvict(key = "'accessory-'+#id")
 	public void delete(Long id) {
 		this.accessoryDao.remove(id);
 	}
@@ -55,7 +55,7 @@ public class AccessoryServiceImpl implements IAccessoryService {
 		return accessoryDao.list(properties);
 	}
 
-	@CachePut(key = "#accessory.id")
+	@CachePut(key = "'accessory-'+#accessory.id")
 	public Accessory update(Accessory accessory) {
 		return this.accessoryDao.update( accessory);
 	}
@@ -65,9 +65,8 @@ public class AccessoryServiceImpl implements IAccessoryService {
 	}
 	
 	@Override
-	public Accessory getObjByProperty(String construct, String propertyName,
-			Object value) {
-		return this.accessoryDao.getBy(construct, propertyName, value);
+	public Accessory getObjByProperty(Object... fields) {
+		return this.accessoryDao.getOne(fields);
 	}
 
 	@Override

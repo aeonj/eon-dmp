@@ -4,9 +4,7 @@ import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -17,7 +15,9 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = Globals.SYS_TABLE_SUFFIX + "accessory")
+@Table(name = Globals.SYS_TABLE_SUFFIX + "accessory", indexes = {
+		@Index(name = "idx_accessory", columnList = "acc_type")
+})
 public class Accessory extends IdEntity {
 
 	private String name;// 附件名称
@@ -29,6 +29,12 @@ public class Accessory extends IdEntity {
 	private String ext;// 扩展名，不包括.
 	private String info;// 附件说明
 	private String real_name;//文件上传的真实名称
+	//acc_type 等于11时代表工作流模板，记录blob字段
+	@Column(length = 2, columnDefinition = "int default 1")
+	private int acc_type = 1;
+	@Lob
+	@Basic(fetch = FetchType.LAZY)
+	private byte[] blob_value;
 
 	public Accessory(Long id, Date addTime) {
 		super(id, addTime);

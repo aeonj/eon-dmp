@@ -69,11 +69,10 @@ public interface IAccessoryService {
 	
 	/**
 	 * 
-	 * @param propertyName
-	 * @param value
+	 * @param fields
 	 * @return
 	 */
-	Accessory getObjByProperty(String construct, String propertyName, Object value);
+	Accessory getObjByProperty(Object... fields);
 
 	/**
 	 * 物理删除文件和逻辑删除数据库文件

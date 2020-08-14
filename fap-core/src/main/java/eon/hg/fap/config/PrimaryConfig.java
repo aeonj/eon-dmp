@@ -53,7 +53,7 @@ public class PrimaryConfig {
         return builder
                 .dataSource(primaryDataSource)
                 .properties(vendorProperties)
-                .packages("eon.hg.*.db.model.primary") //设置实体类所在位置
+                .packages("eon.hg.*.db.model.primary","com.bstek.uflo.model") //设置实体类所在位置
                 .persistenceUnit("primaryPersistenceUnit")
                 .build();
     }

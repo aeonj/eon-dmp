@@ -131,7 +131,7 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
             sb = new StringBuffer("select obj from ");
         }
         sb.append(clazzName).append(" obj ");
-        sb.append(fetchStr);
+        sb.append(getFetchJoinStr(fetchStr));
         boolean filterRg = !params.containsKey("rg_code");
         if (filterRg) {
             filterRg = CommUtil.isExistsAttr(getDomainClass(), "rg_code");
@@ -159,6 +159,22 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
         return query.getResultList();
     }
 
+    private String getFetchJoinStr(String fetchs) {
+        if (CommUtil.isEmpty(fetchs)) {
+            return "";
+        } else {
+            StringBuffer sb = new StringBuffer();
+            if (fetchs.indexOf("join ")>=0) {
+                sb.append(" ").append(fetchs);
+                return sb.toString();
+            } else {
+                for (String field : fetchs.split(",")) {
+                    sb.append(" left join fetch obj.").append(field);
+                }
+                return sb.toString();
+            }
+        }
+    }
     /**
      * 根据一个查询条件及其参数，还有开始查找的位置和查找的个数来查找任意类型的对象。
      *
