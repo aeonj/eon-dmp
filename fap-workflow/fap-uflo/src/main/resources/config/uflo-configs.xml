@@ -19,7 +19,7 @@
 
     <bean id="uflo.processCache" class="com.bstek.uflo.env.impl.MemoryProcessCache"></bean>
 
-    <bean id="uflo.commandService" class="com.bstek.uflo.command.impl.SpringTransactionCommandService" depends-on="uflo.environmentUtils">
+    <bean id="uflo.commandService" class="eon.hg.fap.uflo.service.SpringTransactionCommandService" depends-on="uflo.environmentUtils">
     </bean>
 
     <bean id="uflo.props" class="com.bstek.uflo.UfloPropertyPlaceholderConfigurer" abstract="true">

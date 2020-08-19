@@ -34,7 +34,6 @@ spring:
           provider_configuration_file_resource_path: ehcache.xml
           region:
             factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
-        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
   cache:
     type: redis   #支持ehcache、redis
   redis:
