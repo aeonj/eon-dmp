@@ -2,7 +2,10 @@ package eon.hg.fap.core.body;
 
 import lombok.*;
 
-
+/**
+ * 统一前端返回对象
+ * @author eonook
+ */
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
@@ -78,9 +81,25 @@ public class ResultBody {
         return resultBody;
     }
 
+    /**
+     * 业务数据失败，返回自定义的错误类型，错误提示自行提供
+     * @param reason
+     * @return
+     */
+    public static ResultBody failed(Integer code, String reason) {
+        ResultBody resultBody = new ResultBody(code);
+        resultBody.setSuccess(false);
+        resultBody.setMsg(reason);
+        return resultBody;
+    }
+
     public ResultBody addObject(Object o) {
         setData(o);
         return this;
     }
 
+    public ResultBody setMsg(String msg) {
+        this.msg = msg;
+        return this;
+    }
 }

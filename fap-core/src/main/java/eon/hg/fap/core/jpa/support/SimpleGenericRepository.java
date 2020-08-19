@@ -28,6 +28,7 @@ import java.util.Map;
  * 
  */
 @Slf4j
+@Transactional(readOnly = true)
 public class SimpleGenericRepository<T, ID extends Serializable> implements GenericRepository<T, ID> {
 
 	private EntityManager entityManager;

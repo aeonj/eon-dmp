@@ -74,6 +74,9 @@ public class ResultException extends RuntimeException {
     }
 
     public ResultBody getBody() {
+        if (body==null) {
+            body = ResultBody.failed(code,msg);
+        }
         return body;
     }
 

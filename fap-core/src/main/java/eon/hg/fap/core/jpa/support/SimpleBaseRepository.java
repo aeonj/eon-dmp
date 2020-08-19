@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.JpaEntityInformationSupport;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -36,6 +37,7 @@ import java.util.Optional;
  * @param <T>
  * @param <ID>
  */
+@Transactional(readOnly = true)
 public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements BaseRepository<T, ID> {
 
     private final JpaEntityInformation<T, ?> entityInformation;
@@ -336,12 +338,14 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
     }
 
     @Override
+    @Transactional(readOnly = false)
     public int executeQuery(final String jpql) {
         Query query = this.entityManager.createQuery(jpql);
         return query.executeUpdate();
     }
 
     @Override
+    @Transactional(readOnly = false)
     public int executeQuery(final String jpql, final Object[] params) {
         Query query = this.entityManager.createQuery(jpql);
         int parameterIndex = 1;
@@ -361,6 +365,7 @@ public class SimpleBaseRepository<T, ID extends Serializable> extends SimpleJpaR
     }
 
     @Override
+    @Transactional(readOnly = false)
     public int executeBySql(String sql, Object[] params) {
         Query query = this.entityManager.createNativeQuery(sql);
         int parameterIndex = 1;
