@@ -48,18 +48,6 @@ public interface FlowProvider {
 
     /**
      * 通用流程处理
-     * @param menu_id 当前菜单ID
-     * @param state 当前状态
-     * @param actionType 操作类型
-     * @param advice 流程处理意见
-     * @param records 业务记录列表
-     * @param toNodeName 只用于转发和退回到指定节点
-     */
-    void doWorkFlowByBusiness(Long menu_id, NodeState state, ActionType actionType, String advice,
-                              List records, String toNodeName);
-
-    /**
-     * 通用流程处理
      * @param node 流程节点信息
      * @param actionType 操作类型
      * @param advice 流程处理意见
@@ -74,24 +62,12 @@ public interface FlowProvider {
      * @param actionType 操作类型
      * @param advice 流程处理意见
      * @param records 业务记录列表
-     * @param toNodeName 只用于转发和退回到指定节点
-     */
-    void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice,
-                              List records, String toNodeName);
-
-    /**
-     * 通用流程处理
-     * @param node 流程节点信息
-     * @param actionType 操作类型
-     * @param advice 流程处理意见
-     * @param records 业务记录列表
-     * @param toNodeName 只用于转发和退回到指定节点
      * @param task_field 业务记录中对应的任务ID字段名
      * @param business_field 业务记录中对应的业务ID字段名，仅records记录集中不存在task_field字段才有用
      * @param bUpdateVariants 是否更新业务记录对应的流程变量
      */
     void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice,
-                              List records, String toNodeName, String task_field, String business_field, boolean bUpdateVariants);
+                              List records, String task_field, String business_field, boolean bUpdateVariants);
 
     /**
      * 获取操作日志

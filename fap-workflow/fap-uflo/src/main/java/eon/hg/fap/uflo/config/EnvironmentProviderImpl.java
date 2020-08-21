@@ -4,7 +4,6 @@ import com.bstek.uflo.env.EnvironmentProvider;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.db.model.virtual.OnlineUser;
 import org.hibernate.SessionFactory;
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.orm.jpa.JpaTransactionManager;

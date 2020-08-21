@@ -44,7 +44,7 @@ import java.util.Map;
 /**
  * 通用流程处理入口
  */
-@Service
+@Service("ufloFlowProviderImpl")
 @Transactional
 public class FlowProviderImpl implements FlowProvider {
     @Resource(name = ProcessService.BEAN_ID)
@@ -280,22 +280,7 @@ public class FlowProviderImpl implements FlowProvider {
     @Override
     public void doWorkFlowByBusiness(Long menu_id, NodeState state, ActionType actionType, String advice,
                                      List records) {
-        doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)).addState(state), actionType, advice, records, null, "task_id", null, false);
-    }
-
-    /**
-     * 通用流程处理
-     *
-     * @param menu_id    当前菜单ID
-     * @param state      当前状态
-     * @param actionType 操作类型
-     * @param advice     流程处理意见
-     * @param records    业务记录列表
-     * @param toNodeName 只用于转发和退回到指定节点
-     */
-    @Override
-    public void doWorkFlowByBusiness(Long menu_id, NodeState state, ActionType actionType, String advice, List records, String toNodeName) {
-        doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)).addState(state), actionType, advice, records, toNodeName, "task_id", null, false);
+        doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)).addState(state), actionType, advice, records, "task_id", null, false);
     }
 
     /**
@@ -309,21 +294,7 @@ public class FlowProviderImpl implements FlowProvider {
     @Override
     public void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice,
                                      List records) {
-        doWorkFlowByBusiness(node, actionType, advice, records, null, "task_id", null, false);
-    }
-
-    /**
-     * 通用流程处理
-     *
-     * @param node       流程节点信息
-     * @param actionType 操作类型
-     * @param advice     流程处理意见
-     * @param records    业务记录列表
-     * @param toNodeName 只用于转发和退回到指定节点
-     */
-    @Override
-    public void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice, List records, String toNodeName) {
-        doWorkFlowByBusiness(node, actionType, advice, records, toNodeName, "task_id", null, false);
+        doWorkFlowByBusiness(node, actionType, advice, records, "task_id", null, false);
     }
 
     /**
@@ -333,13 +304,12 @@ public class FlowProviderImpl implements FlowProvider {
      * @param actionType      操作类型
      * @param advice          流程处理意见
      * @param records         业务记录列表
-     * @param toNodeName      只用于转发和退回到指定节点
      * @param task_field      业务记录中对应的任务ID字段名
      * @param business_field  业务记录中对应的业务ID字段名，仅records记录集中不存在task_field字段才有用
      * @param bUpdateVariants 是否更新业务记录对应的流程变量
      */
     @Override
-    public void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice, List records, String toNodeName, String task_field, String business_field, boolean bUpdateVariants) {
+    public void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice, List records, String task_field, String business_field, boolean bUpdateVariants) {
         for (int i = 0; i < records.size(); i++) {
             Long taskId = null;
             Map mapRec = new HashMap();
@@ -444,6 +414,15 @@ public class FlowProviderImpl implements FlowProvider {
                         taskService.rollback(task, task.getPrevTask(), mapRec, new TaskOpinion(advice));
                     } else {
                         taskService.rollback(task, task.getPrevTask(), null, new TaskOpinion(advice));
+                    }
+                } else if (ActionType.BACK_FIRST.equals(actionType)) {
+                    ProcessDefinition pd = processService.getProcessById(task.getProcessId());
+                    String nodeName = pd.getStartNode().getName();
+                    //退回
+                    if (bUpdateVariants) {
+                        taskService.rollback(task, nodeName, mapRec, new TaskOpinion(advice));
+                    } else {
+                        taskService.rollback(task, nodeName, null, new TaskOpinion(advice));
                     }
                 } else if (ActionType.DISCARD.equals(actionType)) {
                     taskService.cancelTask(taskId, new TaskOpinion(advice));

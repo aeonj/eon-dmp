@@ -11,4 +11,5 @@ public class ServletConfig {
     public ServletRegistrationBean servletRegistration() {
         return new ServletRegistrationBean(new UfloServlet(), "/uflo/*");
     }
+
 }

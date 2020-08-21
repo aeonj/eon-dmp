@@ -1,5 +1,8 @@
 package eon.hg.fap.config;
 
+import cn.hutool.core.util.StrUtil;
+import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.common.properties.ExternalProperties;
 import eon.hg.fap.core.jpa.support.BaseRepositoryFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Configuration
 @EnableTransactionManagement
@@ -34,6 +38,9 @@ public class PrimaryConfig {
     @Qualifier("vendorProperties")
     private Map<String, Object> vendorProperties;
 
+    @Autowired
+    private ExternalProperties externalProperties;
+
     @Bean(name = "entityManagerFactoryPrimary")
     @Primary
     public LocalContainerEntityManagerFactoryBean entityManagerFactoryPrimary (EntityManagerFactoryBuilder builder) {
@@ -50,10 +57,17 @@ public class PrimaryConfig {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Supplier<String[]> packages = () -> {
+            if (StrUtil.isNotBlank(externalProperties.getEntity_packages())) {
+                return StrUtil.split("eon.hg.*.db.model.primary"+","+externalProperties.getEntity_packages(),",");
+            } else {
+                return new String[]{"eon.hg.*.db.model.primary"};
+            }
+        };
         return builder
                 .dataSource(primaryDataSource)
                 .properties(vendorProperties)
-                .packages("eon.hg.*.db.model.primary","com.bstek.uflo.model") //设置实体类所在位置
+                .packages(packages.get()) //设置实体类所在位置
                 .persistenceUnit("primaryPersistenceUnit")
                 .build();
     }

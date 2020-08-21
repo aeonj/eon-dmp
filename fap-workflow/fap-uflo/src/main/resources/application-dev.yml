@@ -94,4 +94,6 @@ eon:
       server_url: http://127.0.0.1:8080/vcf/remote/
     file:
       upload_folder: /Users/aeon/Documents/uploadfile/
+    external:
+      entity_packages: com.bstek.uflo.model
 
