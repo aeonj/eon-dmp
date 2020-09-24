@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author AEON
  *
  */
-public class SecurityUserHolder {
+public class UserHolder {
 
 	public static OnlineUser getOnlineUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -29,44 +29,6 @@ public class SecurityUserHolder {
 			return (OnlineUser)authentication.getPrincipal();
 		}
 		return null;
-	}
-
-	/**
-	 * Returns the current user
-	 * 
-	 * @return
-	 */
-	public static User getCurrentUser() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication != null
-				&& authentication.getPrincipal() instanceof User) {
-			return (User) authentication.getPrincipal();
-		} else if (authentication != null
-				&& authentication.getPrincipal() instanceof OnlineUser) {
-			OnlineUser token_user = (OnlineUser) authentication.getPrincipal();
-			UserDao userDao = SpringUtils.getBean("userDao",UserDao.class);
-			User user = userDao.get(Long.valueOf(token_user.getUserid()));
-			return user;
-		} else if (authentication != null
-				&& authentication.getPrincipal() instanceof String) {
-			String username = (String) authentication.getPrincipal();
-			if ("anonymousUser".equals(username))
-			    return null;
-			UserDetailsService userService = SpringUtils.getBean("securityUserSupport",UserDetailsService.class);
-			User user = (User) userService.loadUserByUsername(username);
-			return user;
-		} else {
-			User user = null;
-			if (RequestContextHolder.getRequestAttributes() != null) {
-				HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
-						.getRequestAttributes()).getRequest();
-				user = (request.getSession().getAttribute("user") != null ? (User) request
-						.getSession().getAttribute("user") : null);
-				// System.out.println(user != null ? user.getUserName() : "空");
-			}
-			return user;
-		}
-
 	}
 
 	public static String getSetYear() {
