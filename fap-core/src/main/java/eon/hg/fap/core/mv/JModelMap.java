@@ -4,8 +4,8 @@ import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.HttpInclude;
-import eon.hg.fap.db.model.primary.SysConfig;
-import eon.hg.fap.db.model.primary.UserConfig;
+import eon.hg.fap.support.model.SConfig;
+import eon.hg.fap.support.model.UConfig;
 import org.springframework.ui.ModelMap;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,8 +17,8 @@ public class JModelMap extends ModelMap{
         super();
     }
 
-    public JModelMap(SysConfig config, UserConfig uconfig,
-                         HttpServletRequest request, HttpServletResponse response) {
+    public JModelMap(SConfig config, UConfig uconfig,
+                     HttpServletRequest request, HttpServletResponse response) {
         String contextPath = request.getContextPath().equals("/") ? ""
                 : request.getContextPath();
         String webPath = CommUtil.getURL(request);
@@ -42,7 +42,7 @@ public class JModelMap extends ModelMap{
         super.addAttribute("webPath", webPath);
         super.addAttribute("config", config);
         super.addAttribute("uconfig", uconfig);
-        super.addAttribute("user", SecurityUserHolder.getCurrentUser());
+        super.addAttribute("user", SecurityUserHolder.getOnlineUser());
         super.addAttribute("rgcode", SecurityUserHolder.getRgCode());
         super.addAttribute("httpInclude", new HttpInclude(request, response));
         String query_url = "";

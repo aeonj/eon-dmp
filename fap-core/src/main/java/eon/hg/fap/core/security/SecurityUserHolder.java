@@ -4,12 +4,9 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import eon.hg.fap.core.beans.SpringUtils;
 import eon.hg.fap.core.constant.AeonConstants;
-import eon.hg.fap.db.dao.primary.UserDao;
-import eon.hg.fap.db.model.primary.User;
+import eon.hg.fap.core.domain.entity.IdEntity;
 import eon.hg.fap.db.model.virtual.OnlineUser;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import eon.hg.fap.support.session.SessionPrincipal;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -20,13 +17,25 @@ import javax.servlet.http.HttpServletRequest;
  * @author AEON
  *
  */
-public class UserHolder {
+public class SecurityUserHolder {
+    private static SessionPrincipal principal;
 
 	public static OnlineUser getOnlineUser() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		if (authentication != null
-				&& authentication.getPrincipal() instanceof OnlineUser) {
-			return (OnlineUser)authentication.getPrincipal();
+		if (principal==null) {
+			principal = SpringUtils.getBean("sessionPrincipal", SessionPrincipal.class);
+			if (principal != null) {
+				return principal.getOnlineUser();
+			}
+		}
+		return null;
+	}
+
+	public static IdEntity getCurrentUser() {
+		if (principal==null) {
+			principal = SpringUtils.getBean("sessionPrincipal", SessionPrincipal.class);
+			if (principal != null) {
+				return principal.getCurrentUser();
+			}
 		}
 		return null;
 	}
@@ -34,7 +43,7 @@ public class UserHolder {
 	public static String getSetYear() {
 		return Convert.toStr(DateUtil.thisYear());
 	}
-	
+
 	/**
 	 * 获取当前登录用户的所在区划
 	 * @return

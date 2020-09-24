@@ -4,6 +4,7 @@ import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.query.PageObject;
 import eon.hg.fap.core.query.QueryBean;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ import java.util.Map;
  * </p>
  * 
  */
-public interface IQueryObject {
+public interface IQueryObject extends Serializable {
 	/**
 	 * 获得查询构造器，查询对象指定字段
 	 * 

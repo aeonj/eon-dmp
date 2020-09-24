@@ -1,5 +1,6 @@
 package eon.hg.fap.security.access;
 
+import cn.hutool.core.convert.Convert;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.db.model.primary.User;
@@ -63,7 +64,7 @@ public class EonAccessDeniedHandler implements AccessDeniedHandler {
 			}
 		} else {
 			this.errorPage = null;
-			User user = SecurityUserHolder.getCurrentUser();
+			User user = userService.getObjById(Convert.toLong(SecurityUserHolder.getOnlineUser().getUserid()));
 			if (user.getUserRole().indexOf("MANAGE") < 0) {
 				this.errorPage = "/authority.htm";
 			} else {

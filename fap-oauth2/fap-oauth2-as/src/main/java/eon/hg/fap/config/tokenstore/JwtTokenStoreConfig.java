@@ -1,6 +1,6 @@
 package eon.hg.fap.config.tokenstore;
 
-import eon.hg.fap.db.model.virtual.OnlineUser;
+import eon.hg.fap.security.session.SessionUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +45,7 @@ public class JwtTokenStoreConfig {
             @Override
             public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
                 final Map<String, Object> additionalInformation = new HashMap<>();
-                OnlineUser userModel = (OnlineUser) authentication.getUserAuthentication().getPrincipal();
+                SessionUser userModel = (SessionUser) authentication.getUserAuthentication().getPrincipal();
                 //把用户的主键uin放进去
                 additionalInformation.put("uom", userModel);
                 ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInformation);

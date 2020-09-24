@@ -21,7 +21,6 @@ import eon.hg.fap.core.exception.ResultException;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
-import eon.hg.fap.db.model.primary.UfloCurrentTasks;
 import eon.hg.fap.db.model.virtual.OnlineUser;
 import eon.hg.fap.db.service.IMenuService;
 import eon.hg.fap.db.service.IUfloCurrentTasksService;
@@ -32,7 +31,6 @@ import eon.hg.fap.uflo.interfaces.UserTaskListener;
 import eon.hg.fap.uflo.util.UfloUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;

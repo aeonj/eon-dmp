@@ -6,12 +6,12 @@
 
 package eon.hg.fap.common.tools.json;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.serializer.BeforeFilter;
 import com.alibaba.fastjson.serializer.PropertyFilter;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.proxy.HibernateProxy;
-import org.springframework.security.oauth2.common.DefaultExpiringOAuth2RefreshToken;
-import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 
 /**
  * 对于jpa的懒加载，非ehcache缓存的在这里进行急加载
@@ -34,8 +34,7 @@ public class FastJsonPropertyFilter extends BeforeFilter implements PropertyFilt
 			if (val == null) {
 				return false;
 			}
-		} else if (value instanceof DefaultOAuth2AccessToken
-				|| value instanceof DefaultExpiringOAuth2RefreshToken) {
+		} else if (StrUtil.containsAny(value.getClass().getName(),"DefaultOAuth2AccessToken","DefaultExpiringOAuth2RefreshToken")) {
 			return false;
 		}
 		return true;
@@ -53,13 +52,12 @@ public class FastJsonPropertyFilter extends BeforeFilter implements PropertyFilt
 		 *     "scope": "read write"
 		 * }
 		 */
-		if (object instanceof DefaultOAuth2AccessToken) {
-			DefaultOAuth2AccessToken accessToken = (DefaultOAuth2AccessToken) object;
-			writeKeyValue("access_token", accessToken.getValue());
-			writeKeyValue("token_type", accessToken.getTokenType());
-			writeKeyValue("refresh_token", accessToken.getRefreshToken().getValue());
-			writeKeyValue("expires_in", accessToken.getExpiresIn());
-			writeKeyValue("scope", String.join(" ", accessToken.getScope()));
+		if (StrUtil.containsAny(object.getClass().getName(),"DefaultOAuth2AccessToken")) {
+			writeKeyValue("access_token", BeanUtil.getProperty(object,"value"));
+			writeKeyValue("token_type", BeanUtil.getProperty(object,"tokenType"));
+			writeKeyValue("refresh_token", BeanUtil.getProperty(BeanUtil.getProperty(object,"refreshToken"),"value"));
+			writeKeyValue("expires_in", BeanUtil.getProperty(object,"expiresIn"));
+			writeKeyValue("scope", String.join(" ", (String)BeanUtil.getProperty(object,"scope")));
 		}
 	}
 }

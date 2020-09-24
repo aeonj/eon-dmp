@@ -5,8 +5,8 @@ import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.HttpInclude;
 import eon.hg.fap.core.tools.WebHandler;
-import eon.hg.fap.db.model.primary.SysConfig;
-import eon.hg.fap.db.model.primary.UserConfig;
+import eon.hg.fap.support.model.SConfig;
+import eon.hg.fap.support.model.UConfig;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,7 +34,7 @@ public class JModelAndView extends ModelAndView {
 	 *            用户自定义的视图，可以添加任意路径
 	 * @param request
 	 */
-	public JModelAndView(String viewName, SysConfig config, UserConfig uconfig,
+	public JModelAndView(String viewName, SConfig config, UConfig uconfig,
 						 HttpServletRequest request, HttpServletResponse response) {
 		String contextPath = request.getContextPath().equals("/") ? ""
 				: request.getContextPath();
@@ -61,7 +61,7 @@ public class JModelAndView extends ModelAndView {
 		super.addObject("webPath", webPath);
 		super.addObject("config", config);
 		super.addObject("uconfig", uconfig);
-		super.addObject("user", SecurityUserHolder.getCurrentUser());
+		super.addObject("user", SecurityUserHolder.getOnlineUser());
 		super.addObject("rgcode", SecurityUserHolder.getRgCode());
 		super.addObject("httpInclude", new HttpInclude(request, response));
 		String query_url = "";
@@ -95,7 +95,7 @@ public class JModelAndView extends ModelAndView {
 	 * @param type
 	 *            视图类型 0为后台，1为前台 大于1为自定义路径
 	 */
-	public JModelAndView(String viewName, SysConfig config, UserConfig uconfig,
+	public JModelAndView(String viewName, SConfig config, UConfig uconfig,
                          int type, HttpServletRequest request, HttpServletResponse response) {
 		if (config.getSysLanguage() != null) {
 			if (config.getSysLanguage().equals(Globals.DEFAULT_SYSTEM_LANGUAGE)) {
@@ -153,7 +153,7 @@ public class JModelAndView extends ModelAndView {
 		super.addObject("routePath",webPath+routePath);
 		super.addObject("config", config);
 		super.addObject("uconfig", uconfig);
-		super.addObject("user", SecurityUserHolder.getCurrentUser());
+		super.addObject("user", SecurityUserHolder.getOnlineUser());
 		super.addObject("rgcode", SecurityUserHolder.getRgCode());
 		super.addObject("httpInclude", new HttpInclude(request, response));
 		String query_url = "";

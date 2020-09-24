@@ -4,13 +4,11 @@ import com.bstek.uflo.console.provider.ProcessFile;
 import com.bstek.uflo.console.provider.ProcessProvider;
 import eon.hg.fap.db.model.primary.Accessory;
 import eon.hg.fap.db.service.IAccessoryService;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Component

@@ -21,8 +21,6 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>fap-oauth2-rs</artifactId>
             <version>${project.version}</version>
-            <type>jar</type>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 

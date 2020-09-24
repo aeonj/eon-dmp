@@ -57,7 +57,7 @@ public class NorLogoutFilter extends LogoutFilter {
 			log.setTitle("用户退出");
 			log.setType(0);
 			log.setUser_id(user.getId());
-			log.setUser_name(user.getUsername());
+			log.setUser_name(user.getUserName());
 			log.setIp(CommUtil.getIpAddr(request));
 			this.sysLogService.save(log);
 		}

@@ -37,7 +37,7 @@ public class DictionaryAction extends BizAction {
 		if (CommUtil.isNotEmpty(dto.get("source"))) {
 			if (CommUtil.isNotEmpty(dto.get("ispermission"))) {
 				if (dto.getBoolean("ispermission")) {
-					User user = SecurityUserHolder.getCurrentUser();
+					User user = (User) SecurityUserHolder.getCurrentUser();
 					if (user==null) {
 						dto.put("belong_source", "-1");
 					} else {

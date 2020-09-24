@@ -3,8 +3,6 @@ package eon.hg.fap.core.filter;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.security.SecurityUserHolder;
-import eon.hg.fap.db.model.primary.SysConfig;
-import eon.hg.fap.db.service.ISysConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.*;
@@ -15,52 +13,28 @@ import java.io.IOException;
 
 @WebFilter
 public class RequestFilter implements Filter {
-    @Autowired
-    private ISysConfigService configService;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        // TODO Auto-generated method stub
-        SysConfig config = this.configService.getSysConfig();
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String url = request.getRequestURI();
         boolean redirect = false;
         String redirect_url = "";
         if (AeonConstants.VLicense.isinstall() || url.indexOf("/manage") < 0) {
-            if (!config.isWebsiteState()) {
-                if (this.init_url(url)) {
-                    if (url.indexOf("/manage") < 0 && url.indexOf("/wap") < 0
-                            && url.indexOf("/install.htm") <= 0
-                            && url.indexOf("/close.htm") < 0
-                            && url.indexOf("/jsload.htm") < 0
-                            && url.indexOf("/verify.htm") < 0
-                            && url.indexOf("login_success.htm") < 0
-                            && url.indexOf("logout_success.htm") < 0) {
-                        redirect = true;
-                        redirect_url = CommUtil.getURL(request) + "/close.htm";
-                    }
-                    if (url.indexOf("/mobile") >= 0) {
-                        redirect = true;
-                        redirect_url = CommUtil.getURL(request)
-                                + "/mobile/close.htm";
-                    }
+            if (SecurityUserHolder.getOnlineUser() != null) {
+                if (url.indexOf("/manage/login.htm") >= 0) {
+                    redirect = true;
+                    redirect_url = CommUtil.getURL(request) + "/manage/index.htm";
+                }
+                if (url.indexOf("/register.htm") >= 0) {
+                    redirect = true;
+                    redirect_url = CommUtil.getURL(request) + "/index.htm";
                 }
             } else {
-                if (SecurityUserHolder.getOnlineUser() != null) {
-                        if (url.indexOf("/manage/login.htm") >= 0) {
-                            redirect = true;
-                            redirect_url = CommUtil.getURL(request) + "/manage/index.htm";
-                        }
-                        if (url.indexOf("/register.htm") >= 0) {
-                            redirect = true;
-                            redirect_url = CommUtil.getURL(request) + "/index.htm";
-                        }
-                } else {
-                    if (url.indexOf("/install") >= 0) {
-                        redirect_url = CommUtil.getURL(request) + "/index.htm";
-                        redirect = true;
-                    }
+                if (url.indexOf("/install") >= 0) {
+                    redirect_url = CommUtil.getURL(request) + "/index.htm";
+                    redirect = true;
                 }
             }
         } else {
@@ -86,8 +60,8 @@ public class RequestFilter implements Filter {
         } else {
             prifix = url;
         }
-        String[] extend_list = new String[] { "css", "jpg", "jpeg", "png",
-                "gif", "bmp", "tbi", "js" };
+        String[] extend_list = new String[]{"css", "jpg", "jpeg", "png",
+                "gif", "bmp", "tbi", "js"};
         boolean flag = true;
         for (String temp : extend_list) {
             if (temp.equals(prifix)) {

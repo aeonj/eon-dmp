@@ -6,16 +6,11 @@
 
 package eon.hg.fap.db.service.impl;
 
-import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.db.dao.primary.UfloCurrentTasksDao;
 import eon.hg.fap.db.model.primary.UfloCurrentTasks;
 import eon.hg.fap.db.service.IUfloCurrentTasksService;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

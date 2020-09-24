@@ -2,6 +2,7 @@ package eon.hg.fap.config.tokenstore;
 
 import cn.hutool.core.convert.Convert;
 import eon.hg.fap.db.model.virtual.OnlineUser;
+import eon.hg.fap.security.session.SessionUser;
 import eon.hg.fap.security.support.SecurityUserSupport;
 import io.micrometer.core.instrument.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +57,9 @@ public class JwtTokenStoreConfig {
                     }
                     String userid = Convert.toStr(mapUser.get("userid"),"-1");
                     String username = Convert.toStr(mapUser.get("username"),"");
-                    String password = Convert.toStr(mapUser.get("userid"));
-                    OnlineUser user = new OnlineUser(userid,username,password,grantedAuthoritySet);
+                    String nickname = Convert.toStr(mapUser.get("nickname"),"");
+                    String password = Convert.toStr(mapUser.get("password"));
+                    SessionUser user = new SessionUser(userid,username,nickname,password,grantedAuthoritySet);
                     Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
                     Object principal = user;
                     return new UsernamePasswordAuthenticationToken(principal, "N/A", authorities);

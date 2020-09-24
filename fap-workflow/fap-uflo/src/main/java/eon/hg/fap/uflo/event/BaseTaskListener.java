@@ -4,7 +4,6 @@ import com.bstek.uflo.env.Context;
 import com.bstek.uflo.model.ProcessInstance;
 import com.bstek.uflo.model.task.Task;
 import com.bstek.uflo.model.task.TaskParticipator;
-import com.bstek.uflo.model.task.TaskState;
 import com.bstek.uflo.model.task.TaskType;
 import com.bstek.uflo.process.assign.AssigneeProvider;
 import com.bstek.uflo.process.listener.GlobalTaskListener;

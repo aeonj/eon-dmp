@@ -268,7 +268,7 @@ public class UserManageAction extends BizAction {
     @RequestMapping("/user_delete.htm")
     public Dto user_delete(Long user_id) {
         User user = this.userService.getObjById(user_id);
-        if (CommUtil.null2String(user.getUsername()).equalsIgnoreCase(AeonConstants.SUPER_USER)) {
+        if (CommUtil.null2String(user.getUserName()).equalsIgnoreCase(AeonConstants.SUPER_USER)) {
             return ErrTipMsg("super是系统内置用户，不允许维护");
         }
             // 删除管理员操作日志
@@ -285,12 +285,12 @@ public class UserManageAction extends BizAction {
             // 管理员伪删除,取消所有管理员权限
             user.setIs_deleted(true);
             user.getRoles().clear();
-            user.setUserName("_" + user.getUsername());
+            user.setUserName("_" + user.getUserName());
             boolean is_exists = true;
             while (is_exists) {
-                User vf = this.userService.getObjByProperty(null, "userName", user.getUsername());
+                User vf = this.userService.getObjByProperty(null, "userName", user.getUserName());
                 if (vf != null) {
-                    user.setUserName("_" + user.getUsername());
+                    user.setUserName("_" + user.getUserName());
                 } else {
                     is_exists = false;
                 }

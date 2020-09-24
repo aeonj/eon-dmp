@@ -6,8 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 系统权限资源标签，系统使用springSecurity作为权限框架，该注解用在需要纳入权限管理的action中
- * ， 通过AdminManageAction中init_role方法完成权限资源基础数据的导入以及不同用户角色权限的分配
+ * 系统权限资源标签，系统使用springSecurity作为权限框架，该注解用在需要纳入权限管理的controller中
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

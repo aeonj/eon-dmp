@@ -518,7 +518,7 @@ public class ElementOP {
 	private String getPermissionSql(Dto dto) {
 		String sql = "";
         //判断本要素是否需要筛选
-        User cur_user = SecurityUserHolder.getCurrentUser();
+        User cur_user = (User) SecurityUserHolder.getCurrentUser();
         if (CommUtil.isNotEmpty(cur_user.getBelong_source())) {
             List<Dto> lstBelong = JsonHandler.parseList(cur_user.getBelong_source());
             if (dto.get("belong_source").equals(dto.getString("source"))) {

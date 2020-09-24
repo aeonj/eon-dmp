@@ -1,55 +1,29 @@
 package eon.hg.fap.db.model.virtual;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.SpringSecurityCoreVersion;
-import org.springframework.security.core.userdetails.User;
-
 import java.io.Serializable;
 import java.util.Collection;
 
-public class OnlineUser extends User implements Serializable {
-    private static final long serialVersionUID = SpringSecurityCoreVersion.SERIAL_VERSION_UID;
 
-    private String userid;
+public interface OnlineUser extends Serializable,Cloneable {
 
-    private String cookie;
+    public String getUserid();
 
-    private Object context;
+    public void setUserid(String userid);
 
-    public String getUserid() {
-        return userid;
-    }
+    public String getNickname();
 
-    public void setUserid(String userid) {
-        this.userid = userid;
-    }
+    public void setNickname(String nickname);
 
-    public String getCookie() {
-        return cookie;
-    }
+    public String getCookie();
 
-    public void setCookie(String cookie) {
-        this.cookie = cookie;
-    }
+    public void setCookie(String cookie);
 
-    public Object getContext() {
-        return context;
-    }
+    public Object getContext();
 
-    public void setContext(Object context) {
-        this.context = context;
-    }
+    public void setContext(Object context);
 
-    /**
-     * Calls the more complex constructor with all boolean arguments set to {@code true}.
-     *
-     * @param username
-     * @param password
-     * @param authorities
-     */
-    public OnlineUser(String userid, String username, String password, Collection<? extends GrantedAuthority> authorities) {
-        super(username, password, authorities);
-        this.userid = userid;
-    }
+    String getPassword();
+
+    String getUsername();
 
 }

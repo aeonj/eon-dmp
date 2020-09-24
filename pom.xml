@@ -84,14 +84,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-oauth2</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<!--Redis和jdbc的Session共享-->
@@ -190,7 +182,9 @@
 	<modules>
 		<module>fap-common</module>
 		<module>fap-core</module>
+		<module>fap-db</module>
 		<module>fap-security</module>
+		<module>fap-log</module>
 		<module>fap-web</module>
 		<module>fap-hessian</module>
 		<module>fap-webservice</module>

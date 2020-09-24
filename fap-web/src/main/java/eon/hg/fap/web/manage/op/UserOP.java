@@ -98,9 +98,9 @@ public class UserOP {
 	private Dto UserData2Dto(User user) {
 		Dto dto = new HashDto();
 		dto.put("id", user.getId());
-		dto.put("code", user.getUsername());
+		dto.put("code", user.getUserName());
 		dto.put("name", user.getTrueName());
-		dto.put("text", user.getUsername()+" "+user.getTrueName());
+		dto.put("text", user.getUserName()+" "+user.getTrueName());
 		dto.put("leaf", true);
 		dto.put("children", new ArrayList<Dto>());
 		dto.put("type", "3");
