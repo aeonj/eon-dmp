@@ -17,27 +17,27 @@ import javax.servlet.http.HttpServletRequest;
  * @author AEON
  *
  */
-public class SecurityUserHolder {
+public final class SecurityUserHolder {
     private static SessionPrincipal principal;
 
 	public static OnlineUser getOnlineUser() {
 		if (principal==null) {
 			principal = SpringUtils.getBean("sessionPrincipal", SessionPrincipal.class);
-			if (principal != null) {
-				return principal.getOnlineUser();
+			if (principal == null) {
+				return null;
 			}
 		}
-		return null;
+		return principal.getOnlineUser();
 	}
 
 	public static IdEntity getCurrentUser() {
 		if (principal==null) {
 			principal = SpringUtils.getBean("sessionPrincipal", SessionPrincipal.class);
-			if (principal != null) {
-				return principal.getCurrentUser();
+			if (principal == null) {
+				return null;
 			}
 		}
-		return null;
+		return principal.getCurrentUser();
 	}
 
 	public static String getSetYear() {

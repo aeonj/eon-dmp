@@ -1,5 +1,8 @@
 package eon.hg.fap.security.support;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.crypto.SecureUtil;
 import eon.hg.fap.core.constant.Globals;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,25 +26,37 @@ public class EonAuthenticationProvider extends DaoAuthenticationProvider {
 			logger.debug("Authentication failed: no credentials provided");
 
 			throw new BadCredentialsException(messages.getMessage(
-					"AbstractUserDetailsAuthenticationProvider.badCredentials",
-					"Bad credentials"));
+					"AbstractSecurityInterceptor.authenticationNotFound",
+					"未能获取用户授权令牌"));
 		}
-
-		String presentedPassword = authentication.getCredentials().toString();
-
-		if (presentedPassword.indexOf(Globals.THIRD_ACCOUNT_LOGIN) >= 0) {
-			presentedPassword = presentedPassword.substring(Globals.THIRD_ACCOUNT_LOGIN.length());
-			if (!presentedPassword.equals(userDetails.getPassword())) {
+		if (authentication.getCredentials() instanceof SsoCredential) {
+			SsoCredential credential = (SsoCredential) authentication.getCredentials();
+			if (DateUtil.between(DateUtil.parse(credential.getTimestamp()),DateUtil.date(), DateUnit.SECOND)>SsoCredential.getExpired()) {
 				throw new BadCredentialsException(this.messages
-						.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "Bad credentials"));
+						.getMessage("AbstractUserDetailsAuthenticationProvider.credentialsExpired", "用户授权认证已过期"));
+			}
+			String sign = SecureUtil.md5(userDetails.getUsername()+credential.getTimestamp()+SsoCredential.getCertKey());
+			if (!sign.equals(credential.getSign())) {
+				throw new BadCredentialsException(this.messages
+						.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "用户登录验证失败"));
 			}
 		} else {
-			if (!getPasswordEncoder().matches(presentedPassword, userDetails.getPassword())) {
-				logger.debug("Authentication failed: password does not match stored value");
+			String presentedPassword = authentication.getCredentials().toString();
 
-				throw new BadCredentialsException(messages.getMessage(
-						"AbstractUserDetailsAuthenticationProvider.badCredentials",
-						"Bad credentials"));
+			if (presentedPassword.indexOf(Globals.THIRD_ACCOUNT_LOGIN) >= 0) {
+				presentedPassword = presentedPassword.substring(Globals.THIRD_ACCOUNT_LOGIN.length());
+				if (!presentedPassword.equals(userDetails.getPassword())) {
+					throw new BadCredentialsException(this.messages
+							.getMessage("AbstractUserDetailsAuthenticationProvider.badCredentials", "用户登录验证请求未通过"));
+				}
+			} else {
+				if (!getPasswordEncoder().matches(presentedPassword, userDetails.getPassword())) {
+					logger.debug("Authentication failed: password does not match stored value");
+
+					throw new BadCredentialsException(messages.getMessage(
+							"AbstractUserDetailsAuthenticationProvider.badCredentials",
+							"用户名或密码错误"));
+				}
 			}
 		}
 	}

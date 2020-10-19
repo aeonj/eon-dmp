@@ -18,8 +18,10 @@ import eon.hg.fap.db.service.IUserService;
 import eon.hg.fap.security.SecurityManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
+import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.RequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
@@ -104,7 +106,7 @@ public class BaseManageAction extends BizAction{
 
 	/**
 	 * 用户登录后去向控制，根据用户角色UserRole进行控制,该请求不纳入权限管理
-	 * 
+	 *
 	 * @param request
 	 * @return
 	 * @throws IOException
@@ -158,7 +160,7 @@ public class BaseManageAction extends BizAction{
 
 	/**
 	 * 用户成功退出后的URL导向
-	 * 
+	 *
 	 * @param response
 	 * @throws IOException
 	 */
@@ -174,24 +176,30 @@ public class BaseManageAction extends BizAction{
 	 * @author AEON
 	 */
 	@RequestMapping("/login_error.htm")
-	public void login_error(HttpServletResponse response) throws IOException {
+	public void login_error(HttpServletRequest request,HttpServletResponse response) throws IOException {
+		AuthenticationException ex = (AuthenticationException) request.getSession(false)
+				.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+		String errorMsg = ex != null ? ex.getMessage() : "Invalid credentials";
 		Map dto = new HashMap();
 		dto.put("success", false);
-		dto.put("msg", "用户名或密码错误！");
+		dto.put("msg", errorMsg);
 		dto.put("errorType", 3);
 		write(JsonHandler.toJson(dto),response);
 	}
-	
+
 	@RequestMapping("/third_login.htm")
 	public void third_login(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
 		if (SecurityUserHolder.getOnlineUser()==null) {
+			//request.getSession(false).setAttribute("third_password",request.getParameter("password"));
 			response.sendRedirect(CommUtil.getURL(request)+"/iaeon_login.htm?username="
 					+ CommUtil.encode(request.getParameter("username"))
-					+ "&password=" + Globals.THIRD_ACCOUNT_LOGIN + request.getParameter("password")+"&login_role="+request.getParameter("login_role")+"&synclogin=0");
+					+ "&timestamp=" + request.getParameter("timestamp")
+					+ "&sign=" + request.getParameter("sign")
+					+ "&login_role="+request.getParameter("login_role")+"&synclogin=0");
 		}
 	}
-	
+
 	@RequestMapping("/third_logout.htm")
 	public void third_logout(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
@@ -199,7 +207,7 @@ public class BaseManageAction extends BizAction{
 			response.sendRedirect(CommUtil.getURL(request)+"/iaeon_logout.htm?synclogout=0");
 		}
 	}
-	
+
 	@RequestMapping("/manage/switch_elecode.htm")
 	public void switch_elecode(HttpServletRequest request,
 			HttpServletResponse response) {
@@ -226,7 +234,7 @@ public class BaseManageAction extends BizAction{
 
 	/**
 	 * 管理员退出，清除管理员权限数据,退出后，管理员可以作为普通登录用户进行任意操作，该请求在前台将不再使用，保留以供二次开发使用
-	 * 
+	 *
 	 * @return
 	 */
 	@RequestMapping("/manage/logout.htm")
@@ -236,7 +244,7 @@ public class BaseManageAction extends BizAction{
 
 	/**
 	 * 登录页面
-	 * 
+	 *
 	 * @param request
 	 * @return
 	 */
@@ -266,7 +274,7 @@ public class BaseManageAction extends BizAction{
 
 	/**
 	 * 默认错误页面
-	 * 
+	 *
 	 * @param request
 	 * @return
 	 */
@@ -289,7 +297,7 @@ public class BaseManageAction extends BizAction{
 
 	/**
 	 * 默认异常出现
-	 * 
+	 *
 	 * @param request
 	 * @return
 	 */
@@ -314,7 +322,7 @@ public class BaseManageAction extends BizAction{
 
 	/**
 	 * 超级后台默认无权限页面
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 * @return
@@ -338,7 +346,7 @@ public class BaseManageAction extends BizAction{
 
 	/**
 	 * flash获取验证码
-	 * 
+	 *
 	 * @param request
 	 * @param response
 	 * @throws IOException

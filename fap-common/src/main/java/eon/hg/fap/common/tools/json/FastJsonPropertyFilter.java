@@ -55,7 +55,7 @@ public class FastJsonPropertyFilter extends BeforeFilter implements PropertyFilt
 		if (StrUtil.containsAny(object.getClass().getName(),"DefaultOAuth2AccessToken")) {
 			writeKeyValue("access_token", BeanUtil.getProperty(object,"value"));
 			writeKeyValue("token_type", BeanUtil.getProperty(object,"tokenType"));
-			writeKeyValue("refresh_token", BeanUtil.getProperty(BeanUtil.getProperty(object,"refreshToken"),"value"));
+			writeKeyValue("refresh_token", BeanUtil.getProperty(object,"refreshToken.value"));
 			writeKeyValue("expires_in", BeanUtil.getProperty(object,"expiresIn"));
 			writeKeyValue("scope", String.join(" ", (String)BeanUtil.getProperty(object,"scope")));
 		}

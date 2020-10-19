@@ -54,6 +54,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         EonAuthenticationProvider authenticationProvider = new EonAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
+        //redis可设置UserCache缓存
+        //authenticationProvider.setUserCache();
         return authenticationProvider;
     }
 

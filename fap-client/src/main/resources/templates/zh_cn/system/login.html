@@ -93,6 +93,7 @@
              */
             Ext.Ajax.request({
                 url : '${webPath}/iaeon_login.htm',
+                method: 'POST',
                 success : function(response) {
                     var resultArray = Ext.util.JSON.decode(response.responseText);
                     if (resultArray.success === true) {

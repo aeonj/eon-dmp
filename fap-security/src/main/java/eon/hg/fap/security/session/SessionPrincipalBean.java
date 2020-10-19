@@ -19,7 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
-@Service
+@Service("sessionPrincipal")
 public class SessionPrincipalBean implements SessionPrincipal {
 
     @Resource
