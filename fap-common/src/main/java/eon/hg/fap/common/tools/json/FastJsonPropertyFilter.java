@@ -22,20 +22,22 @@ public class FastJsonPropertyFilter extends BeforeFilter implements PropertyFilt
 
 	@Override
 	public boolean apply(Object source, String name, Object value) {
-		if (value instanceof HibernateProxy) {//hibernate代理对象
-			return false;
+		if (value!=null) {
+			if (value instanceof HibernateProxy) {//hibernate代理对象
+				return false;
 
-		} else if (value instanceof PersistentCollection) {//实体关联集合一对多等
-			PersistentCollection collection = (PersistentCollection) value;
-			if (!collection.wasInitialized()) {
+			} else if (value instanceof PersistentCollection) {//实体关联集合一对多等
+				PersistentCollection collection = (PersistentCollection) value;
+				if (!collection.wasInitialized()) {
+					return false;
+				}
+				Object val = collection.getValue();
+				if (val == null) {
+					return false;
+				}
+			} else if (StrUtil.containsAny(value.getClass().getName(), "DefaultOAuth2AccessToken", "DefaultExpiringOAuth2RefreshToken")) {
 				return false;
 			}
-			Object val = collection.getValue();
-			if (val == null) {
-				return false;
-			}
-		} else if (StrUtil.containsAny(value.getClass().getName(),"DefaultOAuth2AccessToken","DefaultExpiringOAuth2RefreshToken")) {
-			return false;
 		}
 		return true;
 	}

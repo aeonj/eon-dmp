@@ -38,10 +38,10 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
-        if (!request.getMethod().equals("POST")) {
-            throw new AuthenticationServiceException(
-                    "Authentication method not supported: " + request.getMethod());
-        }
+//        if (!request.getMethod().equals("POST")) {
+//            throw new AuthenticationServiceException(
+//                    "Authentication method not supported: " + request.getMethod());
+//        }
         // 状态， manage表示后台业务系统，public表示公众用户
         String login_role = request.getParameter("login_role");
         if (login_role == null || login_role.equals(""))
