@@ -8,10 +8,13 @@ import eon.hg.fap.security.support.SecurityUserSupport;
 import eon.hg.fap.security.web.DnsSecurityExceptionFilter;
 import eon.hg.fap.security.web.LoginAuthenticationFilter;
 import eon.hg.fap.security.web.LoginUrlEntryPoint;
+import eon.hg.fap.security.web.SsoAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.BeanIds;
@@ -24,6 +27,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 
 @Configuration
 @EnableWebSecurity
@@ -50,6 +54,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     PasswordEncoder passwordEncoder;
 
     @Bean
+    public MessageSource getMessageSource(){
+        ReloadableResourceBundleMessageSource parentMessageSource = new ReloadableResourceBundleMessageSource();
+        parentMessageSource.setDefaultEncoding("UTF-8");
+
+        parentMessageSource.setBasename("classpath:org/springframework/security/messages_zh_CN");
+
+        return parentMessageSource;
+    }
+
+    @Bean
     public AuthenticationProvider authenticationProvider() {
         EonAuthenticationProvider authenticationProvider = new EonAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userService);
@@ -65,12 +79,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 
-    @Bean
     public UsernamePasswordAuthenticationFilter eonLoginAuthenticationFilter() throws Exception {
         return new LoginAuthenticationFilter(authenticationManagerBean());
     }
 
-    @Bean
+    public SsoAuthenticationFilter ssoAuthenticationFilter() throws Exception {
+        return new SsoAuthenticationFilter(authenticationManagerBean());
+    }
+
     public DnsSecurityExceptionFilter dnsSecurityExceptionFilter() {
         return new DnsSecurityExceptionFilter(loginUrlEntryPoint);
     }
@@ -99,9 +115,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authenticationProvider(authenticationProvider());
+        http.userDetailsService(userService);
         http.headers().frameOptions().sameOrigin();
         http
                 .authorizeRequests()     //配置安全策略
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
                     @Override
                     public <O extends FilterSecurityInterceptor> O postProcess(O object) {
@@ -127,12 +145,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutUrl("/iaeon_logout.htm")
                 .logoutSuccessUrl("/logout_success.htm")
                 .and()
+                .cors()
+                .and()
                 .csrf()
                 .disable()
                 .exceptionHandling()
                 //.authenticationEntryPoint(loginUrlEntryPoint)
                 .accessDeniedHandler(dnsAccessDeniedHandler);
+        //暂时去掉LoginAuthenticationFilter注入，使用默认用户名密码认证
         http.addFilterAt(eonLoginAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterAt(ssoAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         //http.addFilterAfter(dnsSecurityExceptionFilter(), ExceptionTranslationFilter.class);
         //http.authenticationProvider(authenticationProvider());
     }

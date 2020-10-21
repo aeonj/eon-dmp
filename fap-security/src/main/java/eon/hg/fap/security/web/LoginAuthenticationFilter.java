@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -96,11 +97,6 @@ public class LoginAuthenticationFilter extends UsernamePasswordAuthenticationFil
             return getAuthenticationManager().authenticate(authRequest);
         }
 
-    }
-
-    protected void setDetails(HttpServletRequest request,
-                              UsernamePasswordAuthenticationToken authRequest) {
-        authRequest.setDetails(authenticationDetailsSource.buildDetails(request));
     }
 
     protected void successfulAuthentication(HttpServletRequest request,

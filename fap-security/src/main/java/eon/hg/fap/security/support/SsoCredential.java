@@ -3,6 +3,7 @@ package eon.hg.fap.security.support;
 public class SsoCredential {
     private final static String certKey = "moSp8okRMYwQuCKuxzZQksxpTvjsFjz8";
     private final static long expired  = 1800;
+    private String username;
     private String timestamp;
     private String sign;
 
@@ -12,6 +13,14 @@ public class SsoCredential {
 
     public static long getExpired() {
         return expired;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getTimestamp() {

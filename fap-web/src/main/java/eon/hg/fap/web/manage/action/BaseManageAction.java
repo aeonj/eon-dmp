@@ -288,10 +288,11 @@ public class BaseManageAction extends BizAction{
 
 		mv.addObject("op_title",
 				request.getSession(false).getAttribute("op_title"));
-		mv.addObject("list_url", request.getSession(false).getAttribute("url"));
-		mv.addObject("url", request.getSession(false).getAttribute("url"));
+		mv.addObject("list_url", request.getSession(false).getAttribute("list_url"));
+		mv.addObject("open_url", request.getSession(false).getAttribute("open_url"));
 		request.getSession(false).removeAttribute("op_title");
-		request.getSession(false).removeAttribute("url");
+		request.getSession(false).removeAttribute("list_url");
+		request.getSession(false).removeAttribute("open_url");
 		return mv;
 	}
 
