@@ -17,16 +17,14 @@ import javax.servlet.annotation.WebListener;
  */
 @WebListener
 public class SystemInitListener implements ServletContextListener {
-    @Autowired
-    PropertiesBean propertiesBean;
-    @Autowired
-    RedisPool redisPool;
+    @Autowired(required = false)
+    private RedisPool redisPool;
 
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
         try {
-            if (!"ehcache".equals(propertiesBean.getCache_type())) {
+            if (redisPool!=null) {
                 clearRedisCache();
             }
             String path = PropertiesBean.UPLOAD_FOLDER;

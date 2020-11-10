@@ -3,6 +3,7 @@ package eon.hg.fap.config;
 import eon.hg.fap.security.access.EonAccessDecisionManager;
 import eon.hg.fap.security.access.EonAccessDeniedHandler;
 import eon.hg.fap.security.interceptor.SecureResourceFilterMetadataSource;
+import eon.hg.fap.security.session.SessionUserCache;
 import eon.hg.fap.security.support.EonAuthenticationProvider;
 import eon.hg.fap.security.support.SecurityUserSupport;
 import eon.hg.fap.security.web.DnsSecurityExceptionFilter;
@@ -54,6 +55,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     PasswordEncoder passwordEncoder;
 
     @Bean
+    public SessionUserCache sessionUserCache() {
+        return new SessionUserCache();
+    };
+
+    @Bean
     public MessageSource getMessageSource(){
         ReloadableResourceBundleMessageSource parentMessageSource = new ReloadableResourceBundleMessageSource();
         parentMessageSource.setDefaultEncoding("UTF-8");
@@ -69,7 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationProvider.setUserDetailsService(userService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
         //redis可设置UserCache缓存
-        //authenticationProvider.setUserCache();
+        authenticationProvider.setUserCache(sessionUserCache());
         return authenticationProvider;
     }
 

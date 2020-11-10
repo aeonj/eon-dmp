@@ -18,10 +18,7 @@ import java.util.Map;
  */
 public abstract class AbstractCacheOperator implements CacheOperator,java.io.Serializable {
 
-	@Autowired
-	PropertiesBean propertiesBean;
-
-	@Autowired
+	@Autowired(required = false)
 	RedisPool redisPool;
 
 	@Autowired
@@ -32,7 +29,7 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 		if (cachePool.containsKey(cacheId)) {
 			cachePool.get(cacheId).clear();
 		}
-		if ("redis".equals(propertiesBean.getCache_type())) {
+		if (redisPool!=null) {
 			if (redisPool.hasKey(cacheId)) {
 				redisPool.del(cacheId);
 			}
@@ -47,7 +44,7 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 			if (cachePool.containsKey(cacheId)) {
 				cachePool.get(cacheId).remove(key);
 			}
-			if ("redis".equals(propertiesBean.getCache_type())) {
+			if (redisPool!=null) {
 				if (redisPool.hasKey(cacheId)) {
 					redisPool.hdel(cacheId, key);
 				}
@@ -63,7 +60,7 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 			if (cachePool.containsKey(cacheId)) {
 				cachePool.remove(cacheId);
 			}
-			if ("redis".equals(propertiesBean.getCache_type())) {
+			if (redisPool!=null) {
 				if (redisPool.hasKey(cacheId)) {
 					redisPool.del(cacheId);
 				}
@@ -101,7 +98,7 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 	 */
 	@Override
 	public <T> T getCache(Object... params) throws Exception {
-		if ("ehcache".equals(propertiesBean.getCache_type())) {
+		if (redisPool!=null) {
 			return getPoolCache(params);
 		}
 		String cacheId = getCacheId(params);

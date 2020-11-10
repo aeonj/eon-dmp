@@ -1,6 +1,7 @@
 package eon.hg.fap.security.interceptor;
 
 import cn.hutool.core.util.StrUtil;
+import eon.hg.fap.core.cache.RedisPool;
 import eon.hg.fap.db.model.primary.Res;
 import eon.hg.fap.db.model.primary.Role;
 import eon.hg.fap.db.service.IResService;
@@ -35,6 +36,8 @@ public class SecureResourceFilterMetadataSource implements
 	private IResService resService;
 	@Autowired
 	private IRoleService roleService;
+	@Autowired(required = false)
+	private RedisPool redisPool;
 
 	private Map<String, Collection<ConfigAttribute>> urlAuthorities = new HashMap<>();
 
@@ -88,12 +91,31 @@ public class SecureResourceFilterMetadataSource implements
 		//session和token方式加载资源角色权限暂时分开 2019.8.11
 		if ("session".equals(AUTH_TYPE)) {
 			params.put("type", "URL");
-			List<Res> urlResources = this.resService.query(
-					"select obj from Res obj where obj.type = :type", params, -1,
-					-1);
+			List<Res> urlResources = null;
+			if (redisPool!=null) {
+				urlResources = redisPool.hget("eon.table.res","URL");
+			}
+			if (urlResources==null) {
+				urlResources = this.resService.query(
+						"select obj from Res obj where obj.type = :type", params, -1,
+						-1);
+				if (redisPool!=null) {
+					redisPool.hset("eon.table.res","URL",urlResources,7200);
+				}
+			}
 			for (Res res : urlResources) {
-				String[] permissions = StrUtil.split(res.getPermission(), ",");
-				urlAuthorities.put(res.getValue(), list2Collection(permissions));
+				Collection<ConfigAttribute> auths = null;
+				if (redisPool!=null) {
+					auths = redisPool.hget("eon.auth.url",res.getValue());
+				}
+				if (auths==null) {
+					String[] permissions = StrUtil.split(res.getPermission(), ",");
+					auths =list2Collection(permissions);
+					if (redisPool!=null) {
+						redisPool.hset("eon.auth.url",res.getValue(),auths,7200);
+					}
+				}
+				urlAuthorities.put(res.getValue(), auths);
 			}
 		} else {
 			params.put("type", "ANY");
@@ -104,6 +126,7 @@ public class SecureResourceFilterMetadataSource implements
 				urlAuthorities.put(res.getValue(), list2Collection(res.getRoles()));
 			}
 		}
+
 	}
 
 	/** 
