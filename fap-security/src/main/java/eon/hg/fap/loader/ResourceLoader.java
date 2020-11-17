@@ -3,6 +3,7 @@ package eon.hg.fap.loader;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.core.beans.SpringUtils;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.db.model.primary.*;
 import eon.hg.fap.db.service.*;
@@ -48,68 +49,76 @@ public class ResourceLoader {
     private ISysConfigService sysConfigService;
 	@Autowired
 	private RequestMappingHandlerMapping requestMappingHandlerMapping;
+	@Autowired
+	private SpringUtils springUtils;
 
 	@PostConstruct
 	public void init_user_role() {
 		Map<RequestMappingInfo, HandlerMethod> map = requestMappingHandlerMapping.getHandlerMethods();
 
-		for (Map.Entry<RequestMappingInfo, HandlerMethod> me : map.entrySet()) {
-			RequestMappingInfo info = me.getKey();
-			HandlerMethod method = me.getValue();
-			PatternsRequestCondition p = info.getPatternsCondition();
-			String value = "";
-			for (String url : p.getPatterns()) {
-				value = url;
-			}
+		SysConfig sc = sysConfigService.getSysConfig();
+		if (sc.getRequest_count()!=map.size()) {
+			sc.setRequest_count(map.size());
+			sysConfigService.update(sc);
+			for (Map.Entry<RequestMappingInfo, HandlerMethod> me : map.entrySet()) {
+				RequestMappingInfo info = me.getKey();
+				HandlerMethod method = me.getValue();
+				PatternsRequestCondition p = info.getPatternsCondition();
+				String value = "";
+				for (String url : p.getPatterns()) {
+					value = url;
+				}
 
-			Annotation[] annotation = method.getMethod().getAnnotations();
-			for (Annotation tag : annotation) {
-				if (SecurityMapping.class.isAssignableFrom(tag
-						.annotationType())) {
-					Map params = new HashMap();
-					params.put("value", value+"*");
-					List<Res> ress = this.resService
-							.query("select obj from Res obj where obj.value=:value",
-									params, -1, -1);
-					String permissionTitle = ((SecurityMapping) tag).title();
-					String[] perms = ((SecurityMapping) tag).value();
-					if (ress.size() == 0) {
-						Res res = new Res();
-						res.setValue(value+"*");
-						res.setAddTime(new Date());
-						res.setResName(permissionTitle);
-						res.setType("URL");
-						res.setPermission(ArrayUtil.join(perms,","));
-						this.resService.save(res);
-						log.info("初始化资源："+res.getResName());
-					} else {
-						Res res = ress.get(0);
-						String str_perms = CommUtil.null2String(ArrayUtil.join(perms,","));
-						if (!str_perms.equals(res.getPermission())) {
-							res.setPermission(str_perms);
-							this.resService.update(res);
-							log.info("更新资源："+res.getResName());
-						}
-					}
-					for (String strtag: perms) {
-						Permissions permissions = this.permissionsService.getObjByProperty(null,"value",strtag);
-						if (permissions==null) {
-							permissions = new Permissions();
-							if (StrUtil.isNotBlank(permissionTitle)) {
-								permissions.setTitle(permissionTitle);
-							}
-							permissions.setValue(strtag);
-							this.permissionsService.save(permissions);
+				Annotation[] annotation = method.getMethod().getAnnotations();
+				for (Annotation tag : annotation) {
+					if (SecurityMapping.class.isAssignableFrom(tag
+							.annotationType())) {
+						Map params = new HashMap();
+						params.put("value", value+"*");
+						List<Res> ress = this.resService
+								.query("select obj from Res obj where obj.value=:value",
+										params, -1, -1);
+						String permissionTitle = ((SecurityMapping) tag).title();
+						String[] perms = ((SecurityMapping) tag).value();
+						if (ress.size() == 0) {
+							Res res = new Res();
+							res.setValue(value+"*");
+							res.setAddTime(new Date());
+							res.setResName(permissionTitle);
+							res.setType("URL");
+							res.setPermission(ArrayUtil.join(perms,","));
+							this.resService.save(res);
+							log.info("初始化资源："+res.getResName());
 						} else {
-							if (StrUtil.isBlank(permissions.getTitle()) && StrUtil.isNotBlank(permissionTitle)) {
-								permissions.setTitle(permissionTitle);
-								this.permissionsService.update(permissions);
+							Res res = ress.get(0);
+							String str_perms = CommUtil.null2String(ArrayUtil.join(perms,","));
+							if (!str_perms.equals(res.getPermission())) {
+								res.setPermission(str_perms);
+								this.resService.update(res);
+								log.info("更新资源："+res.getResName());
+							}
+						}
+						for (String strtag: perms) {
+							Permissions permissions = this.permissionsService.getObjByProperty(null,"value",strtag);
+							if (permissions==null) {
+								permissions = new Permissions();
+								if (StrUtil.isNotBlank(permissionTitle)) {
+									permissions.setTitle(permissionTitle);
+								}
+								permissions.setValue(strtag);
+								this.permissionsService.save(permissions);
+							} else {
+								if (StrUtil.isBlank(permissions.getTitle()) && StrUtil.isNotBlank(permissionTitle)) {
+									permissions.setTitle(permissionTitle);
+									this.permissionsService.update(permissions);
+								}
 							}
 						}
 					}
 				}
 			}
 		}
+
 		// 添加默认超级管理员并赋予所有权限
 		User user = this.userService.getObjByProperty(null, "userName",
 				AeonConstants.SUPER_USER);

@@ -25,4 +25,10 @@ public abstract class Assert {
             throw new RuntimeException(exceptionMessage);
         }
     }
+
+    public static void isInstandOf(Class<?> type, Object obj, String exceptionMessage) {
+        if (false == type.isInstance(obj)){
+            throw new RuntimeException(exceptionMessage);
+        }
+    }
 }
