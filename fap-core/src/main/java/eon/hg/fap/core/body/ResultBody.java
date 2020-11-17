@@ -2,6 +2,8 @@ package eon.hg.fap.core.body;
 
 import lombok.*;
 
+import java.io.Serializable;
+
 /**
  * 统一前端返回对象
  * @author eonook
@@ -10,12 +12,12 @@ import lombok.*;
 @NoArgsConstructor
 @RequiredArgsConstructor
 @ToString(exclude = {"success","data"})
-public class ResultBody {
+public class ResultBody<T> implements Serializable {
     //设置统一的返回码
     @NonNull private Integer code;
     private Boolean success;
     private String msg;
-    private Object data;
+    private T data;
 
     public ResultBody(ResultCode resultCode) {
         this.code = resultCode.getCode();
@@ -26,14 +28,14 @@ public class ResultBody {
      * 业务处理成功，专用于数据增删改等数据处理
      * @return
      */
-    public static ResultBody success() {
-        ResultBody resultBody = new ResultBody(ResultCode.SUCCESS);
+    public static <T> ResultBody<T> success() {
+        ResultBody<T> resultBody = new ResultBody<T>(ResultCode.SUCCESS);
         resultBody.setSuccess(true);
         return resultBody;
     }
 
-    public static ResultBody success(String message) {
-        ResultBody resultBody = new ResultBody(ResultCode.SUCCESS.getCode());
+    public static <T> ResultBody<T> success(String message) {
+        ResultBody<T> resultBody = new ResultBody<T>(ResultCode.SUCCESS.getCode());
         resultBody.setSuccess(true);
         resultBody.setMsg(message);
         return resultBody;
@@ -44,8 +46,8 @@ public class ResultBody {
      * @param data
      * @return
      */
-    public static ResultBody success(Object data) {
-        ResultBody resultBody = new ResultBody(ResultCode.SUCCESS.getCode());
+    public static <T> ResultBody<T> success(T data) {
+        ResultBody<T> resultBody = new ResultBody<T>(ResultCode.SUCCESS.getCode());
         resultBody.setSuccess(true);
         return resultBody.addObject(data);
     }
@@ -54,7 +56,7 @@ public class ResultBody {
      * 业务数据失败
      * @return
      */
-    public static ResultBody failed() {
+    public static <T> ResultBody<T> failed() {
         return failed(ResultCode.FAILED);
     }
 
@@ -63,8 +65,8 @@ public class ResultBody {
      * @param resultCode
      * @return
      */
-    public static ResultBody failed(ResultCode resultCode) {
-        ResultBody resultBody = new ResultBody(resultCode);
+    public static <T> ResultBody<T> failed(ResultCode resultCode) {
+        ResultBody<T> resultBody = new ResultBody<T>(resultCode);
         resultBody.setSuccess(false);
         return resultBody;
     }
@@ -74,8 +76,8 @@ public class ResultBody {
      * @param reason
      * @return
      */
-    public static ResultBody failed(String reason) {
-        ResultBody resultBody = new ResultBody(ResultCode.CUSTOMIZE_FAIL.getCode());
+    public static <T> ResultBody<T> failed(String reason) {
+        ResultBody<T> resultBody = new ResultBody<T>(ResultCode.CUSTOMIZE_FAIL.getCode());
         resultBody.setSuccess(false);
         resultBody.setMsg(reason);
         return resultBody;
@@ -86,19 +88,19 @@ public class ResultBody {
      * @param reason
      * @return
      */
-    public static ResultBody failed(Integer code, String reason) {
-        ResultBody resultBody = new ResultBody(code);
+    public static <T> ResultBody<T> failed(Integer code, String reason) {
+        ResultBody<T> resultBody = new ResultBody<T>(code);
         resultBody.setSuccess(false);
         resultBody.setMsg(reason);
         return resultBody;
     }
 
-    public ResultBody addObject(Object o) {
+    public ResultBody<T> addObject(T o) {
         setData(o);
         return this;
     }
 
-    public ResultBody setMsg(String msg) {
+    public ResultBody<T> setMsg(String msg) {
         this.msg = msg;
         return this;
     }

@@ -1563,6 +1563,10 @@ Ext.define('Ext.vcf.TableGrid', {
     columnLines: true,
     stripeRows: true,
     frame: true,
+    constructor: function (config) {
+        var me = this;
+        me.callParent([config]);
+    },
     initComponent: function() {
         var me = this,
             columnBase = me.columnBase || [];
@@ -1650,8 +1654,8 @@ Ext.define('Ext.vcf.TableGrid', {
             me.bbar = bbar;
         }
         me.ajaxLoaded=false;
-        me.callParent(arguments);
         //this.addEvents('loadrelation', this);
+        me.callParent(arguments);
         if (!me.userDefined) {
             if (me.autoLoad) {
                 me.store.load({
@@ -1661,6 +1665,8 @@ Ext.define('Ext.vcf.TableGrid', {
             me.ajaxLoaded=true;
         } else {
             me.initUI();
+            me.autoQuery = me.autoLoad;
+            me.autoLoad= false;
         }
     },
     isAjaxLoaded: function () {

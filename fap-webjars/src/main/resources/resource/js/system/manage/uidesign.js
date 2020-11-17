@@ -521,8 +521,8 @@ function addGridByServer(comp, ray) {
         //if (typeof comp.getBottomToolbar()!='undefined') {
         //    comp.getBottomToolbar().bind(store);
         //}
-        if (comp.autoLoad) {
-            comp.store.reload(comp.params);
+        if (comp.autoQuery) {
+            comp.store.load(comp.params);
         }
     }
     if (typeof ray.main != 'undefined') {

@@ -1,22 +1,24 @@
 package eon.hg.fap.core.body;
 
+import eon.hg.fap.core.exception.Assert;
 import eon.hg.fap.core.query.support.IPageList;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @RequiredArgsConstructor
 @ToString(exclude = {"success","data"})
-public class PageBody {
+public class PageBody<T> implements Serializable {
 
     @NonNull private Integer code;
     private Boolean success;
     private String msg;
     private int page;
     private int total;
-    private Object data;
+    private T data;
 
     public PageBody(ResultCode resultCode) {
         this.code = resultCode.getCode();
@@ -27,8 +29,8 @@ public class PageBody {
      * 业务处理成功
      * @return
      */
-    public static PageBody success() {
-        PageBody pageBody = new PageBody(ResultCode.SUCCESS.getCode());
+    public static <T> PageBody<T> success() {
+        PageBody<T> pageBody = new PageBody<T>(ResultCode.SUCCESS.getCode());
         pageBody.setSuccess(true);
         return pageBody;
     }
@@ -38,13 +40,13 @@ public class PageBody {
      * @param o
      * @return
      */
-    public static PageBody success(Object o) {
-        PageBody pageBody = new PageBody(ResultCode.SUCCESS.getCode());
+    public static <T> PageBody<T> success(Object o) {
+        PageBody<T> pageBody = new PageBody<T>(ResultCode.SUCCESS.getCode());
         pageBody.setSuccess(true);
         if (o instanceof IPageList) {
             return pageBody.addPageInfo((IPageList) o);
         } else {
-            return pageBody.addObject(o);
+            return pageBody.addObject((T) o);
         }
     }
 
@@ -53,14 +55,14 @@ public class PageBody {
      * @param reason
      * @return
      */
-    public static PageBody failed(String reason) {
-        PageBody pageBody = new PageBody(ResultCode.CUSTOMIZE_FAIL.getCode());
+    public static <T> PageBody<T> failed(String reason) {
+        PageBody<T> pageBody = new PageBody<T>(ResultCode.CUSTOMIZE_FAIL.getCode());
         pageBody.setSuccess(false);
         return pageBody;
     }
 
-    public static PageBody failed(ResultCode resultCode) {
-        PageBody pageBody = new PageBody(resultCode);
+    public static <T> PageBody<T> failed(ResultCode resultCode) {
+        PageBody<T> pageBody = new PageBody<T>(resultCode);
         pageBody.setSuccess(false);
         return pageBody;
     }
@@ -70,21 +72,19 @@ public class PageBody {
      * @param page
      * @return
      */
-    public PageBody addPageInfo(IPageList page) {
+    public PageBody<T> addPageInfo(IPageList page) {
         this.page = page.getCurrentPage();
         this.total = page.getRowCount();
-        this.data = page.getResult();
-        return this;
+        return this.addObject((T) page.getResult());
     }
 
-    public PageBody addPageInfo(List resultList, int page, int total) {
+    public PageBody<T> addPageInfo(List resultList, int page, int total) {
         this.page = page;
         this.total = total;
-        this.data = resultList;
-        return this;
+        return this.addObject((T) resultList);
     }
 
-    public PageBody addObject(Object o) {
+    public PageBody<T> addObject(T o) {
         setData(o);
         return this;
     }
