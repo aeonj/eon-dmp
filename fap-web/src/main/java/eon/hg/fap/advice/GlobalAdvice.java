@@ -61,14 +61,4 @@ public class GlobalAdvice {
         return  ResultBody.failed(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(),"不支持当前媒体类型!");
     }
 
-    /**
-     * 500 - Internal Server Error
-     */
-    @ResponseStatus(HttpStatus.OK)
-    @ExceptionHandler(Exception.class)
-    public ResultBody handleException(Exception e) {
-        logger.error("服务运行异常", e);
-        return ResultBody.failed(HttpStatus.INTERNAL_SERVER_ERROR.value(),"服务运行异常!");
-    }
-
 }
