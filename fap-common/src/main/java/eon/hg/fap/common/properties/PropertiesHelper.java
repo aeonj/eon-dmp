@@ -1,7 +1,7 @@
 package eon.hg.fap.common.properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Properties;
@@ -12,7 +12,7 @@ import java.util.Properties;
  * @since 2009-07-10
  */
 public class PropertiesHelper {
-	private static Log log = LogFactory.getLog(PropertiesHelper.class);
+	private static Logger log = LoggerFactory.getLogger(PropertiesHelper.class);
 	private Properties objProperties;
 	
 	/**
