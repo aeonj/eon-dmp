@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.util.Map;
+
 /**
  * Spring的Bean获取和操作类
  * @author AEON
@@ -51,7 +53,11 @@ public final class SpringUtils implements ApplicationContextAware, DisposableBea
 	 */
 	public static Object getBean(String name) {
 		Assert.hasText(name);
-		return applicationContext.getBean(name);
+		try {
+			return applicationContext.getBean(name);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/**
@@ -66,6 +72,26 @@ public final class SpringUtils implements ApplicationContextAware, DisposableBea
 	public static <T> T getBean(String name, Class<T> type) {
 		Assert.hasText(name);
 		Assert.notNull(type);
-		return applicationContext.getBean(name, type);
+		try {
+			return applicationContext.getBean(name, type);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
+	 * 获取实例
+	 *
+	 * @param type
+	 *            Bean类型
+	 * @return 实例
+	 */
+	public static <T> Map<String, T> getBeansOfType(Class<T> type) {
+		Assert.notNull(type);
+		try {
+			return applicationContext.getBeansOfType(type);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 }
