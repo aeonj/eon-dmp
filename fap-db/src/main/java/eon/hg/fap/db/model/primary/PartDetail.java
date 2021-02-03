@@ -28,6 +28,7 @@ public class PartDetail extends IdEntity {
 	private PartGroup pg;   //权限要素
 	@Column(length=42)
 	private String eleCode;   //要素名
+	@Column(length=80)
 	private String value;
 
 }
