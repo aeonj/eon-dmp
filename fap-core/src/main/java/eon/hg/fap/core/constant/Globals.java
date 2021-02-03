@@ -36,6 +36,7 @@ public class Globals {
 	public final static int DEFAULT_IMAGE_BIG_HEIGH = 1024;// 默认大图片高度
 	public final static String DEFAULT_TABLE_SUFFIX = "hg_";// 默认表前缀名
 	public final static String SYS_TABLE_SUFFIX = "sys_";// 系统表前缀名
+	public final static String FLOW_TABLE_SUFFIX = "wf_";// 系统表前缀名
 	public final static String ELE_TABLE_SUFFIX = "ele_";// 基础表前缀名
 	public final static String THIRD_ACCOUNT_LOGIN = "eon_login_";// 第三方账号登录的前缀
 	public final static String DEFAULT_SMS_URL = "http://service.winic.org/sys_port/gateway/";// 暂时使用第三方，以后公司会接入自己的接口
