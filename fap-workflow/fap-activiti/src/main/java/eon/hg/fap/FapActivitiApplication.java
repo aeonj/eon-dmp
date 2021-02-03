@@ -6,10 +6,10 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 
 @SpringBootApplication
 @ServletComponentScan(basePackages = "eon.hg.*")
-public class FapFlowApplication {
+public class FapActivitiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(FapFlowApplication.class, args);
+        SpringApplication.run(FapActivitiApplication.class, args);
     }
 
 }
