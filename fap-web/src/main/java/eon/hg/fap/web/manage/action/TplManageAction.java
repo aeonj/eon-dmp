@@ -1,5 +1,7 @@
 package eon.hg.fap.web.manage.action;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.properties.PropertiesFactory;
@@ -8,6 +10,7 @@ import eon.hg.fap.common.properties.PropertiesHelper;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.constant.AeonConstants;
+import eon.hg.fap.core.domain.entity.IdEntity;
 import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.core.security.SecurityUserHolder;
@@ -34,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用于Ext处理页面
@@ -202,7 +206,9 @@ public class TplManageAction {
 					Menu menu =ro.getOperate().getMenu();
 					if (menu.getId().equals(menu_id)) {
 						toolIndex = menu.getToolbar_index();
-						grantList.add(ro.getOperate());
+						if (!ContainsNode(grantList,ro.getOperate().getId())) {
+							grantList.add(ro.getOperate());
+						}
 					}
 				}
 			}
@@ -264,5 +270,14 @@ public class TplManageAction {
                 this.userConfigService.getUserConfig(), 0, request, response);
         return mv;
     }
+
+	private boolean ContainsNode(List<? extends IdEntity> lst, Long value) {
+		for (IdEntity el : lst) {
+			if (el.getId().longValue()==value.longValue()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 }
