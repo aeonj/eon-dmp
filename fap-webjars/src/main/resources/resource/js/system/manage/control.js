@@ -1137,7 +1137,7 @@ Ext.define('Ext.vcf.TreeField', {
                 var selnodetexts = '';
                 Ext.each(checkedNodes, function(tn) {
                     if (tn.isLeaf()) {
-                        if (tn.getOwnerTree().isCodeAsValue){
+                        if (me.isCodeAsValue){
                             selnodeids = selnodeids + tn.get('code') + ',';
                         } else {
                             selnodeids = selnodeids + tn.get('id') + ',';
@@ -1509,6 +1509,18 @@ Ext.define('Ext.vcf.QueryPanel', {
         } else {
             return {querystr: me.getQueryString(), state: me.getState()};
         }
+    },
+    getReportParams : function () {
+        var me=this,
+            fields = me.form.getFields(),
+            params = '';
+        for (var i = 0; i < fields.getCount(); i++) {
+            var field = fields.get(i);
+            if (me.contain_state || field.getName()!='state') {
+                params += '&'+field.getName()+'='+field.getSubmitValue();
+            }
+        }
+        return params;
     }
 });
 
