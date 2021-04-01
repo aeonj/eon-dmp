@@ -98,7 +98,7 @@ public abstract class AbstractCacheOperator implements CacheOperator,java.io.Ser
 	 */
 	@Override
 	public <T> T getCache(Object... params) throws Exception {
-		if (redisPool!=null) {
+		if (redisPool==null) {
 			return getPoolCache(params);
 		}
 		String cacheId = getCacheId(params);
