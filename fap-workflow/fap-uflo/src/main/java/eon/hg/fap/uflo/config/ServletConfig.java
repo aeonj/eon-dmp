@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class ServletConfig {
     @Bean
     public ServletRegistrationBean servletRegistration() {
-        return new ServletRegistrationBean(new UfloServlet(), "/uflo/*");
+        return new ServletRegistrationBean(new UfloServlet(), "/flow/*");
     }
 
 }

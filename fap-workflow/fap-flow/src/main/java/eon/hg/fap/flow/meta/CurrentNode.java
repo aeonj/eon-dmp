@@ -6,19 +6,17 @@ import eon.hg.fap.core.exception.ResultException;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.model.primary.Menu;
-import eon.hg.fap.support.session.UserContext;
 import eon.hg.fap.db.model.virtual.OnlineUser;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class CurrentNode extends UserContext {
+public class CurrentNode {
     private static Map<Long,CurrentNode> nodes = new HashMap<>();
     private String flowId;
     private String flowName;
     private String flowKey;
     private String nodeName;
-    private String userId;
     private NodeState state;
 
     public String getFlowId() {
@@ -51,14 +49,6 @@ public class CurrentNode extends UserContext {
 
     public void setNodeName(String nodeName) {
         this.nodeName = nodeName;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public NodeState getState() {

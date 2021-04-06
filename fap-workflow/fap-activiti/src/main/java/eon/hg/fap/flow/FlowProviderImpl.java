@@ -51,6 +51,21 @@ public class FlowProviderImpl implements FlowProvider {
      * 基于node的当前工作节点和业务状态获取工作流条件语句
      * 本接口与待办任务进行join连接查询，返回结果需要自行处理
      *
+     * @param menu_id  当前菜单功能
+     * @param state    当前状态
+     * @param alias    业务表别名
+     * @param id_field 业务表ID
+     * @return sql连接对象
+     */
+    @Override
+    public SqlRelation getTaskSqlCondition(Long menu_id, NodeState state, String alias, String id_field) {
+        return null;
+    }
+
+    /**
+     * 基于node的当前工作节点和业务状态获取工作流条件语句
+     * 本接口与待办任务进行join连接查询，返回结果需要自行处理
+     *
      * @param node     当前节点对象，包括流程名称，节点名称，节点状态，用户ID
      * @param alias    业务表别名
      * @param id_field 业务表ID
@@ -186,7 +201,7 @@ public class FlowProviderImpl implements FlowProvider {
                         String myTaskId = null;
                         HistoricTaskInstance myTask = null;
                         for(HistoricTaskInstance hti : htiList) {
-                            if(node.getUserId().equals(hti.getAssignee())) {
+                            if(loginUser.getUserid().equals(hti.getAssignee())) {
                                 myTaskId = hti.getId();
                                 myTask = hti;
                                 break;

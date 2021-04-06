@@ -17,6 +17,8 @@
 
     <modules>
         <module>fap-flow</module>
+        <module>fap-flow-console</module>
+        <module>fap-flow-core</module>
         <module>fap-uflo</module>
         <module>fap-activiti</module>
     </modules>

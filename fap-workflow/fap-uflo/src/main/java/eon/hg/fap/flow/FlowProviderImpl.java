@@ -79,30 +79,46 @@ public class FlowProviderImpl implements FlowProvider {
         return null;
     }
 
+    /**
+     * 基于node的当前工作节点和业务状态获取工作流条件语句
+     * 本接口与待办任务进行join连接查询，返回结果需要自行处理
+     *
+     * @param menu_id  当前菜单功能
+     * @param state    当前状态
+     * @param alias    业务表别名
+     * @param id_field 业务表ID
+     * @return sql连接对象
+     */
+    @Override
+    public SqlRelation getTaskSqlCondition(Long menu_id, NodeState state, String alias, String id_field) {
+        return getTaskSqlCondition(CurrentNode.menuInstance(menuService.getObjById(menu_id)).addState(state),alias,id_field);
+    }
+
     @Override
     public SqlRelation getTaskSqlCondition(CurrentNode node, String alias, String id_field) {
         ProcessDefinition pd = getProcessDefinition(node);
         if (StrUtil.isBlank(node.getNodeName())) {
             throw new ResultException("未找到对应的流程节点");
         }
+        OnlineUser oUser = SecurityUserHolder.getOnlineUser();
         SqlRelation sqlRelation = new SqlRelation();
         StringBuilder sqlBuilder = new StringBuilder();
         if (NodeState.ALL.equals(node.getState())) {
-            sqlBuilder.append(" and ct.process_id=").append(pd.getId()).append(" and ct.current_node_name='").append(node.getNodeName()).append("' and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.current_node_name and unu.user_id='").append(node.getUserId()).append("')");
+            sqlBuilder.append(" and ct.process_id=").append(pd.getId()).append(" and ct.current_node_name='").append(node.getNodeName()).append("' and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.current_node_name and unu.user_id='").append(oUser.getUserid()).append("')");
 
             sqlRelation.setColumns(",ct.current_task_id task_id");
             sqlRelation.setJoins(StrUtil.concat(true, " inner join sys_uflo_current_tasks ct on ct.business_id_=", alias, ".", id_field));
             sqlRelation.setConditions(sqlBuilder.toString());
         } else if (NodeState.CHECK.equals(node.getState()) || NodeState.BACK.equals(node.getState()) || NodeState.DISCARD.equals(node.getState())) {
             sqlBuilder.append(" and ct.process_id=").append(pd.getId()).append(" and ct.current_node_name='").append(node.getNodeName()).append("' and ct.current_status_code='")
-                    .append(node.getState().getCode()).append("' and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.current_node_name and unu.user_id='").append(node.getUserId()).append("')");
+                    .append(node.getState().getCode()).append("' and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.current_node_name and unu.user_id='").append(oUser.getUserid()).append("')");
 
             sqlRelation.setColumns(",ct.current_task_id task_id");
             sqlRelation.setJoins(StrUtil.concat(true, " inner join sys_uflo_current_tasks ct on ct.business_id_=", alias, ".", id_field));
             sqlRelation.setConditions(sqlBuilder.toString());
         } else if (NodeState.UN_CHECK.equals(node.getState()) || NodeState.FROM_BACK.equals(node.getState())) {
             sqlBuilder.append(" and ct.process_id=").append(pd.getId()).append(" and ct.next_node_name='").append(node.getNodeName()).append("' and ct.next_status_code='")
-                    .append(node.getState().getCode()).append("' and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.next_node_name and unu.user_id='").append(node.getUserId()).append("')");
+                    .append(node.getState().getCode()).append("' and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.next_node_name and unu.user_id='").append(oUser.getUserid()).append("')");
 
             sqlRelation.setColumns(",ct.next_task_id task_id");
             sqlRelation.setJoins(StrUtil.concat(true, " inner join sys_uflo_current_tasks ct on ct.business_id_=", alias, ".", id_field));
@@ -133,10 +149,10 @@ public class FlowProviderImpl implements FlowProvider {
                     sqlBuilder.append(")");
                 }
 
-                sqlBuilder.append(" and exists(select 1 from uflo_task_participator tp where tp.task_id_=task.id_ and tp.user_='").append(node.getUserId()).append("'");
+                sqlBuilder.append(" and exists(select 1 from uflo_task_participator tp where tp.task_id_=task.id_ and tp.user_='").append(oUser.getUserid()).append("'");
 
                 sqlBuilder.append(" and ct.process_id=").append(pd.getId()).append(" and ct.next_node_name='").append(node.getNodeName()).append("' and ct.next_status_code='")
-                        .append(node.getState().getCode()).append("' and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.next_node_name and unu.user_id='").append(node.getUserId()).append("')");
+                        .append(node.getState().getCode()).append("' and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.next_node_name and unu.user_id='").append(oUser.getUserid()).append("')");
 
                 sqlRelation.setColumns(",ct.next_task_id task_id");
                 sqlRelation.setJoins(StrUtil.concat(true, " inner join sys_uflo_current_tasks ct on ct.business_id_=", alias, ".", id_field));
@@ -144,7 +160,7 @@ public class FlowProviderImpl implements FlowProvider {
             } else if (NodeState.CHECK.equals(node.getState())) {
                 HistoryTaskQuery historyTaskQuery = historyService.createHistoryTaskQuery();
                 historyTaskQuery.nodeName(node.getNodeName());
-                historyTaskQuery.assignee(node.getUserId());
+                historyTaskQuery.assignee(oUser.getUserid());
                 historyTaskQuery.processId(pd.getId());
 
                 ProcessInstanceQuery piQuery = processService.createProcessInstanceQuery();
@@ -160,7 +176,7 @@ public class FlowProviderImpl implements FlowProvider {
 //            sqlBuilder.append(" and exists(select 1 from uflo_his_task task where task.business_id_=").append(alias).append(".").append(id_field).append(" and task.process_id_='").append(pd.getId()).append("'");
 //            sqlBuilder.append(" and task.node_name_='").append(node.getNodeName()).append("'");
 
-                sqlBuilder.append(" and exists(select 1 from uflo_task_participator tp where tp.task_id_=ct.old_task_id and tp.user_='").append(node.getUserId()).append("')");
+                sqlBuilder.append(" and exists(select 1 from uflo_task_participator tp where tp.task_id_=ct.old_task_id and tp.user_='").append(oUser.getUserid()).append("')");
                 sqlRelation.setColumns(",task.task_id");
                 sqlRelation.setJoins(StrUtil.concat(true, " inner join uflo_tasks task on task.business_id_=", alias, ".", id_field));
                 sqlRelation.setConditions(sqlBuilder.toString());
@@ -180,21 +196,22 @@ public class FlowProviderImpl implements FlowProvider {
         if (StrUtil.isBlank(node.getNodeName())) {
             throw new ResultException("未找到对应的流程节点");
         }
+        OnlineUser oUser = SecurityUserHolder.getOnlineUser();
         Dto params = new HashDto();
         params.put("process_id", pd.getId());
         if (NodeState.ALL.equals(node.getState())) {
             params.put("current_node_name", node.getNodeName());
-            params.put("user_id", node.getUserId());
+            params.put("user_id", oUser.getUserid());
             qo.addQuery("exists(select 1 from UfloCurrentTasks ct where obj.id=ct.business_id and ct.process_id=:process_id and ct.current_node_name=:current_node_name and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.current_node_name and unu.user_id=:user_id))", params);
         } else if (NodeState.CHECK.equals(node.getState()) || NodeState.BACK.equals(node.getState()) || NodeState.DISCARD.equals(node.getState())) {
             params.put("current_node_name", node.getNodeName());
             params.put("current_status_code", node.getState().getCode());
-            params.put("user_id", node.getUserId());
+            params.put("user_id", oUser.getUserid());
             qo.addQuery("exists(select 1 from UfloCurrentTasks ct where obj.id=ct.business_id and ct.process_id=:process_id and ct.current_node_name=:current_node_name and ct.current_status_code=:current_status_code and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.current_node_name and unu.user_id=:user_id))", params);
         } else if (NodeState.UN_CHECK.equals(node.getState()) || NodeState.FROM_BACK.equals(node.getState())) {
             params.put("next_node_name", node.getNodeName());
             params.put("next_status_code", node.getState().getCode());
-            params.put("user_id", node.getUserId());
+            params.put("user_id", oUser.getUserid());
             qo.addQuery("exists(select 1 from UfloCurrentTasks ct where obj.id=ct.business_id and ct.process_id=:process_id and ct.next_node_name=:next_node_name and ct.next_status_code=:next_status_code and exists(select 1 from UfloNodeUsers unu where unu.process_instance_id=ct.process_instance_id and unu.node_name=ct.next_node_name and unu.user_id=:user_id))", params);
         } else {
             if (NodeState.UN_CHECK.equals(node.getState())) {
@@ -202,7 +219,7 @@ public class FlowProviderImpl implements FlowProvider {
                 for (TaskState taskState : UfloUtil.getTaskStates(node.getState())) {
                     taskQuery.addTaskState(taskState);
                 }
-                List<Task> tasks = taskQuery.nodeName(node.getNodeName()).addParticipator(node.getUserId()).addProcessId(pd.getId()).list();
+                List<Task> tasks = taskQuery.nodeName(node.getNodeName()).addParticipator(oUser.getUserid()).addProcessId(pd.getId()).list();
                 if (tasks.size() <= 500) {
                     StringBuilder sbIds = new StringBuilder();
                     sbIds.append(tasks.get(0).getBusinessId());
