@@ -81,6 +81,9 @@ eon:
         resourceId: oauth2-resource
       login_url: /manage/login.htm   #自定义登录地址
       index_url: /portal/index.htm    #自定义首页地址
+    external:
+      slow_req_millis: 10000
+      user_context_class: eon.hg.fap.support.session.UserContext
     async:
       corePoolSize : 10
       maxPoolSize : 200
