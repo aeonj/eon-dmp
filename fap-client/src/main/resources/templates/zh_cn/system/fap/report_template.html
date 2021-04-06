@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    ${httpInclude.include("html_tag.htm")}
+    <!--${httpInclude.include("ui_grant_tag.htm?menu_id=${(req_params['men_id'])!}")}-->
+    <script type="text/javascript">
+        var reportURL = "${server_url}?reportlet=${report_id}";
+        function pageLoad() {
+            var topPanel = Ext.create('Ext.vcf.QueryPanel',{
+                id: 'topPanel',
+                labelAlign: 'right',
+                labelWidth: 85,
+                bodyStyle: 'padding:10 5 5 5',
+                border: true,
+                userDefined: true,
+                stateChange: function (comp) {
+                    pageLoad.refresh();
+                }
+            });
+
+            this.refreshData = function() {
+                document.reportParam.action = encodeURI(reportURL+topPanel.getReportParams());
+                document.reportParam.submit();
+            };
+
+            Ext.create('Ext.container.Viewport',{
+                layout: 'border',
+                items: [{
+                    region: 'north',
+                    autoHeight: true,
+                    items: [topPanel]
+                }, {
+                    region: 'center',
+                    layout: 'border',
+                    bodyStyle: 'background-color:#FFF;',
+                    html:'<iframe id="reportFrame" name="reportFrame" width="100%" height="100%" src="${server_url}?reportlet=${report_id}"></iframe>'
+                }]
+            });
+
+
+        };
+        Ext.onReady(pageLoad);
+
+    </script>
+</head>
+<body>
+<div><form name="reportParam" target='reportFrame' method="post"></form></div>
+</body>
+</html>
