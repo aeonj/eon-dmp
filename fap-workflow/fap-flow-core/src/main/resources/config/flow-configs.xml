@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	">
+
+	<bean id="wf.calendarService" class="eon.hg.fap.flow.service.impl.CalendarServiceImpl">
+		<property name="commandService" ref="wf.commandService"></property>
+	</bean>
+
+	<bean id="wf.ufloCalendarProvider" class="eon.hg.fap.flow.process.node.reminder.impl.UfloCalendarProvider">
+		<property name="calendarService" ref="wf.calendarService"></property>
+	</bean>
+
+	<bean id="wf.processValidator" class="eon.hg.fap.flow.deploy.validate.impl.ProcessValidator"></bean>
+
+	<bean id="wf.environmentUtils" class="eon.hg.fap.flow.utils.EnvironmentUtils"></bean>
+
+	<bean id="wf.processCache" class="eon.hg.fap.flow.env.impl.MemoryProcessCache"></bean>
+
+	<bean id="wf.commandService" class="eon.hg.fap.flow.command.impl.SpringTransactionCommandService" depends-on="wf.environmentUtils">
+	</bean>
+
+	<bean id="wf.props" class="eon.hg.fap.flow.FlowPropertyPlaceholderConfigurer" abstract="true">
+		<property name="ignoreUnresolvablePlaceholders" value="true"></property>
+	</bean>
+
+	<bean id="wf.processDeployer" class="eon.hg.fap.flow.deploy.impl.DefaultProcessDeployer">
+		<property name="commandService" ref="wf.commandService"></property>
+		<property name="processValidator" ref="wf.processValidator"></property>
+	</bean>
+
+	<bean id="wf.businessCalendar" class="eon.hg.fap.flow.process.node.calendar.BusinessCalendar">
+		<property name="businessDayHours" value="${uflo.businessDayHours}"></property>
+	</bean>
+
+	<bean id="wf.processService" class="eon.hg.fap.flow.service.impl.DefaultProcessService">
+		<property name="commandService" ref="wf.commandService"></property>
+		<property name="processDeployer" ref="wf.processDeployer"></property>
+	</bean>
+
+	<bean id="wf.taskService" class="eon.hg.fap.flow.service.impl.DefaultTaskService">
+		<property name="commandService" ref="wf.commandService"></property>
+		<property name="processService" ref="wf.processService"></property>
+		<property name="historyService" ref="wf.historyService"></property>
+	</bean>
+	<bean id="wf.historyService" class="eon.hg.fap.flow.service.impl.DefaultHistoryService">
+		<property name="commandService" ref="wf.commandService"></property>
+	</bean>
+
+	<bean id="wf.expressionContext" class="eon.hg.fap.flow.expr.impl.ExpressionContextImpl" depends-on="wf.environmentUtils">
+		<property name="processService" ref="wf.processService"></property>
+	</bean>
+
+	<bean id="wf.identityService" class="eon.hg.fap.flow.service.impl.DefaultIdentityService"></bean>
+
+	<bean id="wf.schedulerService" class="eon.hg.fap.flow.service.impl.SchedulerServiceImpl" depends-on="wf.processParser" destroy-method="destroy">
+		<property name="taskService" ref="wf.taskService"></property>
+		<property name="processService" ref="wf.processService"></property>
+		<property name="threadCount" value="${uflo.jobThreadCount}"></property>
+		<property name="makeSchedulerThreadDaemon" value="${uflo.makeSchedulerThreadDaemon}"></property>
+		<property name="enableScanReminderJob" value="${uflo.enableScanReminderJob}"></property>
+	</bean>
+
+	<bean id="wf.instanceDetection" class="eon.hg.fap.flow.heartbeat.InstanceDetection" depends-on="wf.environmentUtils">
+		<property name="disableScheduler" value="${uflo.disableScheduler}"></property>
+		<property name="instanceNames" value="${uflo.clusterInstanceNames}"></property>
+		<property name="schedulerService" ref="wf.schedulerService"></property>
+	</bean>
+
+	<bean id="wf.idGenerator" class="eon.hg.fap.flow.utils.IDGenerator">
+		<property name="commandService" ref="wf.commandService"></property>
+		<property name="blockSize" value="${uflo.idBlockSize}"></property>
+	</bean>
+
+	<!-- 	<bean id="wf.restService" class="eon.hg.fap.flow.service.impl.RestServiceImpl">
+            <constructor-arg name="username" value="${uflo.restAccessUsername}"></constructor-arg>
+            <constructor-arg name="password" value="${uflo.restAccessPassword}"></constructor-arg>
+            <property name="baseUrl" value="${uflo.restAccessBaseUrl}"></property>
+            <property name="converters">
+                <list>
+                    <bean
+                        class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter"></bean>
+                    <bean
+                        class="org.springframework.http.converter.StringHttpMessageConverter">
+                        <constructor-arg value="utf-8"></constructor-arg>
+                    </bean>
+                </list>
+            </property>
+        </bean> -->
+
+	<bean id="wf.processParser" class="eon.hg.fap.flow.deploy.parse.impl.ProcessParser"></bean>
+	<bean id="wf.startParser" class="eon.hg.fap.flow.deploy.parse.impl.StartParser"></bean>
+	<bean id="wf.taskParser" class="eon.hg.fap.flow.deploy.parse.impl.TaskParser"></bean>
+	<bean id="wf.foreachParser" class="eon.hg.fap.flow.deploy.parse.impl.ForeachParser"></bean>
+	<bean id="wf.decisionParser" class="eon.hg.fap.flow.deploy.parse.impl.DecisionParser"></bean>
+	<bean id="wf.actionParser" class="eon.hg.fap.flow.deploy.parse.impl.ActionParser"></bean>
+	<bean id="wf.swimlaneParser" class="eon.hg.fap.flow.deploy.parse.impl.SwimlaneParser"></bean>
+	<bean id="wf.subprocessParser" class="eon.hg.fap.flow.deploy.parse.impl.SubprocessParser"></bean>
+	<bean id="wf.joinParser" class="eon.hg.fap.flow.deploy.parse.impl.JoinParser"></bean>
+	<bean id="wf.endParser" class="eon.hg.fap.flow.deploy.parse.impl.EndParser"></bean>
+	<bean id="wf.sequenceFlowParser" class="eon.hg.fap.flow.deploy.parse.impl.SequenceFlowParser"></bean>
+	<bean id="wf.forkParser" class="eon.hg.fap.flow.deploy.parse.impl.ForkParser"></bean>
+</beans>

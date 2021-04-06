@@ -1,0 +1,98 @@
+server:
+  port: 8180
+  servlet:
+    session:
+      timeout: 0s
+spring:
+  datasource:
+    primary:
+      jdbc-url: jdbc:mysql://212.64.7.68:53306/eon_fap?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      username: root
+      password: jshg@123
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    secondary:
+      jdbc-url: jdbc:mysql://212.64.7.68:53306/eon_fap2?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=true
+      username: root
+      password: jshg@123
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  application:
+    name: 禾冠平台
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+    generate-ddl: true
+    properties:
+      hibernate:
+        format_sql: true
+        enable_lazy_load_no_trans: false     #支持全局实体的懒加载，但开销很大
+        cache:
+          use_query_cache: true
+          use_second_level_cache: true
+          provider_configuration_file_resource_path: ehcache.xml
+          region:
+            factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+  cache:
+    type: redis   #支持ehcache、redis
+  redis:
+    database: 1
+    host: 212.64.7.68
+    port: 6379
+    password: jshg
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1ms
+        max-idle: 8
+        min-idle: 0
+  freemarker:
+    request-context-attribute: req  #req访问request
+    suffix:   #后缀名
+    content-type: text/html
+    enabled: true
+    cache: false #缓存配置
+    template-loader-path: classpath:/ #模板加载路径 按需配置
+    charset: UTF-8 #编码格式
+    settings:
+      number_format: '0.##'   #数字格式化，无小数点
+#security:
+#  oauth2:
+#    client:
+#      clientId: cxj
+#      clientSecret: user
+#      userAuthorizationUri: http://localhost:8100/oauth/authorize
+#      grant-type: password
+#      scope: read
+#      access-token-uri: http://localhost:8100/oauth/token
+#    resource:
+#      token-info-uri: http://localhost:8100/oauth/check_token
+#      user-info-uri: http://localhost:8100/user
+#      #jwt:
+#      #  key-uri: http://localhost:8100/oauth/token_key
+#    authorization:
+#      check-token-access: http://localhost:8100/oauth/check_token
+logging:
+  level:
+    root: info
+  path: /usr/local/logs/spring
+eon:
+  hg:
+    security:
+      authType: session    #认证方式，session，token
+      oauth2:
+        storeType: redis    #jdbc，redis，jwt几种模式，需要与授权服务器一致
+        resourceId: oauth2-resource
+      login_url: /manage/login.htm   #自定义登录地址
+      index_url: /portal/index.htm    #自定义首页地址
+    async:
+      corePoolSize : 10
+      maxPoolSize : 200
+      queueCapacity : 10
+    hessian:
+      server_url: http://127.0.0.1:8080/vcf/remote/
+    file:
+      upload_folder: /Users/aeon/Documents/uploadfile/
+    external:
+      entity_packages: com.bstek.uflo.model
+
