@@ -43,4 +43,13 @@
            clearOnFlush="true"
            memoryStoreEvictionPolicy="LRU"/>
 
+    <cache name="hg_accessory"
+           maxEntriesLocalHeap="30"
+           eternal="false"
+           timeToIdleSeconds="300"
+           timeToLiveSeconds="0"
+           overflowToDisk="false"
+           clearOnFlush="true"
+           memoryStoreEvictionPolicy="LRU"/>
+
 </ehcache>
