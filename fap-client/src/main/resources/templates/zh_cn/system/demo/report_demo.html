@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    ${httpInclude.include("/manage/html_tag.htm")}
+    <script language="JavaScript" src="/resource/report/createControl.js"></script>
+</head>
+<script type="text/javascript">
+        Ext.onReady(function() {
+            var gr_InstallPath = "<%=path%>"; //实际项目中应该写从根目录寻址的目录，如gr_InstallPath="/myapp/report/grinstall";
+            var gr_Version = "6,0,15,0331";
+//报表插件目前只能在32位浏览器中使用
+            var _gr_platform = window.navigator.platform;
+            if (_gr_platform.indexOf("64") > 0) {
+                Ext.Msg.alert("系统提示", "锐浪Grid++Report报表插件不能运行在64位浏览器中，相关报表与打印功能将无法正常运新，请改用32位浏览器！");
+            }
+//区分浏览器(IE or not)
+            var _gr_agent = navigator.userAgent.toLowerCase();
+            var _gr_isIE = (_gr_agent.indexOf("msie") > 0) ? true : false;
+            var gr_CodeBase;
+            if (_gr_isIE)
+                gr_CodeBase = 'codebase="' + gr_InstallPath + '/grbsctl6.cab#Version='
+                    + gr_Version + '"';
+            else
+                gr_CodeBase = '';
+            var typeid;
+            if (_gr_isIE)
+                typeid = 'classid="CLSID:ABB64AAC-D7E8-4733-B052-1B141C92F3CE" ' + gr_CodeBase;
+            else
+                typeid = 'type="application/x-grplugin6-printviewer"';
+//以下注册号为本机开发测试注册号，报表访问地址为localhost时可以去掉试用标志
+//购买注册后，请用您的注册用户名与注册号替换下面变量中值
+            var gr_UserName = 'zhongkejiangnan_ctjsoft_1710';
+            var gr_SerialNo = 'PVWZ6LXXX4TJSG6GGUA9AYF68A0FC6APH6998SW63AFC6P8FH3BNRW6YV5D6BPVX90U4G51INK5';
+
+            var reportCode = null;
+            var reportPanel = CreateReport('Report');
+            Ext.create('Ext.Viewport',{
+                layout: 'border',
+                items: [{
+                    id: 'boxPanel',
+                    title: '<span class="commoncss">菜单列表</span>',
+                    region: 'center',
+                    layout: 'fit',
+                    margins: '3 3 3 3',
+                    border: false,
+                    html: reportPanel
+                }]
+            });
+        });
+</script>
+<body>
+<div id="reportDiv"></div>
+</body>
+
+</html>

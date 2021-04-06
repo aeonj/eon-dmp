@@ -12,6 +12,7 @@ import eon.hg.fap.db.model.mapper.BaseData;
 import eon.hg.fap.db.service.IBaseDataService;
 import eon.hg.fap.db.service.ISysConfigService;
 import eon.hg.fap.db.service.IUserConfigService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author aeon
  *
  */
+@Slf4j
 @Controller
 public class DemoAction extends BizAction {
     @Autowired
@@ -55,7 +57,17 @@ public class DemoAction extends BizAction {
     @RequestMapping("/demo/enterprise.htm")
     public @ResponseBody BaseData enterprise(Long id) {
         //return this.baseDataService.getObjById(EleEnterprise.class, id);
+        log.info(id.toString());
         return null;
+    }
+
+    @RequestMapping("/demo/report.htm")
+    public ModelAndView report(HttpServletRequest request,
+                               HttpServletResponse response) {
+        ModelAndView mv = new JModelAndView("demo/report_demo.html",
+                configService.getSysConfig(), userConfigService.getUserConfig(),
+                0, request, response);
+        return mv;
     }
 
 
