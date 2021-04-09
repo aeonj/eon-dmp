@@ -340,6 +340,25 @@ public class UIManageAction extends BizAction {
     }
 
     /**
+     * 界面视图调级缓存字段
+     * @param inDto
+     * @throws Exception
+     */
+    @RequestMapping("/grade_uicolcache.htm")
+    public @ResponseBody void grade_uicolcache(@RequestParam Map<String, Object> inDto) throws Exception {
+        Dto swapDto = JsonHandler.parseDto((String)inDto.get("swap"));
+        List<Map> dsDetail =uiManagerService.getPoolCache(new Object[]{"detail", httpSession.getId(), Convert.toStr(inDto.get("ui_id"))});
+        if (dsDetail!=null) {
+            //顺序存在bug，将原有交换顺序号的代码换成更新为所有顺序号（同一父节点）重排  modify by cxj 2016.5.27
+            for (Map map:dsDetail) {
+                if (swapDto.containsKey(map.get("ui_detail_id"))) {
+                    map.put("parent_id",swapDto.get(map.get("ui_detail_id")));
+                }
+            }
+        }
+    }
+
+    /**
      * 更新缓冲表，存入缓冲区
      * @param inDto
      * @throws Exception

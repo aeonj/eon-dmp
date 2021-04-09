@@ -406,7 +406,8 @@ function addUIByServer(comp, ray, pos) {
 function addGridByServer(comp, ray) {
     if (typeof ray.detail != 'undefined') {
         var newColumnModel = function (comp, ray, store) {
-            var cmArray = [];
+            var cmArray = [],
+                colObj = {};
             var findIsCodeAsValue = function (childs) {
                 for (var k = 0; k < childs.length; k++) {
                     if (childs[j].uiconf_field == 'isCodeAsValue') {
@@ -477,7 +478,27 @@ function addGridByServer(comp, ray) {
                         }
                     }
                 }
-                cmArray.push(newField);
+                colObj[ray[i].id] = newField;
+            }
+            //形成多栏表头
+            for (var i = 0; ray != null && i < ray.length; i++) {
+                //形成表头级次
+                var colId = ray[i].parent_id;
+                if(colId == null) {
+                    cmArray.push(colObj[ray[i].id]);
+                    continue;
+                }
+                if(colObj[colId].columns) {
+                    colObj[colId].columns.push(colObj[ray[i].id]);
+                } else {
+                    for (var key in colObj[colId]) {
+                        if (key!='header') {
+                            delete colObj[colId][key];
+                        }
+                    }
+                    colObj[colId].columns = [colObj[ray[i].id]];
+                }
+
             }
             if (typeof this == Ext.vcf.EditorColumnModel) {
                 return new Ext.vcf.EditorColumnModel(comp.columnBase.concat(cmArray), store, comp.editDataIndex);

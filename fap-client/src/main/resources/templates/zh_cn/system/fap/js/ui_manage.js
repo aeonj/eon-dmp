@@ -572,7 +572,8 @@ Ext.onReady(function() {
             jsonArray.push(item.data);
         });
         // 提交到后台处理
-        var oldnode = treeCols.getRootNode().findChild("id", editColPanel.getForm().findField('ui_detail_id').getValue());
+        //var oldnode = treeCols.getRootNode().findChild("id", editColPanel.getForm().findField('ui_detail_id').getValue());
+        var oldnode = treeCols.getStore().getNodeById(editColPanel.getForm().findField('ui_detail_id').getValue());
         if (oldnode == null) return;
         var param = editColPanel.getForm().getValues();
         Ext.Ajax.request({
@@ -581,11 +582,16 @@ Ext.onReady(function() {
                 var array = Ext.util.JSON.decode(response.responseText);
                 if (array['success']) {
                     var resultArray = array['data'];
-                    var newnode = mergeObj(oldnode.data, resultArray);
-                    newnode.text = resultArray.field_name + ' ' + resultArray.field_title;
-                    treeCols.getRootNode().replaceChild(newnode, oldnode);
+                    var selectModel = treeCols.getSelectionModel();
+                    var selectNode = selectModel.selected.items[0];
+                    resultArray.text = resultArray.field_name + ' ' + resultArray.field_title;
+                    mergeObj(oldnode.data, resultArray);
+                    oldnode.parentNode.replaceChild(oldnode, oldnode);
                     //mergeObj(oldnode.data,resultArray);
                     //oldnode.setText(resultArray.field_name+' '+resultArray.field_title);
+                    if (selectNode != null && selectNode != treeEle.getRootNode()) {
+                        treeCols.selectItemByNode(selectNode);
+                    }
                 } else {
                     Ext.MessageBox.alert('提示', array['msg']);
                 }
@@ -1455,6 +1461,45 @@ Ext.onReady(function() {
         selectModel.select(selectNode);
     }
 
+    function gradeColCache(type) {
+        var selectModel = treeCols.getSelectionModel();
+        var selectNode = selectModel.selected.items[0];
+        if (selectNode == null || selectNode == treeEle.getRootNode()) {
+            Ext.Msg.alert('提示', '未选择待调整顺序的字段列，不能执行该操作!');
+            return;
+        }
+        var parNode = selectNode.parentNode;
+        var swapNode = selectNode;
+        if (type=='left') {
+            if (parNode.isRoot()) return;
+            swapNode = parNode.nextSibling;
+            parNode = parNode.parentNode;
+            parNode.insertBefore(selectNode,swapNode);
+        } else if (type=='right') {
+            if (parNode.indexOf(selectNode) == 0) return;
+            swapNode = selectNode.previousSibling;
+            swapNode.appendChild(selectNode);
+            swapNode.expand();
+        }
+        var parent_id = selectNode.parentNode.id;
+        if (parent_id==0) parent_id=null;
+        selectNode.data.parent_id=parent_id;
+        var order_param = {};
+        order_param[selectNode.id]=parent_id;
+        Ext.Ajax.request({
+            url : 'grade_uicolcache.htm',
+            success : function(response) {
+            },
+            failure : function(response) {
+            },
+            params : {
+                ui_id : seltreeid,
+                swap : Ext.encode(order_param)
+            }
+        });
+        selectModel.select(selectNode);
+    }
+
     function upColCache() {
         swapColCache('up');
     }
@@ -1467,12 +1512,15 @@ Ext.onReady(function() {
         if (tabUIBase.getForm().findField('xtype').getValue()!='tablegrid') {
             return;
         }
+        gradeColCache('left');
+
     }
 
     function rightColCache() {
         if (tabUIBase.getForm().findField('xtype').getValue()!='tablegrid') {
             return;
         }
+        gradeColCache('right');
     }
 
     function appendColCache() {
