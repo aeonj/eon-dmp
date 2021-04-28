@@ -18,7 +18,10 @@ package eon.hg.fap.flow.model.task;
 /**
  * @author Jacky.gao
  * @since 2013年8月13日
+ * 去除Appoint
+ * @author eonook
+ * @since 2021.4.26
  */
 public enum TaskType {
-	Normal,Participative,Countersign,Appoint;
+	Normal,Participative,Countersign;
 }

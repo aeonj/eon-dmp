@@ -349,7 +349,6 @@ public class FlowProviderImpl implements FlowProvider {
                 } else {
                     throw new ResultException("业务数据集流程中所需字段不存在，没有任务ID字段或业务ID字段！");
                 }
-                doStartFlow(node, business_id, mapRec);
                 OnlineUser oUser = SecurityUserHolder.getOnlineUser();
                 Assert.notNull(oUser);
                 StartProcessInfo spi = new StartProcessInfo(oUser.getUserid());

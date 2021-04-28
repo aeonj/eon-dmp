@@ -70,7 +70,6 @@ public class LeaveTaskCommand implements Command<Task> {
 				taskBusiness.setCurrentStatusCode(NodeState.DISCARD.getCode());
 			}
 			taskBusiness.setCurrentNodeName(task.getNodeName());
-			taskBusiness.setNextNodeName(null);
 			taskBusiness.setActionType(actionType);
 			taskBusiness.setCurrentTaskId(task.getId());
 			session.update(taskBusiness);

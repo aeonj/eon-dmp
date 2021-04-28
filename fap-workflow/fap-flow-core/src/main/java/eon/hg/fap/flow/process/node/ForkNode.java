@@ -27,8 +27,9 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 分支节点，开启子流程实例
  * @author Jacky.gao
- * @since 2013年7月31日
+ * @since 2020年7月31日
  */
 public class ForkNode extends Node {
 	private static final long serialVersionUID = -1654058426879715199L;

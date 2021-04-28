@@ -25,6 +25,10 @@ public class FlowTaskUtils {
             taskStateList.add(TaskState.Reserved);
         } else if (NodeState.CHECK.equals(ns)) {
             taskStateList.add(TaskState.Completed);
+        } else if (NodeState.BACK.equals(ns)) {
+            taskStateList.add(TaskState.Rollback);
+        } else if (NodeState.FROM_BACK.equals(ns)) {
+            taskStateList.add(TaskState.Ready);
         } else if (NodeState.ALL.equals(ns)) {
 
         }

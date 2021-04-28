@@ -21,17 +21,18 @@ public class TaskBusiness {
     private Long processId;
     @Column(name="PROCESS_INSTANCE_ID_")
     private Long processInstanceId;
-    @Column(name="BUSINESS_ID_")
+    @Column(name="BUSINESS_ID_",length=60)
     private String businessId;
-    @Column(name="CURRENT_NODE_NAME_")
+    @Column(name="CURRENT_NODE_NAME_",length=60)
     private String currentNodeName;
-    @Column(name="NEXT_NODE_NAME_")
+    @Column(name="NEXT_NODE_NAME_",length=60)
     private String nextNodeName;
     @Column(name="CURRENT_STATUS_CODE_",length = 20)
     private String currentStatusCode;
     @Column(name="NEXT_STATUS_CODE_",length = 20)
     private String nextStatusCode;
-    @Column(name="ACTION_TYPE_")
+    @Enumerated(EnumType.STRING)
+    @Column(name="ACTION_TYPE_",length = 20)
     private ActionType actionType;
     @Column(name="CURRENT_TASK_ID_")
     private Long currentTaskId;

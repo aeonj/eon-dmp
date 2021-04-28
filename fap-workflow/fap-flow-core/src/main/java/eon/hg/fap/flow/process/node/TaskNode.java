@@ -312,8 +312,9 @@ public class TaskNode extends Node {
 					listener.onTaskCreate(context, task);
 				}
 			}
-			createBusiProcess(context,task);
+			createBusiProcess(context,processInstance,task.getNodeName(),task.getId());
 		}else if(taskType.equals(TaskType.Countersign)){
+		    //为拥有权限的每个用户增加代办任务 add by eonook
 			for(String user:users){
 				Task task=createTask(context, processInstance);
 				task.setAssignee(user);
@@ -338,6 +339,7 @@ public class TaskNode extends Node {
 					listener.onTaskCreate(context, task);
 				}
 			}
+            createBusiProcess(context,processInstance,getName(),null);
 		}else{
 			throw new IllegalArgumentException("Unsupported current task type :"+taskType);
 		}
@@ -349,26 +351,27 @@ public class TaskNode extends Node {
 	 * 生成业务流程节点跳转关系记录
 	 * @author eonook
 	 */
-	private void createBusiProcess(Context context, Task task) {
+	private void createBusiProcess(Context context, ProcessInstance pi, String nextNodeName, Long nextTaskId) {
 		Session session=context.getSession();
 		Criteria criteria=session.createCriteria(TaskBusiness.class);
-		criteria.add(Restrictions.eq("processInstanceId",task.getProcessInstanceId()));
+		criteria.add(Restrictions.eq("processInstanceId",pi.getId()));
 		List<TaskBusiness> list = criteria.list();
 		if (list!=null && list.size()>0) {
 			TaskBusiness taskBusiness = list.get(0);
-			taskBusiness.setNextNodeName(task.getNodeName());
-			taskBusiness.setNextTaskId(task.getId());
+			taskBusiness.setNextNodeName(nextNodeName);
+			taskBusiness.setNextTaskId(nextTaskId);
+			taskBusiness.setCurrentNodeName(pi.getCurrentNode());
 			session.update(taskBusiness);
 		} else {
 			TaskBusiness taskBusiness = new TaskBusiness();
 			taskBusiness.setId(IDGenerator.getInstance().nextId());
-			taskBusiness.setProcessId(task.getProcessId());
-			taskBusiness.setProcessInstanceId(task.getProcessInstanceId());
-			taskBusiness.setBusinessId(task.getBusinessId());
-			taskBusiness.setCurrentNodeName(null);
-			taskBusiness.setNextNodeName(task.getNodeName());
+			taskBusiness.setProcessId(pi.getProcessId());
+			taskBusiness.setProcessInstanceId(pi.getId());
+			taskBusiness.setBusinessId(pi.getBusinessId());
+			taskBusiness.setCurrentNodeName(pi.getCurrentNode());
+			taskBusiness.setNextNodeName(nextNodeName);
 			taskBusiness.setNextStatusCode(NodeState.UN_CHECK.getCode());
-			taskBusiness.setNextTaskId(task.getId());
+			taskBusiness.setNextTaskId(nextTaskId);
 			taskBusiness.setActionType(ActionType.INPUT);
 			session.save(taskBusiness);
 		}

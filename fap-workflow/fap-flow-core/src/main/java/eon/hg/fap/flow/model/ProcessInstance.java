@@ -16,6 +16,7 @@
 package eon.hg.fap.flow.model;
 
 import eon.hg.fap.core.constant.Globals;
+import eon.hg.fap.flow.meta.ActionType;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -75,7 +76,7 @@ public class ProcessInstance{
 	
 	@Column(name="TAG_",length=30)
 	private String tag;
-	
+
 	@Transient
 	private Map<String,Object> metadata=new HashMap<String,Object>();
 	

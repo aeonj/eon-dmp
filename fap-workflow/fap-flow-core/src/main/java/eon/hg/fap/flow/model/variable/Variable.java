@@ -19,6 +19,7 @@ import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.flow.env.Context;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -55,6 +56,8 @@ public abstract class Variable {
 			}else{
 				variable=new StringVariable((String)value);				
 			}
+		}else if(value instanceof BigDecimal){
+			variable=new DoubleVariable(((BigDecimal) value).doubleValue());
 		}else if(value instanceof Double){
 			variable=new DoubleVariable((Double)value);
 		}else if(value instanceof Float){

@@ -19,8 +19,11 @@ import eon.hg.fap.flow.meta.*;
 import eon.hg.fap.flow.model.ProcessDefinition;
 import eon.hg.fap.flow.model.ProcessInstance;
 import eon.hg.fap.flow.model.task.Task;
+import eon.hg.fap.flow.model.task.TaskParticipator;
 import eon.hg.fap.flow.model.task.TaskState;
 import eon.hg.fap.flow.model.task.TaskType;
+import eon.hg.fap.flow.process.node.Node;
+import eon.hg.fap.flow.process.node.TaskNode;
 import eon.hg.fap.flow.query.HistoryTaskQuery;
 import eon.hg.fap.flow.query.ProcessInstanceQuery;
 import eon.hg.fap.flow.query.TaskQuery;
@@ -89,25 +92,66 @@ public class FlowProviderImpl implements FlowProvider {
         StringBuilder sqlBuilder = new StringBuilder();
         if (NodeState.ALL.equals(node.getState())) {
             sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' and exists(select 1 from wf_node_users unu where unu.process_instance_id_=ct.process_instance_id_ and unu.node_name_=ct.current_node_name_ and unu.user_id_='").append(oUser.getUserid()).append("')");
+            //sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' ");
 
             sqlRelation.setColumns(",ct.current_task_id_ task_id");
             sqlRelation.setJoins(StrUtil.concat(true, " inner join wf_task_business ct on ct.business_id_=", alias, ".", id_field));
             sqlRelation.setConditions(sqlBuilder.toString());
         } else if (NodeState.CHECK.equals(node.getState()) || NodeState.BACK.equals(node.getState()) || NodeState.DISCARD.equals(node.getState())) {
-            sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' and ct.current_status_code_='")
-                    .append(node.getState().getCode()).append("' and exists(select 1 from wf_node_users unu where unu.process_instance_id_=ct.process_instance_id_ and unu.node_name_=ct.current_node_name_ and unu.user_id_='").append(oUser.getUserid()).append("')");
+            sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' and ct.current_status_code_='").append(node.getState().getCode()).append("' and ct.action_type_='NEXT'");
+            Node taskNode = pd.getNode(node.getNodeName());
+            if (taskNode instanceof TaskNode) {
+                TaskNode tn = (TaskNode) taskNode;
+                if (TaskType.Countersign.equals(tn.getTaskType())) {
+                    sqlBuilder.append(" and exists(select 1 from wf_task unu where unu.id_=ct.current_task_id_ and unu.owner_='").append(oUser.getUserid()).append("')");
+                } else {
+                    sqlBuilder.append(" and exists(select 1 from wf_task_participator unu where unu.task_id_=ct.current_task_id_ and unu.user_='").append(oUser.getUserid()).append("')");
+                }
+            } else {
+                sqlBuilder.append(" and 1=0");
+            }
 
             sqlRelation.setColumns(",ct.current_task_id_ task_id");
             sqlRelation.setJoins(StrUtil.concat(true, " inner join wf_task_business ct on ct.business_id_=", alias, ".", id_field));
             sqlRelation.setConditions(sqlBuilder.toString());
+//            if (taskNode instanceof TaskNode) {
+//                TaskNode tn = (TaskNode) taskNode;
+//                if (TaskType.Countersign.equals(tn.getTaskType())) {
+//                    sqlBuilder.append(" and exists(select 1 from wf_task ct where ").append(alias).append(".").append(id_field).append("=ct.business_id_ and ct.process_id_=").append(pd.getId()).append(" and ct.node_name_='").append(node.getNodeName()).append("' and ct.state_ in ('Completed') and ct.type_!='Participative' and ct.owner_='").append(oUser.getUserid()).append("')");
+//                } else {
+//                    sqlBuilder.append(" and exists(select 1 from wf_task ct where ").append(alias).append(".").append(id_field).append("=ct.business_id_ and ct.process_id_=").append(pd.getId()).append(" and ct.node_name_='").append(node.getNodeName()).append("' and ct.state_ in ('Completed') and ct.type_='Participative' and exists(select 1 from wf_task_participator tp where tp.task_id_=ct.id_ and tp.user_='").append(oUser.getUserid()).append("'))");
+//                }
+//            }
+//            sqlRelation.setConditions(sqlBuilder.toString());
         } else if (NodeState.UN_CHECK.equals(node.getState()) || NodeState.FROM_BACK.equals(node.getState())) {
-            sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.next_node_name_='").append(node.getNodeName()).append("' and ct.next_status_code_='")
-                    .append(node.getState().getCode()).append("' and exists(select 1 from wf_node_users unu where unu.process_instance_id_=ct.process_instance_id_ and unu.node_name_=ct.next_node_name_ and unu.user_id_='").append(oUser.getUserid()).append("')");
+            sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.next_node_name_='").append(node.getNodeName()).append("' and ct.next_status_code_='").append(node.getState().getCode()).append("'");
+            Node taskNode = pd.getNode(node.getNodeName());
+            if (taskNode instanceof TaskNode) {
+                TaskNode tn = (TaskNode) taskNode;
+                if (TaskType.Countersign.equals(tn.getTaskType())) {
+                    sqlBuilder.append(" and exists(select 1 from wf_task unu where unu.id_=ct.next_task_id_ and unu.owner_='").append(oUser.getUserid()).append("')");
+                } else {
+                    sqlBuilder.append(" and exists(select 1 from wf_task_participator unu where unu.task_id_=ct.next_task_id_ and unu.user_='").append(oUser.getUserid()).append("')");
+                }
+            } else {
+                sqlBuilder.append(" and 1=0");
+            }
 
             sqlRelation.setColumns(",ct.next_task_id_ task_id");
             sqlRelation.setJoins(StrUtil.concat(true, " inner join wf_task_business ct on ct.business_id_=", alias, ".", id_field));
             sqlRelation.setConditions(sqlBuilder.toString());
+
+//            if (taskNode instanceof TaskNode) {
+//                TaskNode tn = (TaskNode) taskNode;
+//                if (TaskType.Countersign.equals(tn.getTaskType())) {
+//                    sqlBuilder.append(" and exists(select 1 from wf_task ct where ").append(alias).append(".").append(id_field).append("=ct.business_id_ and ct.process_id_=").append(pd.getId()).append(" and ct.node_name_='").append(node.getNodeName()).append("' and ct.state_ in ('Created','Ready','InProgress') and ct.owner_='").append(oUser.getUserid()).append("')");
+//                } else {
+//                    sqlBuilder.append(" and exists(select 1 from wf_task ct where ").append(alias).append(".").append(id_field).append("=ct.business_id_ and ct.process_id_=").append(pd.getId()).append(" and ct.node_name_='").append(node.getNodeName()).append("' and ct.state_ in ('Created','Ready','InProgress') and exists(select 1 from wf_task_participator tp where tp.task_id_=ct.id_ and tp.user_='").append(oUser.getUserid()).append("'))");
+//                }
+//            }
+//            sqlRelation.setConditions(sqlBuilder.toString());
         }
+
         return sqlRelation;
     }
 
@@ -131,16 +175,77 @@ public class FlowProviderImpl implements FlowProvider {
             params.put("currentNodeName", node.getNodeName());
             params.put("userId", oUser.getUserid());
             qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName and exists(select 1 from NodeUsers unu where unu.processInstanceId=ct.processInstanceId and unu.nodeName=ct.currentNodeName and unu.userId=:userId))", params);
+            //qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName)", params);
         } else if (NodeState.CHECK.equals(node.getState()) || NodeState.BACK.equals(node.getState()) || NodeState.DISCARD.equals(node.getState())) {
             params.put("currentNodeName", node.getNodeName());
             params.put("currentStatusCode", node.getState().getCode());
             params.put("user_id", oUser.getUserid());
-            qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName and ct.currentStatusCode=:currentStatusCode and exists(select 1 from NodeUsers unu where unu.processInstanceId=ct.processInstanceId and unu.nodeName=ct.currentNodeName and unu.userId=:userId))", params);
+            params.put("actionType", ActionType.NEXT);
+            params.put("state",FlowTaskUtils.getTaskStates(node.getState()));
+            //基于nodeUsers生成的流程条件
+            //qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName and ct.currentStatusCode=:currentStatusCode and exists(select 1 from NodeUsers unu where unu.processInstanceId=ct.processInstanceId and unu.nodeName=ct.currentNodeName and unu.userId=:userId))", params);
+
+            //基于TaskBusines和TaskParticipator生成的流程条件
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName and ct.currentStatusCode=:currentStatusCode and ct.actionType=:actionType");
+            Node taskNode = pd.getNode(node.getNodeName());
+            if (taskNode instanceof TaskNode) {
+                TaskNode tn = (TaskNode) taskNode;
+                if (TaskType.Countersign.equals(tn.getTaskType())) {
+                    sqlBuilder.append(" and exists(select 1 from Task unu where unu.id=ct.currentTaskId and unu.owner=:userId)");
+                } else {
+                    sqlBuilder.append(" and exists(select 1 from TaskParticipator unu where unu.taskId_=ct.currentTaskId and unu.user=:userId)");
+                }
+            } else {
+                sqlBuilder.append(" and 1=0");
+            }
+            sqlBuilder.append(")");
+            qo.addQuery(sqlBuilder.toString(),params);
+            //基于Task和TaskParticipator生成的流程条件
+//            Node taskNode = pd.getNode(node.getNodeName());
+//            if (taskNode instanceof TaskNode) {
+//                TaskNode tn = (TaskNode) taskNode;
+//                if (TaskType.Countersign.equals(tn.getTaskType())) {
+//                    qo.addQuery("exists(select 1 from Task ct where obj.id=ct.businessId and ct.processId=:processId and ct.nodeName=:nextNodeName and ct.prevTask in (:state) and ct.owner=:userId)",params);
+//                } else {
+//                    qo.addQuery("exists(select 1 from Task ct where obj.id=ct.businessId and ct.processId=:processId and ct.nodeName=:nextNodeName and ct.state in (:state) and exists(select 1 from TaskParticipator tp where tp.taskId=ct.Id and tp.user=:userId))",params);
+//                }
+//            }
         } else if (NodeState.UN_CHECK.equals(node.getState()) || NodeState.FROM_BACK.equals(node.getState())) {
             params.put("nextNodeName", node.getNodeName());
             params.put("nextStatusCode", node.getState().getCode());
             params.put("userId", oUser.getUserid());
-            qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.nextNode_name=:nextNode_name and ct.nextStatusCode=:nextStatusCode and exists(select 1 from NodeUsers unu where unu.processInstanceId=ct.processInstanceId and unu.nodeName=ct.nextNodeName and unu.userId=:userId))", params);
+            params.put("state",FlowTaskUtils.getTaskStates(node.getState()));
+            //基于nodeUsers生成的流程条件
+            //qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.nextNodeName=:nextNodeName and ct.nextStatusCode=:nextStatusCode and exists(select 1 from NodeUsers unu where unu.processInstanceId=ct.processInstanceId and unu.nodeName=ct.nextNodeName and unu.userId=:userId))",params);
+
+            //基于TaskBusines和TaskParticipator生成的流程条件
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.nextNodeName=:nextNodeName and ct.nextStatusCode=:nextStatusCode");
+            Node taskNode = pd.getNode(node.getNodeName());
+            if (taskNode instanceof TaskNode) {
+                TaskNode tn = (TaskNode) taskNode;
+                if (TaskType.Countersign.equals(tn.getTaskType())) {
+                    sqlBuilder.append(" and exists(select 1 from Task unu where unu.id=ct.nextTaskId and unu.owner=:userId)");
+                } else {
+                    sqlBuilder.append(" and exists(select 1 from TaskParticipator unu where unu.taskId_=ct.nextTaskId and unu.user=:userId)");
+                }
+            } else {
+                sqlBuilder.append(" and 1=0");
+            }
+            sqlBuilder.append(")");
+            qo.addQuery(sqlBuilder.toString(),params);
+            //基于Task生成的流程条件
+//            Node taskNode = pd.getNode(node.getNodeName());
+//            if (taskNode instanceof TaskNode) {
+//                TaskNode tn = (TaskNode) taskNode;
+//                if (TaskType.Countersign.equals(tn.getTaskType())) {
+//                    qo.addQuery("exists(select 1 from Task ct where obj.id=ct.businessId and ct.processId=:processId and ct.nodeName=:nextNodeName and ct.state in (:state) and ct.owner=:userId)",params);
+//                } else {
+//                    qo.addQuery("exists(select 1 from Task ct where obj.id=ct.businessId and ct.processId=:processId and ct.nodeName=:nextNodeName and ct.state in (:state) and exists(select 1 from TaskParticipator tp where tp.taskId=ct.Id and tp.user=:userId))",params);
+//                }
+//            }
+
         } else {
             if (NodeState.UN_CHECK.equals(node.getState())) {
                 TaskQuery taskQuery = taskService.createTaskQuery();
@@ -184,31 +289,6 @@ public class FlowProviderImpl implements FlowProvider {
             }
         }
         return qo;
-    }
-
-    /**
-     * 录入开始流程
-     *
-     * @param node        流程节点信息
-     * @param business_id 业务ID
-     * @param record      业务记录集合
-     */
-    public void doStartFlow(CurrentNode node, String business_id, Map<String, Object> record) {
-        OnlineUser oUser = SecurityUserHolder.getOnlineUser();
-        Assert.notNull(oUser);
-        StartProcessInfo spi = new StartProcessInfo(oUser.getUserid());
-        spi.setBusinessId(business_id);
-        spi.setVariables(record);
-        ProcessInstance pi = null;
-        if (StrUtil.isNotBlank(node.getFlowId())) {
-            pi = processService.startProcessById(Convert.toLong(node.getFlowId()), spi);
-        } else if (StrUtil.isNotBlank(node.getFlowName())) {
-            pi = processService.startProcessByName(node.getFlowName(), spi);
-        } else if (StrUtil.isNotBlank(node.getFlowKey())) {
-            pi = processService.startProcessByKey(node.getFlowKey(), spi);
-        } else {
-            throw new ResultException("CurrentNode流程参数未指定，未能获取流程信息");
-        }
     }
 
     /**
@@ -277,7 +357,6 @@ public class FlowProviderImpl implements FlowProvider {
                 } else {
                     throw new ResultException("业务数据集流程中所需字段不存在，没有任务ID字段或业务ID字段！");
                 }
-                doStartFlow(node, business_id, mapRec);
                 OnlineUser oUser = SecurityUserHolder.getOnlineUser();
                 Assert.notNull(oUser);
                 StartProcessInfo spi = new StartProcessInfo(oUser.getUserid());
@@ -298,7 +377,6 @@ public class FlowProviderImpl implements FlowProvider {
                     taskId = Convert.toLong(mapRec.get(task_field));
                     task = taskService.getTask(taskId);
                 } else {
-                    TaskQuery query = taskService.createTaskQuery();
                     String busiId = "-1";
                     if (mapRec.containsKey(business_field)) {
                         busiId = Convert.toStr(mapRec.get(business_field));
@@ -309,8 +387,20 @@ public class FlowProviderImpl implements FlowProvider {
                     } else {
                         throw new ResultException("业务数据集流程中所需字段不存在，没有任务ID字段或业务ID字段！");
                     }
-                    query.businessId(busiId);
                     ProcessDefinition pd = getProcessDefinition(node);
+                    Assert.notNull(pd);
+                    if (ActionType.NEXT.equals(actionType)) {
+                        //没有流程实例将自动创建
+                        ProcessInstanceQuery piQuery = processService.createProcessInstanceQuery();
+                        piQuery.businessId(busiId);
+                        piQuery.processId(pd.getId());
+                        List<ProcessInstance> piList = piQuery.list();
+                        if (piList == null || piList.size() == 0) {
+                            doWorkFlowByBusiness(node, ActionType.INPUT, advice,records,task_field,business_field,bUpdateVariants);
+                        }
+                    }
+                    TaskQuery query = taskService.createTaskQuery();
+                    query.businessId(busiId);
                     query.addParticipator(SecurityUserHolder.getOnlineUser().getUserid());
                     query.addProcessId(pd.getId());
                     if (ActionType.RECALL.equals(actionType)) {

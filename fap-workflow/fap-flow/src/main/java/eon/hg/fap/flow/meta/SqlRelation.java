@@ -2,11 +2,11 @@ package eon.hg.fap.flow.meta;
 
 public class SqlRelation {
     //逗号开始的select列
-    private String columns;
+    private String columns = "";
     //表连接
-    private String joins;
+    private String joins = "";
     //sql条件
-    private String conditions;
+    private String conditions = "";
 
     public String getColumns() {
         return columns;

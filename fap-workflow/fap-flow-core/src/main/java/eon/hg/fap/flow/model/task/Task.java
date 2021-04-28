@@ -60,7 +60,8 @@ public class Task extends Activity{
 	
 	@Column(name="END_DATE_")
 	private Date endDate;
-	
+
+	//指节点名称，好像与nodeName都是节点名称，不是任务名称 by eonook
 	@Column(name="PREV_TASK_",length=60)
 	private String prevTask;
 	

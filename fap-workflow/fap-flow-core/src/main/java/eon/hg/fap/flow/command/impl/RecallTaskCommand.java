@@ -37,7 +37,7 @@ public class RecallTaskCommand implements Command<Task> {
         if(!taskService.canWithdraw(task)){
             throw new IllegalArgumentException("Task "+task.getTaskName()+" can not forward to "+task.getPrevTask()+" node.");
         }
-        String nodeName = task.getTaskName();
+        String nodeName = task.getNodeName();
         ProcessDefinition pd = context.getProcessService().getProcessById(task.getProcessId());
         ProcessInstance pi = context.getProcessService().getProcessInstanceById(task.getProcessInstanceId());
 
