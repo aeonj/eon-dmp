@@ -550,8 +550,17 @@ function pageLoad() {
             var insertArray = [];
             var b = true;
             var i = Ext.Array.each(mgGrid.store.getNewRecords(), function (item) {
-                if (!item.get('name')) {
-                    return b=false;
+                Ext.Array.each(mgGrid.getColumns(),function (col) {
+                    if (col.dataIndex=='name') {
+                        if (!item.get(col.dataIndex)) {
+                            Ext.MessageBox.alert('提示', col.text+'不能为空');
+                            b = false;
+                            return false;
+                        }
+                    }
+                });
+                if (!b) {
+                    return false;
                 }
                 insertArray.push(item.getData());
             });
@@ -563,7 +572,7 @@ function pageLoad() {
                 updateArray.push(item.getData());
             });
             if (!b) {
-                Ext.MessageBox.alert('提示', '菜单组名称不能为空');
+                //Ext.MessageBox.alert('提示', '菜单组名称不能为空');
                 return;
             }
             var removeArray = [];
