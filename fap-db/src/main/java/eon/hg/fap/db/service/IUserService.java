@@ -15,7 +15,7 @@ public interface IUserService {
 	 * @return 是否保存成功
 	 */
 	User save(User instance);
-	
+
 	/**
 	 * 根据一个ID得到User
 	 * 
@@ -31,7 +31,7 @@ public interface IUserService {
 	 * @return
 	 */
 	void delete(Long id);
-	
+
 	/**
 	 * 批量删除User
 	 * 
@@ -39,7 +39,7 @@ public interface IUserService {
 	 * @return
 	 */
 	void batchDelete(List<Long> ids);
-	
+
 	/**
 	 * 通过一个查询对象得到User
 	 * 
@@ -53,7 +53,7 @@ public interface IUserService {
 	 * 
 	 */
 	User update(User instance);
-	
+
 	/**
 	 * 
 	 * @param query

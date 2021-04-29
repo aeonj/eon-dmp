@@ -500,6 +500,15 @@ function addGridByServer(comp, ray) {
                 }
 
             }
+            //标记级次
+            for (var i = 0; ray != null && i < ray.length; i++) {
+                var colId = ray[i].id;
+                if (colObj[colId].columns) {
+                    ray[i].isLeaf = false;
+                } else {
+                    ray[i].isLeaf = true;
+                }
+            }
             if (typeof this == Ext.vcf.EditorColumnModel) {
                 return new Ext.vcf.EditorColumnModel(comp.columnBase.concat(cmArray), store, comp.editDataIndex);
             } else {
@@ -509,10 +518,12 @@ function addGridByServer(comp, ray) {
         var newStore = function (comp, ray) {
             var stArray = [];
             for (var i = 0; ray != null && i < ray.length; i++) {
-                var newField = {
-                    name: ray[i].field_name
-                };
-                stArray.push(newField);
+                if (ray[i].isLeaf) {
+                    var newField = {
+                        name: ray[i].field_name
+                    };
+                    stArray.push(newField);
+                }
             }
             var recNew = Ext.create('Ext.data.Model', {
                 fields: comp.fieldBase.concat(stArray)

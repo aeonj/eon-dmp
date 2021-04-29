@@ -59,7 +59,8 @@ Ext.onReady(function() {
                         var selection = mainGrid.getSelection();
                         var model = selection[0];
                         var record = model.data;
-                        record["lastname"] = sdata.name;
+                        record["firstname"] = node.id;
+                        record["lastname"] = sdata.code;
                         store.load();
                     }}},renderer: ROLEIdRender},
             {text: 'Last Name',  dataIndex:'lastname',width:200,editor:{allowBlank:true}},

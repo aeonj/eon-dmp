@@ -6,18 +6,21 @@
 
 package eon.hg.fap.db.model.primary;
 
-import cn.hutool.core.util.ArrayUtil;
 import com.alibaba.fastjson.annotation.JSONField;
+import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.core.annotation.Lock;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.entity.IdEntity;
+import eon.hg.fap.core.tools.JsonHandler;
 import lombok.Data;
 import lombok.ToString;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * 用户类,所有用户都在这张表进行管理
@@ -78,6 +81,8 @@ public class User extends IdEntity {
 	private int manageType=0;   //后台管理用户类别  0:普通用户 1:区域管理员
 	@Transient
 	private boolean is_f3_login = false;  //用于F3同步登录
+	@Transient
+	private List<Dto> belongList;
 
 	/**
 	 * 获取不重复的用户菜单
@@ -131,5 +136,31 @@ public class User extends IdEntity {
 		}
 		return this.mgs;
 	}
+
+	/**
+	 * @return the belongList
+	 */
+	public List<Dto> getBelongList(Supplier<List<UserBelong>> belongs) {
+		if (belongList==null) {
+			belongList = new ArrayList<>();
+			List sourceList = JsonHandler.parseList(this.belong_source);
+			for (int i = 0; i < sourceList.size(); i++) {
+				Dto dto = (Dto) sourceList.get(i);
+				StringBuilder eleValues = new StringBuilder();
+				for (UserBelong pd : belongs.get()) {
+					if (dto.getString("eleCode").equals(pd.getEle_code())) {
+						eleValues.append(",").append(pd.getEle_value());
+					}
+				}
+				if (CommUtil.isNotEmpty(eleValues.toString())) {
+					dto.put("eleValue", eleValues.toString().substring(1));
+				}
+				belongList.add(dto);
+			}
+		}
+		return belongList;
+	}
+
+
 
 }

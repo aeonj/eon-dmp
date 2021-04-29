@@ -524,7 +524,7 @@ public class ElementOP {
             if (dto.get("belong_source").equals(dto.getString("source"))) {
                 for (Dto dtoBelong : lstBelong) {
                     if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
-                        sql += " and exists(select 1 from UserBelong o where o.user_id=" + cur_user.getId() + " and o.eleCode='" + dto.getString("source") + "' and o.value=obj.id)";
+                        sql += " and exists(select 1 from UserBelong o where o.user_id=" + cur_user.getId() + " and o.ele_code='" + dto.getString("source") + "' and o.ele_value=obj.id)";
                         break;
                     }
                 }

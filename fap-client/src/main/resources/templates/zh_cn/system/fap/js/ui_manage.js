@@ -88,6 +88,34 @@ Ext.onReady(function() {
                     ui_id : seltreeid
                 }
             });
+        } else if (node.get('xtype') == 'editorgrid') {
+            Ext.Ajax.request({
+                url : 'ui_designer.htm',
+                success : function(response) {
+                    preview.removeAll();
+                    var resultArray = Ext.util.JSON
+                        .decode(response.responseText);
+                    var previewgrid = Ext.create('Ext.vcf.EditorTableGrid',{
+                        url : 'ui_nullstore.htm',
+                        isPaged : false,
+                        isPreview : true,
+                        region : 'center',
+                        //width : '100%',
+                        height : '100%'
+                    });
+                    addGridByServer(previewgrid, resultArray);
+                    console.log(previewgrid);
+                    console.log(preview);
+                    preview.add(previewgrid);
+                    // previewgrid.doLayout();
+                },
+                failure : function(response) {
+
+                },
+                params : {
+                    ui_id : seltreeid
+                }
+            });
         }
     });
 
@@ -181,7 +209,7 @@ Ext.onReady(function() {
                     xtype: "combofield",
                     fieldLabel: "视图类型",
                     allowBlank: false,
-                    enumData: "tablegrid#列表视图+inputpanel#录入视图+querypanel#查询视图",
+                    enumData: "tablegrid#列表视图+inputpanel#录入视图+querypanel#查询视图+editorgrid#可编辑列表",
                     anchor: '100%'
                 }, {
                     name: "total_column",
@@ -209,7 +237,7 @@ Ext.onReady(function() {
             region : 'west',
             title : '<span class="commoncss">视图信息</span>',
             tools : [ {
-                id : 'refresh',
+                type : 'refresh',
                 handler : function() {
                     treeEle.getStore().reload();
                 }
@@ -279,12 +307,13 @@ Ext.onReady(function() {
                     xtype : "combofield",
                     fieldLabel : "视图类型",
                     allowBlank : false,
-                    enumData : "tablegrid#列表视图+inputpanel#录入视图+querypanel#查询视图",
+                    enumData : "tablegrid#列表视图+inputpanel#录入视图+querypanel#查询视图+editorgrid#可编辑列表",
                     value : 'inputpanel',
                     listeners : {
                         'change' : function(combo, newvalue, oldvalue) {
-                            Ext.getCmp('btn_leftcol').setDisabled(combo.getValue()!='tablegrid');
-                            Ext.getCmp('btn_rightcol').setDisabled(combo.getValue()!='tablegrid');
+                            var is_disabled = combo.getValue()!='tablegrid' && combo.getValue()!='editorgrid';
+                            Ext.getCmp('btn_leftcol').setDisabled(is_disabled);
+                            Ext.getCmp('btn_rightcol').setDisabled(is_disabled);
                         },
                         'select' : function(combo, record, index) {
                             Ext.Ajax.request({
@@ -322,7 +351,7 @@ Ext.onReady(function() {
                                 }
                             });
 
-                            if (combo.getValue()=='tablegrid') {
+                            if (combo.getValue()=='tablegrid' || combo.getValue()=='editorgrid') {
                                 editColPanel.form.findField('width').show();
                                 editColPanel.form.findField('cols').hide();
                                 editColPanel.form.findField('field_logic').hide();
@@ -1385,7 +1414,7 @@ Ext.onReady(function() {
                         uiconf_id : seltreeid,xtype : resultData.xtype
                     }
                 });
-                if (resultData.xtype=='tablegrid') {
+                if (resultData.xtype=='tablegrid' || resultData.xtype=='editorgrid') {
                     editColPanel.form.findField('width').show();
                     editColPanel.form.findField('cols').hide();
                     editColPanel.form.findField('field_logic').hide();
@@ -1509,7 +1538,8 @@ Ext.onReady(function() {
     }
 
     function leftColCache() {
-        if (tabUIBase.getForm().findField('xtype').getValue()!='tablegrid') {
+        var xtype_value = tabUIBase.getForm().findField('xtype').getValue();
+        if (xtype_value!='tablegrid' && xtype_value!='editorgrid') {
             return;
         }
         gradeColCache('left');
@@ -1517,7 +1547,8 @@ Ext.onReady(function() {
     }
 
     function rightColCache() {
-        if (tabUIBase.getForm().findField('xtype').getValue()!='tablegrid') {
+        var xtype_value = tabUIBase.getForm().findField('xtype').getValue();
+        if (xtype_value!='tablegrid' && xtype_value!='editorgrid') {
             return;
         }
         gradeColCache('right');

@@ -1,4 +1,5 @@
 Ext.onReady(function () {
+    var belongObj = {belong_source:[],belong_detail:[]};
     var userTreeStore = Ext.create('Ext.data.TreeStore', {
         // type: 'tree',
         proxy: {
@@ -223,7 +224,7 @@ Ext.onReady(function () {
         labelAlign: 'right', // 标签对齐方式
         bodyStyle: 'padding:5px 5px 5px 5px', // 表单元素和表单面板的边距
         // tbar:tb, //工具栏
-        height: 400,
+        height: 420,
         scrollable: true,
         items: [{
             layout: 'column',
@@ -446,7 +447,7 @@ Ext.onReady(function () {
         valueField: 'orgCode',
         // bodyStyle: 'padding:15 15 15 15',
         displayField: 'orgName',
-        fieldLabel: '机构类型',
+        fieldLabel: '机构权限',
         width: 445,
         emptyText: '请选择...',
         afterLabelTextTpl: [
@@ -504,9 +505,8 @@ Ext.onReady(function () {
 
     var tabUserOrg = Ext.create('Ext.panel.Panel', {
         id: 'tabUserOrg',
-        title: '机构权限',
         // frame : true, // 是否渲染表单面板背景色
-        height: 450,
+        height: 420,
         labelAlign: 'right', // 标签对齐方式
         layout: 'form',
         labelWidth: 65, // 标签宽度
@@ -524,8 +524,7 @@ Ext.onReady(function () {
         title: '',
         isPermission: false,
         selectModel:'multiple',
-        width: 440,
-        height: 370,
+        region: 'center',
         border: false, // 面板边框
         useArrows: true, // 箭头节点图标
         // root: rootRole, // 根节点
@@ -553,6 +552,104 @@ Ext.onReady(function () {
         items: [treeRole]
     });
 
+    var tabBelong = Ext.create('Ext.tab.Panel', {
+        region : 'center',
+        plain: true,
+        defaults: {
+            scrollable: true
+        },
+        dockedItems: {
+            dock: 'bottom',
+            xtype: 'toolbar',
+            items: [{
+                text: '新增要素',
+                glyph: 43,
+                listeners: {
+                    click: function() {
+                        var cmbBelong = Ext.create('Ext.vcf.TreeField',{
+                            fieldLabel: '权限要素', // 标签
+                            source: 'ELE',   //系统要素，对应ea_element中的字段ele_code值
+                            isCodeAsValue: true,  //是否将编码作为值 默认为false，即获取基础数据的ID作为值
+                            isDirect: true,    //默认为false，指是否每次从数据库获取
+                            isPermission: false,    //默认为true，指是否按权限过滤基础数据
+                            // all:所有结点都可选中
+                            // exceptRoot：除根结点，其它结点都可选（默认）
+                            // folder:只有目录（非叶子和非根结点）可选
+                            // leaf：只有叶子结点可选  默认
+                            selectNodeModel: 'leaf',
+                            selectModel: 'single',   //single单选 （默认） multiple 多选的
+                            anchor: '100%'// 宽度百分比
+                        });
+                        var win = Ext.create('Ext.vcf.Window', {
+                            title: '新增要素',
+                            autoShow: true,
+                            closeAction: 'destroy',
+                            items: [{
+                                region: 'north',
+                                layout: 'form',
+                                autoHeight: true,
+                                items: [cmbBelong]
+                            }],
+                            buttons : [ {
+                                text : '确定',
+                                iconCls : 'acceptIcon',
+                                handler: function () {
+                                    var eleCode = cmbBelong.getValue();
+                                    if (eleCode=="") {
+                                        return;
+                                    }
+                                    if (containsArray(belongObj.belong_source,eleCode,'eleCode')) {
+                                        Ext.MessageBox.alert('提示', '要素已存在，请重新选择');
+                                        return;
+                                    }
+                                    var tab = tabBelong.add({
+                                        title: cmbBelong.lastSelectionText,
+                                        id: 'tab_belong_'+eleCode,
+                                            xtype: 'assisttree',
+                                            source: eleCode,
+                                            isDirect : false,    //默认为false，指是否每次从数据库获取
+                                            isPermission : false,    //默认为true，指是否按权限过滤基础数据
+                                            selectModel : 'multiple'
+                                    });
+                                    belongObj.belong_source.push({eleCode:eleCode,eleName:cmbBelong.lastSelectionText});
+
+                                    tabBelong.setActiveTab(tab);
+                                    win[win.closeAction]();
+                                }
+                            }, {
+                                text : '关闭',
+                                iconCls : 'deleteIcon',
+                                handler : function () {
+                                    win[win.closeAction]();
+                                }
+                            } ]
+                        });
+
+                    }
+                }
+            },{
+                text: '删除要素',
+                glyph: 45,
+                listeners: {
+                    click: function() {
+                        var tab = tabBelong.getActiveTab(),
+                            idx = tabBelong.items.indexOf(tab),
+                            li_id = tabBelong.getActiveTab().getId(),
+                            eleCode = li_id.replace("tab_belong_","");
+                        tabBelong.remove(tabBelong.getActiveTab());
+                        if (idx>0) {
+                            tabBelong.setActiveTab(idx-1);
+                        } else {
+                            tabBelong.setActiveTab(idx);
+                        }
+                        //删除json对象
+                        removeArrayNew(belongObj.belong_source,eleCode,"eleCode");
+                    }
+                }
+            }]
+        }
+    });
+
     var tabUserAuth = Ext.create('Ext.panel.Panel', {
         id: 'tabUserAuth',
         title: '权限信息',
@@ -567,33 +664,36 @@ Ext.onReady(function () {
                 id : 'rdoEdtAuth',
                 name: 'is_part', // name:后台根据此name属性取值
                 xtype: 'rdofield',
-                width: 180,
-                enumData: '1#全部权限+2#部分权限',
+                width: 280,
+                enumData: '1#全部权限+2#部分权限+3#自定义权限',
                 anchor: '99%', // 宽度百分比
                 listeners : {
                     change : function (comp, newValue, oldValue) {
                         var tree = Ext.getCmp('treeEdtAuth');
                         if (newValue=='1') {
                             tree.hide();
-                        } else {
+                            tabBelong.hide();
+                        } else if (newValue=='2') {
                             tree.show();
+                            tabBelong.hide();
+                        } else {
+                            //pnlBelong.show();
+                            tree.hide();
+                            tabBelong.show();
                         }
                     }
                 }
             }]
         },{
-            xtype : 'panel',
+            id : 'treeEdtAuth',
             region : 'center',
-            items : [{
-                id : 'treeEdtAuth',
-                xtype : 'assisttree',
-                border : false,
-                treeRootText : '权限组信息',
-                url : '/manage/partgroup_tree.htm',
-                hidden : true
-            }]
+            xtype : 'assisttree',
+            border : false,
+            treeRootText : '权限组信息',
+            url : '/manage/partgroup_tree.htm',
+            hidden : true
 
-        }]
+        },tabBelong]
     });
 
     var userTabs = Ext.create('Ext.tab.Panel', {
@@ -609,16 +709,16 @@ Ext.onReady(function () {
 
     var addForm = Ext.create('Ext.form.Panel', {
         id: 'addForm',
+        region: 'center',
         items: [userTabs],
-        anchor: '100%'
     });
 
     var addUserWindow = Ext.create('Ext.window.Window', {
         title: '<span class="commoncss">用户管理</span>', // 窗口标题
         iconCls: 'group_linkIcon',
         layout: 'fit', // 设置窗口布局模式
-        width: 460, // 窗口宽度
-        height: 520, // 窗口高度
+        width: 560, // 窗口宽度
+        height: 550, // 窗口高度
         // tbar : tb, // 工具栏
         closable: true, // 是否可关闭
         // scrollable: true,//可滚动
@@ -657,6 +757,8 @@ Ext.onReady(function () {
     //userTabs.activate(0);
 
     function addInit() {
+        belongObj.belong_source = [];
+        belongObj.belong_detail = [];
         addUserWindow.show();
         addUserWindow.setTitle('<span class="commoncss">新增用户</span>');
         Ext.getCmp('rdoEdtAuth').setValue("1");
@@ -665,6 +767,8 @@ Ext.onReady(function () {
     }
 
     function editInit() {
+        belongObj.belong_source = [];
+        belongObj.belong_detail = [];
         var selectNode = userTree.getSelectionModel().getSelected().items[0];
         // var selectNode = userTree.getSelectionModel().select(userTree.getRootNode());
         if (Ext.isEmpty(selectNode)) {
@@ -681,12 +785,32 @@ Ext.onReady(function () {
             params: {user_id: selectNode.id},
             waitMsg: '请稍后......',
             success: function (form, action) {
-                var pg_id = action.result.data['pg_id'];
-                if (pg_id==null || pg_id=='-1') {
-                    Ext.getCmp('rdoEdtAuth').setValue("1");
-                } else {
+                var pg_id = action.result.data['pg_id'],
+                    belong_source = action.result.data['belong_source'];
+                if (pg_id!=null && pg_id!='-1') {
                     Ext.getCmp('rdoEdtAuth').setValue("2");
                     Ext.getCmp('treeEdtAuth').selectNodeByValue(String(pg_id),false);
+                } else if (belong_source!=null && belong_source!='') {
+                    Ext.getCmp('rdoEdtAuth').setValue("3");
+                    belongObj.belong_source = JSON.parse(belong_source);
+                    tabBelong.removeAll();
+                    Ext.each(belongObj.belong_source, function (eleObj) {
+                        var eleCode = eleObj.eleCode,
+                            tree = Ext.create('Ext.vcf.AssistTree',{
+                                title: eleObj.eleName,
+                                id: 'tab_belong_'+eleCode,
+                                source: eleCode,
+                                isDirect : false,    //默认为false，指是否每次从数据库获取
+                                isPermission : false,    //默认为true，指是否按权限过滤基础数据
+                                selectModel : 'multiple',
+                            });
+                        tree.resetChecked(eleObj.eleValue);
+                        tabBelong.add(tree);
+                        delete eleObj.eleValue;
+                    });
+                    tabBelong.setActiveTab(0);
+                } else {
+                    Ext.getCmp('rdoEdtAuth').setValue("1");
                 }
                 Ext.getCmp('add_cmb_org_type').getStore().reload();
                 cmbOrgType.getStore().reload();
@@ -769,6 +893,22 @@ Ext.onReady(function () {
                 pg_id =selectAuth.id;
             }
         }
+        if (Ext.getCmp('rdoEdtAuth').getValue()=='3') {
+            if (Ext.isEmpty(belongObj.belong_source)) {
+                Ext.Msg.alert('提示', '自定义权限没有设置');
+                return;
+            }
+            Ext.each(belongObj.belong_source, function (eleObj) {
+                var eleCode = eleObj.eleCode,
+                    tree = Ext.getCmp('tab_belong_' + eleCode),
+                    eleValue = tree.getCheckValues();
+                belongObj.belong_detail.push({eleCode:eleCode,eleValue:eleValue});
+            });
+        } else {
+            belongObj.belong_source=[];
+            belongObj.belong_detail=[];
+        }
+
 
         addForm.form.submit({
             url: 'user_save.htm',
@@ -777,6 +917,8 @@ Ext.onReady(function () {
             params: {
                 rolenodes: rolenodes,
                 orgnodes: orgnodes,
+                belong_source: JSON.stringify(belongObj.belong_source),
+                belong_detail: JSON.stringify(belongObj.belong_detail),
                 pg_id: pg_id
             },
             waitMsg: '正在处理数据,请稍候...',
@@ -834,6 +976,22 @@ Ext.onReady(function () {
             }
         }
 
+        if (Ext.getCmp('rdoEdtAuth').getValue()=='3') {
+            if (Ext.isEmpty(belongObj.belong_source)) {
+                Ext.Msg.alert('提示', '自定义权限没有设置');
+                return;
+            }
+            Ext.each(belongObj.belong_source, function (eleObj) {
+                var eleCode = eleObj.eleCode,
+                    tree = Ext.getCmp('tab_belong_' + eleCode),
+                    eleValue = tree.getCheckValues();
+                belongObj.belong_detail.push({eleCode:eleCode,eleValue:eleValue});
+            });
+        } else {
+            belongObj.belong_source=[];
+            belongObj.belong_detail=[];
+        }
+
 
         addForm.form.submit({
             url: 'user_update.htm',
@@ -842,6 +1000,8 @@ Ext.onReady(function () {
             params: {
                 rolenodes: rolenodes,
                 orgnodes: orgnodes,
+                belong_source: JSON.stringify(belongObj.belong_source),
+                belong_detail: JSON.stringify(belongObj.belong_detail),
                 pg_id: pg_id
             },
             waitMsg: '正在处理数据,请稍候...',

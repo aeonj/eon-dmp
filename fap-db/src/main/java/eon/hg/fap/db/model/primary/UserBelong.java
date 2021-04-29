@@ -19,47 +19,33 @@ import javax.persistence.*;
 @Entity
 @Table(name = Globals.SYS_TABLE_SUFFIX + "userbelong")
 public class UserBelong extends IdEntity {
-	private static final long serialVersionUID = -8559866174935141545L;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	private User user;
+
+	private Long user_id;
 	@Column(length=42)
 	private String ele_code;
-	private Long ele_id;
-	/**
-	 * @return the user
-	 */
-	public User getUser() {
-		return user;
+	private String ele_value;
+
+	public Long getUser_id() {
+		return user_id;
 	}
-	/**
-	 * @param user the user to set
-	 */
-	public void setUser(User user) {
-		this.user = user;
+
+	public void setUser_id(Long user_id) {
+		this.user_id = user_id;
 	}
-	/**
-	 * @return the ele_code
-	 */
+
 	public String getEle_code() {
 		return ele_code;
 	}
-	/**
-	 * @param ele_code the ele_code to set
-	 */
+
 	public void setEle_code(String ele_code) {
 		this.ele_code = ele_code;
 	}
-	/**
-	 * @return the ele_id
-	 */
-	public Long getEle_id() {
-		return ele_id;
+
+	public String getEle_value() {
+		return ele_value;
 	}
-	/**
-	 * @param ele_id the ele_id to set
-	 */
-	public void setEle_id(Long ele_id) {
-		this.ele_id = ele_id;
+
+	public void setEle_value(String ele_value) {
+		this.ele_value = ele_value;
 	}
 }

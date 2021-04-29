@@ -26,10 +26,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/manage")
@@ -50,6 +47,8 @@ public class UserManageAction extends BizAction {
     private ISysLogService sysLogService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private IUserBelongService userBelongService;
     @Autowired
     private UserOP userOp;
     @Autowired
@@ -88,6 +87,12 @@ public class UserManageAction extends BizAction {
     @RequestMapping("user_query_edtinfo.htm")
     public String user_query_edtinfo(Long user_id) {
         User user = userService.getObjById(user_id);
+        List<Dto> dtoList = user.getBelongList(()->{
+            QueryObject qo = new QueryObject();
+            qo.addQuery("user_id","user_id",user.getId(),"=");
+            return this.userBelongService.find(qo);
+        });
+        user.setBelong_source(JsonHandler.toJson(dtoList));
         return JsonHandler.toExtJson(user,true,new JsonIncludePreFilter(User.class, "id", "username", "nickName", "trueName", "orgtype_id", "orgtype_ele_id", "birthday", "telephone", "QQ", "years", "address", "sex", "email", "mobile", "card", "pg_id", "belong_source"));
     }
 
@@ -163,6 +168,8 @@ public class UserManageAction extends BizAction {
                          @RequestParam("username") String userName,
                          @RequestParam("password") String password,
                          @RequestParam("rolenodes") String roleids,
+                         @RequestParam("belong_source") String belong_source,
+                         @RequestParam("belong_detail") String belong_detail,
                          Long pg_id) {
         if (AeonConstants.SUPER_USER.equalsIgnoreCase(CommUtil.null2String(userName))) {
             return ErrTipMsg("super是系统内置用户，不允许维护");
@@ -205,7 +212,26 @@ public class UserManageAction extends BizAction {
         user.setPassword(passwordEncoder.encode(password));
         user.setPg_id(pg_id);
         user.setId(null);
-        this.userService.save(user);
+        user.setBelong_source(belong_source);
+        user = this.userService.save(user);
+        if (CommUtil.isNotEmpty(belong_source)) {
+            List detail = JsonHandler.parseList(belong_detail);
+            for (int i = 0; detail != null && i < detail.size(); i++) {
+                Dto map = (Dto) detail.get(i);
+                String ele_values = CommUtil.null2String(map.get("eleValue"));
+                if (CommUtil.isNotEmpty(ele_values)) {
+                    String[] ele_ids = CommUtil.null2String(map.get("eleValue")).split(",");
+                    for (String ele_id : ele_ids) {
+                        UserBelong userBelong = new UserBelong();
+                        userBelong.setUser_id(user.getId());
+                        userBelong.setEle_code(CommUtil.null2String(map.get("eleCode")));
+                        userBelong.setEle_value(ele_id);
+                        userBelong.setAddTime(new Date());
+                        this.userBelongService.save(userBelong);
+                    }
+                }
+            }
+        }
         return OkTipMsg("数据保存成功！");
     }
 
@@ -216,6 +242,8 @@ public class UserManageAction extends BizAction {
                            @RequestParam("username") String userName,
                            @RequestParam("password") String password,
                            @RequestParam("rolenodes") String roleids,
+                           @RequestParam("belong_source") String belong_source,
+                           @RequestParam("belong_detail") String belong_detail,
                            Long pg_id) {
         if (CommUtil.null2String(userName).equalsIgnoreCase(AeonConstants.SUPER_USER)) {
             return ErrTipMsg("super是系统内置用户，不允许维护");
@@ -260,7 +288,27 @@ public class UserManageAction extends BizAction {
             user.setPassword(passwordEncoder.encode(password));
         }
         user.setPg_id(pg_id);
+        user.setBelong_source(belong_source);
         userService.update(user);
+        this.userBelongService.deleteByUser(user.getId());
+        if (CommUtil.isNotEmpty(belong_source)) {
+            List detail = JsonHandler.parseList(belong_detail);
+            for (int i = 0; detail != null && i < detail.size(); i++) {
+                Dto map = (Dto) detail.get(i);
+                String ele_values = CommUtil.null2String(map.get("eleValue"));
+                if (CommUtil.isNotEmpty(ele_values)) {
+                    String[] ele_ids = CommUtil.null2String(map.get("eleValue")).split(",");
+                    for (String ele_id : ele_ids) {
+                        UserBelong userBelong = new UserBelong();
+                        userBelong.setUser_id(user.getId());
+                        userBelong.setEle_code(CommUtil.null2String(map.get("eleCode")));
+                        userBelong.setEle_value(ele_id);
+                        userBelong.setAddTime(new Date());
+                        this.userBelongService.save(userBelong);
+                    }
+                }
+            }
+        }
         return OkTipMsg("数据修改成功！");
     }
 

@@ -530,3 +530,105 @@ function indexArray(arr, obj, field) {
         return containMeta(arr, obj);
     }
 }
+//*   判断在数组中是否含有给定的一个变量值
+//*   参数：
+//*   obj：需要查询的值
+//*    a：被查询的数组
+//*    arrfield: 当arr为json格式的数组时，此参数可指定具体的属性字段
+//*    objfield: 当obj为json格式的数组时，此参数可指定具体的属性字段
+//*   在a中查询obj是否存在，如果找到返回true，否则返回false。
+//*   此函数只能对字符和数字有效
+function containsArrayNew(arr, obj, arrfield, objfield) {
+
+    function containMeta(arr, obj) {
+        for (var i = 0; i < arr.length; i++) {
+            if (arrfield==undefined || arrfield=="") {
+                if (arr[i] === obj) {
+                    return true;
+                }
+            } else {
+                if (arr[i][arrfield] === obj) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    if (obj instanceof Array) {
+        for (var j = 0; j < obj.length; j++) {
+            if (objfield==undefined || objfield=="") {
+                if (!containMeta(arr,obj[j])) {
+                    return false;
+                }
+            } else {
+                if (!containMeta(arr,obj[j][objfield])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    } else {
+        return containMeta(arr,obj);
+    }
+}
+/**
+ * 删除arr数组中指定的元素，支持json对象
+ * @param arr 被删除的数组对象
+ * @param obj 需要查找arr中的值
+ * @param arrfield arr为json数组对象时，指定需要查找的唯一属性字段的值
+ * @param objfield obj为json数组对象时，指定需要用obj的那一个属性字段值去查找arr
+ */
+function removeArrayNew(arr, obj, arrfield, objfield) {
+    function removeMeta(arr, obj) {
+        for (var i = 0; i < arr.length; i++) {
+            if (arrfield==undefined || arrfield=="") {
+                if (arr[i] === obj) {
+                    arr.splice(i,1);
+                    return;
+                }
+            } else {
+                if (arr[i][arrfield] === obj) {
+                    arr.splice(i,1);
+                    return;
+                }
+            }
+        }
+    }
+    if (obj instanceof Array) {
+        for (var j = 0; j < obj.length; j++) {
+            if (objfield==undefined || objfield=="") {
+                removeMeta(arr,obj[j]);
+            } else {
+                removeMeta(arr,obj[j][objfield]);
+            }
+        }
+    } else {
+        removeMeta(arr,obj);
+    }
+}
+/**
+ * 查找指定arr数组对象的位置，从0开始，支持json数组对象
+ * @param arr 被查数组对象
+ * @param obj 查找的值对象
+ * @param arrfield arr为json数组对象时，指定需要查找的唯一属性字段的值
+ * @returns 位置
+ */
+function findArrayNew(arr, obj, arrfield) {
+    var i = 0;
+    for (; i < arr.length; i++) {
+        if (arrfield==undefined || arrfield=="") {
+            if (arr[i] === obj) {
+                return i;
+            }
+        } else {
+            if (arr[i][arrfield] === obj) {
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+function trim(str){ //删除左右两端的空格
+    return str.replace(/(^\s*)|(\s*$)/g, "");
+}

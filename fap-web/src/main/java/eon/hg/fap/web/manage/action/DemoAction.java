@@ -54,6 +54,15 @@ public class DemoAction extends BizAction {
         return mv;
     }
 
+    @RequestMapping("/demo/grid_demo.htm")
+    public ModelAndView grid_demo(HttpServletRequest request,
+                                  HttpServletResponse response) {
+        ModelAndView mv = new JModelAndView("demo/grid_demo.html",
+                configService.getSysConfig(), userConfigService.getUserConfig(),
+                0, request, response);
+        return mv;
+    }
+
     @RequestMapping("/demo/enterprise.htm")
     public @ResponseBody BaseData enterprise(Long id) {
         //return this.baseDataService.getObjById(EleEnterprise.class, id);
