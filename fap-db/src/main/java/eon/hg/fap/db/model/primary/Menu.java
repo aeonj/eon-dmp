@@ -29,6 +29,7 @@ import java.util.List;
 public class Menu extends IdEntity implements Comparable<Menu> {
 	private static final long serialVersionUID = -2502634473094918124L;
 	private String menuName;// 菜单名称
+    private String displayName; //菜单显示名称
 	@Column(unique = true)
 	private String menuCode;// 菜单编码，ss根据该编码来识别菜单
 	private String info;// 菜单说明
@@ -58,6 +59,7 @@ public class Menu extends IdEntity implements Comparable<Menu> {
 	private Integer toolbar_index;  //工具栏所在位置序号
 	private String ui_ids;    //对应界面视图，逗号分隔
 	private String json_obj;
+	private Boolean expanded = false;
 
 	@Override
 	public int compareTo(Menu obj) {

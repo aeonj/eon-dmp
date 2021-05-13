@@ -72,6 +72,11 @@ function pageLoad() {
             sortable: true,
             width: 135
         }, {
+            header: '显示名称',
+            dataIndex: 'displayName',
+            sortable: true,
+            width: 135
+        }, {
             header: '请求地址',
             dataIndex: 'request',
             width: 220,
@@ -139,6 +144,8 @@ function pageLoad() {
             name: 'menuCode'
         }, {
             name: 'menuName'
+        }, {
+            name: 'displayName'
         }, {
             name: 'request'
         }, {
@@ -212,6 +219,8 @@ function pageLoad() {
 
     var addPanel = Ext.create('Ext.vcf.FormPanel',{
         layout : 'form',
+        itemCls: 'required',
+        style: 'margin-top:1px;',
         items : [{
             fieldLabel: '菜单编码',
             name: 'menuCode',
@@ -229,6 +238,15 @@ function pageLoad() {
             ],
             allowBlank: false,
             labelStyle: micolor,
+            listeners: {
+                'blur': function (comp) {
+                    addPanel.getForm().findField("displayName").setValue(comp.getValue());
+                }
+            },
+            anchor: '99%'
+        },{
+            fieldLabel: '显示名称',
+            name: 'displayName',
             anchor: '99%'
         }, {
             fieldLabel: '上级菜单',
@@ -324,10 +342,13 @@ function pageLoad() {
 
     var addWindow = Ext.create('Ext.vcf.Window', {
         width : 510,
+        maxHeight: 580,
+        scrollable: true,
         pageY: 20,
         items : [ {
             region : 'north',
             autoHeight : true,
+            scrollable: true,
             items : [ addPanel ]
         }],
         buttons : [ {

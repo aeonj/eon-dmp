@@ -230,8 +230,13 @@ public class MenuOP extends TreeSort {
 		Dto dto = new HashDto();
 		dto.put("id", node.getId());
 		dto.put("code", node.getMenuCode());
-		dto.put("name", node.getMenuName());
-		dto.put("text", node.getMenuName());
+		if (CommUtil.isNotEmpty(node.getDisplayName())) {
+		    dto.put("name", node.getDisplayName());
+            dto.put("text", node.getDisplayName());
+        } else {
+            dto.put("name", node.getMenuName());
+            dto.put("text", node.getMenuName());
+        }
 		if (node.isDisplay()) {
 			dto.put("iconCls", node.getIcon());
 		} else {
@@ -246,6 +251,7 @@ public class MenuOP extends TreeSort {
 		dto.put("scrollbar","");
 		dto.put("height",0);
 		dto.put("width",0);
+		dto.put("expanded",node.getExpanded());
 		dto.put("authkey",node.getAuthkey());
 		dto.put("type", "2");
 		dto.put("sequence", node.getSequence());
