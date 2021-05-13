@@ -1670,9 +1670,7 @@ Ext.define('Ext.vcf.TableGrid', {
         me.callParent(arguments);
         if (!me.userDefined) {
             if (me.autoLoad) {
-                me.store.load({
-                    params: me.params
-                });
+                me.queryData(me.params);
             }
             me.ajaxLoaded=true;
         } else {
