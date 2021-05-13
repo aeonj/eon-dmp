@@ -10,6 +10,7 @@ public enum NodeState {
     BACK("003","已退回"),
     FROM_BACK("004","被退回"),
     DISCARD("103","已作废"),
+    HISTORY("008","历史记录"),
     ALL("999","全部");
 
     private String code;

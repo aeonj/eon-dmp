@@ -32,7 +32,7 @@
 	</bean>
 
 	<bean id="wf.businessCalendar" class="eon.hg.fap.flow.process.node.calendar.BusinessCalendar">
-		<property name="businessDayHours" value="${uflo.businessDayHours}"></property>
+		<property name="businessDayHours" value="${flow.businessDayHours}"></property>
 	</bean>
 
 	<bean id="wf.processService" class="eon.hg.fap.flow.service.impl.DefaultProcessService">
@@ -58,26 +58,26 @@
 	<bean id="wf.schedulerService" class="eon.hg.fap.flow.service.impl.SchedulerServiceImpl" depends-on="wf.processParser" destroy-method="destroy">
 		<property name="taskService" ref="wf.taskService"></property>
 		<property name="processService" ref="wf.processService"></property>
-		<property name="threadCount" value="${uflo.jobThreadCount}"></property>
-		<property name="makeSchedulerThreadDaemon" value="${uflo.makeSchedulerThreadDaemon}"></property>
-		<property name="enableScanReminderJob" value="${uflo.enableScanReminderJob}"></property>
+		<property name="threadCount" value="${flow.jobThreadCount}"></property>
+		<property name="makeSchedulerThreadDaemon" value="${flow.makeSchedulerThreadDaemon}"></property>
+		<property name="enableScanReminderJob" value="${flow.enableScanReminderJob}"></property>
 	</bean>
 
 	<bean id="wf.instanceDetection" class="eon.hg.fap.flow.heartbeat.InstanceDetection" depends-on="wf.environmentUtils">
-		<property name="disableScheduler" value="${uflo.disableScheduler}"></property>
-		<property name="instanceNames" value="${uflo.clusterInstanceNames}"></property>
+		<property name="disableScheduler" value="${flow.disableScheduler}"></property>
+		<property name="instanceNames" value="${flow.clusterInstanceNames}"></property>
 		<property name="schedulerService" ref="wf.schedulerService"></property>
 	</bean>
 
 	<bean id="wf.idGenerator" class="eon.hg.fap.flow.utils.IDGenerator">
 		<property name="commandService" ref="wf.commandService"></property>
-		<property name="blockSize" value="${uflo.idBlockSize}"></property>
+		<property name="blockSize" value="${flow.idBlockSize}"></property>
 	</bean>
 
 	<!-- 	<bean id="wf.restService" class="eon.hg.fap.flow.service.impl.RestServiceImpl">
-            <constructor-arg name="username" value="${uflo.restAccessUsername}"></constructor-arg>
-            <constructor-arg name="password" value="${uflo.restAccessPassword}"></constructor-arg>
-            <property name="baseUrl" value="${uflo.restAccessBaseUrl}"></property>
+            <constructor-arg name="username" value="${flow.restAccessUsername}"></constructor-arg>
+            <constructor-arg name="password" value="${flow.restAccessPassword}"></constructor-arg>
+            <property name="baseUrl" value="${flow.restAccessBaseUrl}"></property>
             <property name="converters">
                 <list>
                     <bean

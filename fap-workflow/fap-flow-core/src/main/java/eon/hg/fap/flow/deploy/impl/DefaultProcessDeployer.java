@@ -128,7 +128,7 @@ public class DefaultProcessDeployer implements ProcessDeployer{
         			}
         		}
         	}else{
-        		errorInfo.append("当前XML文件不是一个合法的UFLO流程模版文件");
+        		errorInfo.append("当前XML文件不是一个合法的FLOW流程模版文件");
         	}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
