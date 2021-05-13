@@ -11,6 +11,7 @@ import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.db.model.virtual.OnlineUser;
+import eon.hg.fap.db.service.IDataRightService;
 import eon.hg.fap.db.service.IMenuService;
 import eon.hg.fap.flow.command.CommandService;
 import eon.hg.fap.flow.command.impl.LeaveTaskCommand;
@@ -59,6 +60,9 @@ public class FlowProviderImpl implements FlowProvider {
     @Autowired
     private IMenuService menuService;
 
+    @Autowired
+    private IDataRightService dataRightService;
+
     public ProcessService getProcessService() {
         return processService;
     }
@@ -91,9 +95,9 @@ public class FlowProviderImpl implements FlowProvider {
         SqlRelation sqlRelation = new SqlRelation();
         StringBuilder sqlBuilder = new StringBuilder();
         if (NodeState.ALL.equals(node.getState())) {
-            sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' and exists(select 1 from wf_node_users unu where unu.process_instance_id_=ct.process_instance_id_ and unu.node_name_=ct.current_node_name_ and unu.user_id_='").append(oUser.getUserid()).append("')");
-            //sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' ");
-
+            //sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' and exists(select 1 from wf_node_users unu where unu.process_instance_id_=ct.process_instance_id_ and unu.node_name_=ct.current_node_name_ and unu.user_id_='").append(oUser.getUserid()).append("')");
+            sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' ");
+            sqlBuilder.append(dataRightService.getDataRightSql(alias));
             sqlRelation.setColumns(",ct.current_task_id_ task_id");
             sqlRelation.setJoins(StrUtil.concat(true, " inner join wf_task_business ct on ct.business_id_=", alias, ".", id_field));
             sqlRelation.setConditions(sqlBuilder.toString());

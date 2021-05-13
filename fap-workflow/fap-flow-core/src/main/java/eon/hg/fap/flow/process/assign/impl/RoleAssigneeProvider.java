@@ -2,20 +2,14 @@ package eon.hg.fap.flow.process.assign.impl;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.StrUtil;
-import eon.hg.fap.common.properties.PropertiesHelper;
+import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.tools.JsonHandler;
-import eon.hg.fap.db.model.primary.PartDetail;
-import eon.hg.fap.db.model.primary.PartGroup;
-import eon.hg.fap.db.model.primary.Role;
-import eon.hg.fap.db.model.primary.User;
-import eon.hg.fap.db.service.IOrgTypeService;
-import eon.hg.fap.db.service.IPartGroupService;
-import eon.hg.fap.db.service.IRoleService;
-import eon.hg.fap.db.service.IUserService;
+import eon.hg.fap.db.model.primary.*;
+import eon.hg.fap.db.service.*;
 import eon.hg.fap.flow.env.Context;
 import eon.hg.fap.flow.model.ProcessInstance;
 import eon.hg.fap.flow.model.variable.Variable;
@@ -43,6 +37,9 @@ public class RoleAssigneeProvider implements AssigneeProvider {
 
     @Autowired
     private IPartGroupService partGroupService;
+
+    @Autowired
+    private IUserBelongService userBelongService;
 
     @Autowired
     private IOrgTypeService orgTypeService;
@@ -128,6 +125,28 @@ public class RoleAssigneeProvider implements AssigneeProvider {
                         }
                     }
                 }
+            } else if (CommUtil.isNotEmpty(user.getBelong_source())) {
+                List<Dto> lstBelong = JsonHandler.parseList(user.getBelong_source());
+                QueryObject qo = new QueryObject();
+                qo.addQuery("user_id","user_id",user.getId(),"=");
+                List<UserBelong> belongs = userBelongService.find(qo);
+                for (Dto dtoBelong : lstBelong) {
+                    boolean is_pass = true;
+                    //获取权限字段
+                    for (Variable ele : variables) {
+                        if (ele.getKey().equals(dtoBelong.getString("eleCode")+"_id")) {
+                            if (!isPassBelong(belongs, ele.getKey(), Convert.toStr(ele.getValue()))) {
+                                is_pass = false;
+                                log.info("当前用户没有该笔业务数据的访问权限，业务字段名为{}",ele.getKey());
+                                break;
+                            }
+                        }
+                    }
+                    if (!is_pass) {
+                        canAdd = false;
+                        break;
+                    }
+                }
             }
             if (canAdd) {
                 users.add(Convert.toStr(user.getId()));
@@ -150,6 +169,19 @@ public class RoleAssigneeProvider implements AssigneeProvider {
         } else {
             for (PartDetail pd : pg.getDetails()) {
                 if (pd.getEleCode().equals(source) && pd.getValue().equals(value)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean isPassBelong(List<UserBelong> belongs, String source, String value) {
+        if (StrUtil.isBlank(value)) {
+            return true;
+        } else {
+            for (UserBelong pd : belongs) {
+                if (pd.getEle_code().equals(source) && pd.getEle_value().equals(value)) {
                     return true;
                 }
             }
