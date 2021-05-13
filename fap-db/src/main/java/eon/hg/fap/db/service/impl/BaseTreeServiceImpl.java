@@ -251,12 +251,16 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
         if (iscount) {
             sql.append("count(1) as countnum");
         } else {
-            if (System.getProperty("aeonDao.db").equals("oracle")) {
-                sql.append("e.code||' '||e.name text, ");
-            } else if (System.getProperty("aeonDao.db").equals("sqlserver")) {
-                sql.append("e.code+' '+e.name text, ");
-            } else if (System.getProperty("aeonDao.db").equals("mysql")) {
-                sql.append("concat(e.code,' ',e.name) text, ");
+            if (CommUtil.isNotEmpty(dtoParam.get("onlyname")) && dtoParam.getBoolean("onlyname")) {
+                sql.append("e.name text, ");
+            } else {
+                if (System.getProperty("aeonDao.db").equals("oracle")) {
+                    sql.append("e.code||' '||e.name text, ");
+                } else if (System.getProperty("aeonDao.db").equals("sqlserver")) {
+                    sql.append("e.code+' '+e.name text, ");
+                } else if (System.getProperty("aeonDao.db").equals("mysql")) {
+                    sql.append("concat(e.code,' ',e.name) text, ");
+                }
             }
             if ("true".equals(dtoParam.getString("isfulldata"))) {
                 sql.append("e.* ");

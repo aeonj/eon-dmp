@@ -162,6 +162,10 @@ Ext.define('Ext.vcf.AssistTree', {
      * 默认为true，获取所有级次的记录信息
      */
     isFullLevel : true,
+    /**
+     * 节点文本是否只显示名称
+     */
+    onlyName : false,
     border : true, // 面板边框
     useArrows : true, // 箭头节点图标
     autoScroll : true,
@@ -197,6 +201,7 @@ Ext.define('Ext.vcf.AssistTree', {
                 isPermission: this.isPermission,
                 isFullData: this.isFullData,
                 isFullLevel: this.isFullLevel,
+                onlyName: this.onlyName,
                 selectModel: this.selectModel,
                 params: this.params,
                 ownerField: this,
@@ -210,6 +215,7 @@ Ext.define('Ext.vcf.AssistTree', {
                             isdirect: this.isDirect,
                             isfulldata: this.isFullData,
                             isfulllevel: this.isFullLevel,
+                            onlyname: this.onlyName,
                             ispermission: this.isPermission
                         };
                         treeloader.baseParams = mergeObj(bparams, this.params);
@@ -716,6 +722,10 @@ Ext.define('Ext.vcf.TreeField', {
      * 默认为true，获取所有级次的记录信息
      */
     isFullLevel : true,
+    /**
+     * 节点文本是否只显示名称
+     */
+    onlyName : false,
     mode : 'local',
     triggerAction : 'all',
     selectedClass : '',
@@ -768,6 +778,7 @@ Ext.define('Ext.vcf.TreeField', {
                             ispermission: combo.isPermission,
                             isfulldata: combo.isFullData,
                             isfulllevel: combo.isFullLevel,
+                            onlyname: combo.onlyName,
                             values: combo.getValue()
                         };
                         if (combo.isRelation) {
