@@ -78,6 +78,26 @@ public class MenuOP extends TreeSort {
 		return lstTree;
 	}
 
+    /**
+     * 更新树节点
+     * @param lst
+     */
+    public void updateTreesDisplay(List<Dto> lst) {
+        for (Dto dto : lst) {
+            List<Dto> childrens = (List<Dto>) dto.getList("children");
+            if (CommUtil.isNotEmpty(dto.get("displayname"))) {
+                dto.put("text", dto.get("displayname"));
+            }
+            if (childrens==null || childrens.size()==0) {
+                dto.remove("children");
+            } else {
+                updateTreesDisplay(childrens);
+            }
+        }
+    }
+
+
+
     public List<MenuGroup> getCardMgs() {
 		if (AeonConstants.SUPER_USER.equals(SecurityUserHolder.getOnlineUser().getUsername())) {
 			if (sysConfigService.getSysConfig().isDisplay_menu_group()) {
@@ -85,6 +105,7 @@ public class MenuOP extends TreeSort {
 				for (MenuGroup menuGroup : menuGroups) {
 					List<Dto> treeList = getCardMenuList(menuGroup.getMenus());
 					CommUtil.updateTreesLeaf(treeList);
+                    updateTreesDisplay(treeList);
 					String menuListJson = JsonHandler.toJson(treeList);
 					menuGroup.setMenujson(menuListJson);
 				}
@@ -93,6 +114,7 @@ public class MenuOP extends TreeSort {
 				List<Menu> menuList = this.menuService.query("select obj from Menu obj order by obj.sequence",null, -1,-1);
 				List<Dto> treeList = getCardMenuList(menuList);
 				CommUtil.updateTreesLeaf(treeList);
+                updateTreesDisplay(treeList);
 				List<MenuGroup> menuGroupList = new ArrayList<>();
 				fillMenuGroupList(treeList, menuGroupList);
 				return menuGroupList;
@@ -107,6 +129,7 @@ public class MenuOP extends TreeSort {
 					for (MenuGroup menuGroup : user.getMgs()) {
 						List<Dto> treeList = getCardMenuList(menuGroup.getAuthmenus());
 						CommUtil.updateTreesLeaf(treeList);
+                        updateTreesDisplay(treeList);
 						String menuListJson = JsonHandler.toJson(treeList);
 						menuGroup.setMenujson(menuListJson);
 					}
@@ -118,6 +141,7 @@ public class MenuOP extends TreeSort {
 					}
 					List<Dto> treeList = getCardMenuList(menuSet);
 					CommUtil.updateTreesLeaf(treeList);
+                    updateTreesDisplay(treeList);
 					List<MenuGroup> menuGroupList = new ArrayList<>();
 					fillMenuGroupList(treeList, menuGroupList);
 					return menuGroupList;
@@ -230,13 +254,9 @@ public class MenuOP extends TreeSort {
 		Dto dto = new HashDto();
 		dto.put("id", node.getId());
 		dto.put("code", node.getMenuCode());
-		if (CommUtil.isNotEmpty(node.getDisplayName())) {
-		    dto.put("name", node.getDisplayName());
-            dto.put("text", node.getDisplayName());
-        } else {
-            dto.put("name", node.getMenuName());
-            dto.put("text", node.getMenuName());
-        }
+        dto.put("name", node.getMenuName());
+        dto.put("text", node.getMenuName());
+        dto.put("displayname",node.getDisplayName());
 		if (node.isDisplay()) {
 			dto.put("iconCls", node.getIcon());
 		} else {
