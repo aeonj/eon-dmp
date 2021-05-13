@@ -632,3 +632,77 @@ function findArrayNew(arr, obj, arrfield) {
 function trim(str){ //删除左右两端的空格
     return str.replace(/(^\s*)|(\s*$)/g, "");
 }
+function showFlowOperation(business_id) {
+    var pnl_tab = Ext.create('Ext.tab.Panel', {
+        region: 'center',
+        plain: true,
+        defaults: {
+            scrollable: true
+        },
+        activeTab : 0,
+        items: [{
+            title: '流程记录',
+            region: 'center',
+            xtype: 'tablegrid',
+            url: '/flow/operaHistory',
+            params: {businessId: business_id,menu_id:MENU_ID},
+            columnBase: [{
+                xtype: 'rownumberer',
+                width: 30
+            }, {
+                header: '流程节点',
+                dataIndex: 'taskName',
+                width: 140,
+                sortable: true
+            }, {
+                header: '处理意见',
+                dataIndex: 'opinion',
+                width: 100,
+                sortable: true
+            }, {
+                header: '操作人',
+                dataIndex: 'userName',
+                sortable: true,
+                width: 100
+            }, {
+                header: '操作时间',
+                dataIndex: 'endDate',
+                sortable: true,
+                width: 100
+            }],
+            fieldBase: [{
+                name : 'businessId'
+            }, {
+                name : 'taskName'
+            }, {
+                name : 'opinion'
+            }, {
+                name : 'userName'
+            }, {
+                name : 'endDate'
+            }, {
+                name : 'userCode'
+            }]
+
+        },{
+            title: '流程显示',
+            layout: 'fit',
+            html: '<iframe scrolling="auto" frameborder="0" width="100%" height="100%" src="/flow/diagram?businessId='+business_id+'&menu_id='+MENU_ID+'"></iframe>'
+        }]
+    });
+    var win = Ext.create('Ext.vcf.Window', {
+        title: '流程显示',
+        autoShow: true,
+        height: 580,
+        width: 500,
+        closeAction: 'destroy',
+        items: pnl_tab,
+        buttons : [{
+            text : '关闭',
+            iconCls : 'deleteIcon',
+            handler : function () {
+                win[win.closeAction]();
+            }
+        } ]
+    })
+}
