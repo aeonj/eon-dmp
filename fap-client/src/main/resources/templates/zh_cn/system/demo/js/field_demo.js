@@ -93,9 +93,10 @@ Ext.onReady(function () {
             name: 'multipetree', // hiddenName:后台根据此hiddenName属性取值
             xtype: 'treefield',
             source: 'ELE',   //系统要素，对应ea_element中的字段ele_code值
-            isCodeAsValue: false,  //是否将编码作为值 默认为false，即获取基础数据的ID作为值
+            isCodeAsValue: true,  //是否将编码作为值 默认为false，即获取基础数据的ID作为值
             isDirect: false,    //默认为false，指是否每次从数据库获取
-            isPermission: true,    //默认为true，指是否按权限过滤基础数据
+            isPermission: false,    //默认为true，指是否按权限过滤基础数据
+            onlyName: false,    //默认为fase，指只显示节点名称，编码不显示
             // all:所有结点都可选中
             // exceptRoot：除根结点，其它结点都可选（默认）
             // folder:只有目录（非叶子和非根结点）可选

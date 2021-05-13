@@ -58,6 +58,7 @@ Ext.onReady(function() {
             isCodeAsValue : false,  //是否将编码作为值 默认为false，即获取基础数据的ID作为值
             isDirect : false,    //默认为false，指是否每次从数据库获取
             isPermission : true,    //默认为true，指是否按权限过滤基础数据
+            onlyName : true,   //默认为false，指节点是否只显示名称
             width : 500,
             // border: false, //面板边框
             useArrows : true, // 箭头节点图标
