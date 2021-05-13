@@ -378,6 +378,10 @@ function pageLoad() {
             addPanel.getForm().findField('parent_id').setValue(seltreeid);
         }
         addPanel.getForm().findField('parent_id').requestload =true;
+        var record = mainGrid.getSelectionModel().getSelected().items[0];
+        if (!Ext.isEmpty(record)) {
+            addPanel.getForm().loadRecord(record);
+        }
 
     }
 

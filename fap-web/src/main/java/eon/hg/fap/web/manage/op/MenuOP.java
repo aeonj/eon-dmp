@@ -88,6 +88,7 @@ public class MenuOP extends TreeSort {
             if (CommUtil.isNotEmpty(dto.get("displayname"))) {
                 dto.put("text", dto.get("displayname"));
             }
+            dto.put("qtip",dto.get("name"));
             if (childrens==null || childrens.size()==0) {
                 dto.remove("children");
             } else {
