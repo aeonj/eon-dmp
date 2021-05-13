@@ -531,6 +531,21 @@ public class UIManageAction extends BizAction {
             }
         }
         uiManagerService.save(uimanager);
+        //新增的时候，处理上下级关系
+        boolean is_grade = false;
+        for (UIDetail uiDetail : uimanager.getDetails()) {
+            if (CommUtil.isNotEmpty(uiDetail.getParent_id())) {
+                for (UIDetail detailFind : uimanager.getDetails()) {
+                    if (detailFind.getUi_detail_id().equals(Convert.toStr(uiDetail.getParent_id()))) {
+                        uiDetail.setParent_id(detailFind.getId());
+                        is_grade = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (is_grade)
+            uiManagerService.update(uimanager);
         outDto.put("parent_id", uimanager.getParent_id());
         outDto.put("msg", "界面视图新增成功");
         outDto.put("success", AeonConstants.TRUE);
