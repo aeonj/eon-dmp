@@ -521,12 +521,10 @@ public class ElementOP {
         User cur_user = (User) SecurityUserHolder.getCurrentUser();
         if (CommUtil.isNotEmpty(cur_user.getBelong_source())) {
             List<Dto> lstBelong = JsonHandler.parseList(cur_user.getBelong_source());
-            if (dto.get("belong_source").equals(dto.getString("source"))) {
-                for (Dto dtoBelong : lstBelong) {
-                    if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
-                        sql += " and exists(select 1 from UserBelong o where o.user_id=" + cur_user.getId() + " and o.ele_code='" + dto.getString("source") + "' and o.ele_value=obj.id)";
-                        break;
-                    }
+            for (Dto dtoBelong : lstBelong) {
+                if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
+                    sql += " and exists(select 1 from UserBelong o where o.user_id=" + cur_user.getId() + " and o.ele_code='" + dto.getString("source") + "' and o.ele_value=obj.id)";
+                    break;
                 }
             }
         } else if (CommUtil.isNotEmpty(cur_user.getPg_id()) && cur_user.getPg_id()!=-1l) {

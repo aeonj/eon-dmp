@@ -156,18 +156,16 @@ public class BaseTreeServiceImpl extends AbstractCacheOperator implements IBaseT
         }
         if (CommUtil.isNotEmpty(cur_user.getBelong_source())) {
             List<Dto> lstBelong = JsonHandler.parseList(cur_user.getBelong_source());
-            if (dto.get("belong_source").equals(dto.getString("source"))) {
-                for (Dto dtoBelong : lstBelong) {
-                    if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
-                        if (System.getProperty("aeonDao.db").equals("oracle")) {
-                            sql += "connect by prior e.parent_id=e.id\n" +
-                                    " start with exists(\n" +
-                                    "select 1 " +Globals.SYS_TABLE_SUFFIX + "userbelong o where o.user_id=" + cur_user.getId() + " and o.ele_code='" + dto.getString("source") + "' and o.ele_value=e.id)";
-                        } else {
-                            sql += " and exists(select 1 from " +Globals.SYS_TABLE_SUFFIX + "userbelong o where o.user_id=" + cur_user.getId() + " and o.ele_code='" + dto.getString("source") + "' and o.ele_value=e.id)";
-                        }
-                        break;
+            for (Dto dtoBelong : lstBelong) {
+                if (dto.get("source").equals(dtoBelong.get("eleCode"))) {
+                    if (System.getProperty("aeonDao.db").equals("oracle")) {
+                        sql += "connect by prior e.parent_id=e.id\n" +
+                                " start with exists(\n" +
+                                "select 1 " +Globals.SYS_TABLE_SUFFIX + "userbelong o where o.user_id=" + cur_user.getId() + " and o.ele_code='" + dto.getString("source") + "' and o.ele_value=e.id)";
+                    } else {
+                        sql += " and exists(select 1 from " +Globals.SYS_TABLE_SUFFIX + "userbelong o where o.user_id=" + cur_user.getId() + " and o.ele_code='" + dto.getString("source") + "' and o.ele_value=e.id)";
                     }
+                    break;
                 }
             }
         } else if (CommUtil.isNotEmpty(cur_user.getPg_id()) && cur_user.getPg_id()!=-1l) {
