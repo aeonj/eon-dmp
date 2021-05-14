@@ -83,6 +83,5 @@ public class EnvironmentUtils implements ApplicationContextAware{
 			cacheService=new DefaultMemoryCacheService();
 		}
 		environment=this;
-		new Splash().print();
 	}
 }
