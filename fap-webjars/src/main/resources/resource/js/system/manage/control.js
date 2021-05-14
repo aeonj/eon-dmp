@@ -1634,7 +1634,7 @@ Ext.define('Ext.vcf.TableGrid', {
 
         }
 
-        if (me.isPaged) {
+        if (me.isPaged && me.cls!="x-grid-inner-locked") {
             var pagesize_combo = Ext.create('Ext.form.field.ComboBox',{
                 name: 'pagesize',
                 triggerAction: 'all',
@@ -2048,11 +2048,6 @@ Ext.define('Ext.vcf.EditorTableGrid', {
         }
 
         me.callParent(arguments);
-        if (!me.userDefined) {
-            me.store.load(me.params);
-        } else {
-            me.initUI();
-        }
     },
     getCellEditor: function(record, column) {
         var p = record,
