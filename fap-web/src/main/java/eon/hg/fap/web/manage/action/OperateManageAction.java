@@ -92,7 +92,7 @@ public class OperateManageAction extends BizAction {
         qo.addQuery("obj.menu.id", new SysMap("menu_id", menu_id), "=");
         qo.addQuery("obj.name", new SysMap("name", name), "=");
         List<Operate> vfs = this.operateService.find(qo);
-        if (vfs != null && !vfs.get(0).getId().equals(id)) {
+        if (vfs != null && vfs.size()>0 && !vfs.get(0).getId().equals(id)) {
             return ErrTipMsg("操作名称不能重复");
         } else {
             Operate operate = this.operateService.getObjById(id);
