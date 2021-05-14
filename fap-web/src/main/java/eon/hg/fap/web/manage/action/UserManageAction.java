@@ -93,7 +93,7 @@ public class UserManageAction extends BizAction {
             return this.userBelongService.find(qo);
         });
         user.setBelong_source(JsonHandler.toJson(dtoList));
-        return JsonHandler.toExtJson(user,true,new JsonIncludePreFilter(User.class, "id", "username", "nickName", "trueName", "orgtype_id", "orgtype_ele_id", "birthday", "telephone", "QQ", "years", "address", "sex", "email", "mobile", "card", "pg_id", "belong_source"));
+        return JsonHandler.toExtJson(user,true,new JsonIncludePreFilter(User.class, "id", "username", "userName", "nickName", "trueName", "orgtype_id", "orgtype_ele_id", "birthday", "telephone", "QQ", "years", "address", "sex", "email", "mobile", "card", "pg_id", "belong_source"));
     }
 
     @RequestMapping("user_query_edtroleinfo.htm")
@@ -165,7 +165,7 @@ public class UserManageAction extends BizAction {
     @SecurityMapping(title = "用户新增", value = "user:insert")
     @RequestMapping("/user_save.htm")
     public Dto user_save(@RequestParam Map<String, Object> mapPara,
-                         @RequestParam("username") String userName,
+                         @RequestParam("userName") String userName,
                          @RequestParam("password") String password,
                          @RequestParam("rolenodes") String roleids,
                          @RequestParam("belong_source") String belong_source,
@@ -239,7 +239,7 @@ public class UserManageAction extends BizAction {
     @RequestMapping("/user_update.htm")
     public Dto user_update(@RequestParam Map<String, Object> mapPara,
                            @RequestParam("id") Long id,
-                           @RequestParam("username") String userName,
+                           @RequestParam("userName") String userName,
                            @RequestParam("password") String password,
                            @RequestParam("rolenodes") String roleids,
                            @RequestParam("belong_source") String belong_source,

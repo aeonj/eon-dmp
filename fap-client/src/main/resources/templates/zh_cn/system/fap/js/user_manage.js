@@ -239,7 +239,7 @@ Ext.onReady(function () {
                 items: [{
                     // height:20,
                     fieldLabel: '用户名',
-                    name: 'username',
+                    name: 'userName',
                     afterLabelTextTpl: [
                         '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
                     ],
@@ -437,87 +437,6 @@ Ext.onReady(function () {
         // }]),
         // baseParams: {}
     });
-    var cmbOrgType = new Ext.form.ComboBox({
-        id: 'cmb_orgtype',
-        name: 'belong_type',
-        store: orgtypeStore,
-        mode: 'remote',
-        triggerAction: 'all',
-        labelWidth: 65, // 标签宽度
-        valueField: 'orgCode',
-        // bodyStyle: 'padding:15 15 15 15',
-        displayField: 'orgName',
-        fieldLabel: '机构权限',
-        width: 445,
-        emptyText: '请选择...',
-        afterLabelTextTpl: [
-            '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
-        ],
-        allowBlank: false,
-        forceSelection: true,
-        editable: false,
-        typeAhead: true,
-        labelStyle: micolor
-
-    });
-
-    cmbOrgType.addListener('select', function () {
-        // rootStore.getRootNode().reload();
-        treeOrg.requery({orgtype:cmbOrgType.getValue(),
-            user_id: addForm.form.findField('user_id').getValue()});
-    });
-
-    var treeOrg = Ext.create('Ext.vcf.AssistTree', {
-        url: "user_query_org_single_tree.htm",
-        selectModel:'multiple',
-        title: '',
-        width:448,
-        anchor:'100% 100%',
-        height: 345,
-        border: true, // 面板边框
-        useArrows: true, // 箭头节点图标
-        // root: rootOrg, // 根节点
-        autoScroll: true, // 内容溢出时产生滚动条
-        clearOnLoad: true,
-        animate: false,
-        params :{
-            orgtype: '',
-            user_id: ''
-        }
-
-    });
-    treeOrg.store.addListener('beforeload', function (store, node) {
-        store.getProxy().extraParams = {
-            orgtype: cmbOrgType.getValue(),
-            user_id: addForm.form.findField('user_id').getValue()
-        };
-    });
-
-
-    // 绑定选中状态变更事件,增加化横线的效果
-    // treeOrg.addListener('checkchange', function (node, checked, event) {
-    //     if (checked) {
-    //         event.getUI().addClass('node_checked');
-    //     } else {
-    //         event.getUI().removeClass('node_checked');
-    //     }
-    // });
-
-    var tabUserOrg = Ext.create('Ext.panel.Panel', {
-        id: 'tabUserOrg',
-        // frame : true, // 是否渲染表单面板背景色
-        height: 420,
-        labelAlign: 'right', // 标签对齐方式
-        layout: 'form',
-        labelWidth: 65, // 标签宽度
-        defaultType: 'textfield',
-        border: false,
-        layout: 'vbox',
-        bodyStyle: 'padding:5px',
-        items: [cmbOrgType,treeOrg]
-    });
-
-
 
     var treeRole = Ext.create('Ext.vcf.AssistTree', {
         source : 'ROLE',
@@ -813,13 +732,9 @@ Ext.onReady(function () {
                     Ext.getCmp('rdoEdtAuth').setValue("1");
                 }
                 Ext.getCmp('add_cmb_org_type').getStore().reload();
-                cmbOrgType.getStore().reload();
-                treeOrg.store.reload();
             },
             failure: function (form, action) {
                 Ext.getCmp('add_cmb_org_type').getStore().reload();
-                cmbOrgType.getStore().reload();
-                treeOrg.store.reload();
             }
         });
         Ext.Ajax.request({
@@ -871,21 +786,6 @@ Ext.onReady(function () {
             return;
         }
 
-        // 检查机构是否被选定
-        // checkedNodes = treeOrg.getChecked();
-        // if (Ext.isEmpty(checkedNodes)) {
-        //     if (!treeOrg.getRootNode().isLoaded() || treeOrg.getRootNode().hasChildNodes()) {
-        //         Ext.Msg.alert('提示', '用户对应的机构权限没有设置');
-        //         return;
-        //     }
-        // }
-        var orgnodes = '';
-        // Ext.each(checkedNodes, function (node) {
-        //     if (node.isLeaf()) {
-        //         orgnodes = orgnodes + node.id + ',';
-        //     }
-        // });
-
         var pg_id = '-1';
         if (Ext.getCmp('rdoEdtAuth').getValue()=='2') {
             var selectAuth = Ext.getCmp('treeEdtAuth').getSelectionModel().getSelected().items[0];
@@ -916,7 +816,6 @@ Ext.onReady(function () {
             method: 'POST',
             params: {
                 rolenodes: rolenodes,
-                orgnodes: orgnodes,
                 belong_source: JSON.stringify(belongObj.belong_source),
                 belong_detail: JSON.stringify(belongObj.belong_detail),
                 pg_id: pg_id
@@ -966,8 +865,6 @@ Ext.onReady(function () {
             return;
         }
 
-        var orgnodes = treeOrg.getCheckValues();
-
         var pg_id = '-1';
         if (Ext.getCmp('rdoEdtAuth').getValue()=='2') {
             var selectAuth = Ext.getCmp('treeEdtAuth').getSelectionModel().getSelected().items[0];
@@ -999,7 +896,6 @@ Ext.onReady(function () {
             method: 'POST',
             params: {
                 rolenodes: rolenodes,
-                orgnodes: orgnodes,
                 belong_source: JSON.stringify(belongObj.belong_source),
                 belong_detail: JSON.stringify(belongObj.belong_detail),
                 pg_id: pg_id
