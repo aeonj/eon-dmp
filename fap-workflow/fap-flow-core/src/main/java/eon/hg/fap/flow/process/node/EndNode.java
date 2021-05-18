@@ -144,7 +144,7 @@ public class EndNode extends Node{
 		}
 		List<Task> tasks=query.list();
 		for(Task t:tasks){
-			if(t.getType().equals(TaskType.Participative)){
+			if(t.getType().equals(TaskType.Participative) || t.getType().equals(TaskType.Normal)){
 				hql="delete "+TaskParticipator.class.getName()+" where taskId=:taskId";
 				session.createQuery(hql).setLong("taskId", t.getId()).executeUpdate();				
 			}

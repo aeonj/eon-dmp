@@ -48,7 +48,7 @@ public class DeleteTaskByNodeCommand implements Command<Integer> {
 				.list();
 		SchedulerService schedulerService=(SchedulerService)context.getApplicationContext().getBean(SchedulerService.BEAN_ID);
 		for(Task task:list){
-			if(task.getType().equals(TaskType.Participative)){
+			if(task.getType().equals(TaskType.Participative) || task.getType().equals(TaskType.Normal)){
 				session.createQuery("delete "+TaskParticipator.class.getName()+" where taskId=:taskId").setLong("taskId", task.getId()).executeUpdate();			
 			}
 			hql="delete "+HistoryTask.class.getName()+" where taskId=:taskId";
