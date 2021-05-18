@@ -143,19 +143,21 @@ public class User extends IdEntity {
 	public List<Dto> getBelongList(Supplier<List<UserBelong>> belongs) {
 		if (belongList==null) {
 			belongList = new ArrayList<>();
-			List sourceList = JsonHandler.parseList(this.belong_source);
-			for (int i = 0; i < sourceList.size(); i++) {
-				Dto dto = (Dto) sourceList.get(i);
-				StringBuilder eleValues = new StringBuilder();
-				for (UserBelong pd : belongs.get()) {
-					if (dto.getString("eleCode").equals(pd.getEle_code())) {
-						eleValues.append(",").append(pd.getEle_value());
+			if (CommUtil.isNotEmpty(this.belong_source)) {
+				List sourceList = JsonHandler.parseList(this.belong_source);
+				for (int i = 0; i < sourceList.size(); i++) {
+					Dto dto = (Dto) sourceList.get(i);
+					StringBuilder eleValues = new StringBuilder();
+					for (UserBelong pd : belongs.get()) {
+						if (dto.getString("eleCode").equals(pd.getEle_code())) {
+							eleValues.append(",").append(pd.getEle_value());
+						}
 					}
+					if (CommUtil.isNotEmpty(eleValues.toString())) {
+						dto.put("eleValue", eleValues.toString().substring(1));
+					}
+					belongList.add(dto);
 				}
-				if (CommUtil.isNotEmpty(eleValues.toString())) {
-					dto.put("eleValue", eleValues.toString().substring(1));
-				}
-				belongList.add(dto);
 			}
 		}
 		return belongList;
