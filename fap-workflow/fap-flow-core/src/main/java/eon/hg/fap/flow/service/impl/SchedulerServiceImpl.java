@@ -152,13 +152,13 @@ public class SchedulerServiceImpl implements SchedulerService,ApplicationContext
 			if(scheduler!=null && !scheduler.isShutdown()){
 				scheduler.shutdown(false);
 			}
-			log.info("Current uflo job instance scheduler is starting...");
+			log.info("Current flow job instance scheduler is starting...");
 			this.scheduler=this.newScheduler();
 			if(this.scheduler.isInStandbyMode()){
 				this.scheduler.start();
 			}
 			initTaskReminders();
-			log.info("Uflo scheduler is started successfully...");
+			log.info("Flow scheduler is started successfully...");
 		}catch(SchedulerException ex){
 			throw new RuntimeException(ex);
 		}

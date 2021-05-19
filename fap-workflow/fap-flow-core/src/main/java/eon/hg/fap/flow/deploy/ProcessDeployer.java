@@ -25,7 +25,7 @@ import java.io.InputStream;
  */
 public interface ProcessDeployer {
 	public static final String BEAN_ID="wf.processDeployer";
-	public static final String PROCESS_EXTENSION_NAME=".uflo.xml";
+	public static final String PROCESS_EXTENSION_NAME=".flow.xml";
 	public static final String PROCESSIMG_EXTENSION_NAME=".png";
 	ProcessDefinition deploy(InputStream inputStream);
 	ProcessDefinition deploy(InputStream inputStream, int version, long processId);

@@ -9,7 +9,7 @@ import java.util.List;
 
 public class FlowPropertiesConfig {
 
-    public PropertyPlaceholderConfigurer ufloProperties() {
+    public PropertyPlaceholderConfigurer eFlowProperties() {
         final PropertyPlaceholderConfigurer ppc = new PropertyPlaceholderConfigurer();
         ppc.setIgnoreResourceNotFound(true);
         final List<Resource> resourceLst = new ArrayList<Resource>();

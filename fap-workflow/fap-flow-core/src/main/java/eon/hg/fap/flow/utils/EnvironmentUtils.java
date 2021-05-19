@@ -73,7 +73,7 @@ public class EnvironmentUtils implements ApplicationContextAware{
 		this.applicationContext=applicationContext;
 		Collection<EnvironmentProvider> providers=applicationContext.getBeansOfType(EnvironmentProvider.class).values();
 		if(providers.size()==0){
-			throw new RuntimeException("You must be implementation "+EnvironmentProvider.class.getName()+" interface when use uflo!");
+			throw new RuntimeException("You must be implementation "+EnvironmentProvider.class.getName()+" interface when use flow!");
 		}
 		provider=providers.iterator().next();
 		Collection<CacheService> cacheServices=applicationContext.getBeansOfType(CacheService.class).values();

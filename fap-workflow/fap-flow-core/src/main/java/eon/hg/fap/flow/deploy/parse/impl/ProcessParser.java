@@ -132,7 +132,7 @@ public class ProcessParser extends AbstractParser{
 	
 
 	public boolean support(Element element) {
-		return element.getName().equals("uflo-process");
+		return element.getName().equals("uflo-process") || element.getName().equals("flow-process");
 	}
 
 	@Override

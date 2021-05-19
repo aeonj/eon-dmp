@@ -47,26 +47,26 @@ public class InstanceDetection implements InitializingBean{
 	private Logger log=Logger.getGlobal();
 	private void startDaemonJob() throws Exception{
 		if(disableScheduler){
-			log.info("Current uflo application is disabled scheduler...");
+			log.info("Current flow application is disabled scheduler...");
 			return;
 		}
 		String currentInstanceName=System.getProperty("wf.instanceName");
 		if(StrUtil.isBlank(instanceNames)){
 			if(StrUtil.isNotBlank(currentInstanceName)){
-				log.info("Uflo job cluster names is empty,but system property \"wf.instanceName\" value is \""+currentInstanceName+"\",so Uflo job run mode is single still...");
+				log.info("Flow job cluster names is empty,but system property \"wf.instanceName\" value is \""+currentInstanceName+"\",so Flow job run mode is single still...");
 			}else{
-				log.info("Uflo job run mode is single...");				
+				log.info("Flow job run mode is single...");
 			}
 			schedulerService.resetScheduer();
 			return;
 		}else{
 			if(StrUtil.isBlank(currentInstanceName)){
-				String msg="Current uflo application configured cluster names \""+instanceNames+"\",but not configure system property \"wf.instanceName\".";
+				String msg="Current flow application configured cluster names \""+instanceNames+"\",but not configure system property \"wf.instanceName\".";
 				log.info(msg);
 				throw new RuntimeException(msg);
 			}
 		}
-		log.info("Uflo job run mode is cluster...");
+		log.info("Flow job run mode is cluster...");
 		initDetectionScheduler();
 		
 		JobDetailImpl jobDetail=initJobDetail(currentInstanceName);
@@ -75,7 +75,7 @@ public class InstanceDetection implements InitializingBean{
 		jobDetail.setJobClass(detectionJob.getClass());
 		scheduler.scheduleJob(jobDetail, trigger);
 		scheduler.start();
-		log.info("Uflo cluster daemon scheduler is started...");		
+		log.info("Flow cluster daemon scheduler is started...");
 	}
 	
 	private void initDetectionScheduler() throws Exception{

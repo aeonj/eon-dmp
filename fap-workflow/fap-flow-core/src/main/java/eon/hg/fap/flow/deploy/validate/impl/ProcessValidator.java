@@ -77,7 +77,7 @@ public class ProcessValidator implements Validator {
 	}
 
 	public boolean support(Element element) {
-		return element.getNodeName().equals("uflo-process");
+		return element.getNodeName().equals("uflo-process") || element.getNodeName().equals("flow-process");
 	}
 	
 	public String getNodeName() {
