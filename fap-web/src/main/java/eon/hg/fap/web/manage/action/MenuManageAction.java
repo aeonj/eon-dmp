@@ -11,10 +11,8 @@ import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.tools.JsonHandler;
 import eon.hg.fap.db.model.primary.Menu;
 import eon.hg.fap.db.model.primary.MenuGroup;
-import eon.hg.fap.db.service.IMenuGroupService;
-import eon.hg.fap.db.service.IMenuService;
-import eon.hg.fap.db.service.ISysConfigService;
-import eon.hg.fap.db.service.IUserConfigService;
+import eon.hg.fap.db.model.primary.Operate;
+import eon.hg.fap.db.service.*;
 import eon.hg.fap.security.annotation.SecurityMapping;
 import eon.hg.fap.web.manage.op.MenuOP;
 import eon.hg.fap.web.manage.op.UserOP;
@@ -46,6 +44,8 @@ public class MenuManageAction extends BizAction {
     private IMenuService menuService;
     @Autowired
     private IMenuGroupService menuGroupService;
+    @Autowired
+    private IOperateService operateService;
     @Autowired
     private UserOP userOp;
     @Autowired
@@ -137,7 +137,25 @@ public class MenuManageAction extends BizAction {
             Menu menu = BeanUtil.mapToBeanIgnoreCase(mapPara, Menu.class,true);
             MenuGroup menuGroup = this.menuGroupService.getObjById(menuGroupId);
             menu.setMg(menuGroup);
-            this.menuService.save(menu);
+            if (menu.getId()!=null) {
+                Long menu_id = menu.getId();
+                menu.setId(null);
+                this.menuService.save(menu);
+                //复制操作
+                QueryObject qo = new QueryObject();
+                qo.addQuery("obj.menu.id", new SysMap("menu_id", menu_id), "=");
+                List<Operate> vfs = this.operateService.find(qo);
+                if (vfs != null) {
+                    for (Operate operate: vfs) {
+                        Operate op = BeanUtil.toBean(operate,Operate.class);
+                        op.setId(null);
+                        op.setMenu(menu);
+                        this.operateService.save(op);
+                    }
+                }
+            } else {
+                this.menuService.save(menu);
+            }
             return OkTipMsg("数据保存成功！");
         } else {
             return ErrTipMsg("菜单编码不能重复");
