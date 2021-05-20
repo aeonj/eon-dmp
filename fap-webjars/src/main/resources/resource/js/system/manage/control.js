@@ -2182,6 +2182,8 @@ Ext.define('Ext.vcf.CustomNumberField', {
                 });
             }
         }
+        this.value =this._submitVal;
+        return this.value;
     },
 
     beforeBlur : function() {
@@ -2265,6 +2267,10 @@ Ext.define('Ext.vcf.CustomNumberField', {
 
     getSubmitValue : function() {
         return this._submitVal == 0 ? 0 : this._submitVal;
+    },
+    getValue : function() {
+        this.value = this._submitVal == 0 ? 0 : this._submitVal;
+        return this.value;
     }
 });
 
