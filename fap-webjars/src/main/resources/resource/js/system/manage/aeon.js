@@ -492,6 +492,16 @@ function columnMoneyRender(v, cellmeta, record) {
     return Ext.util.Format.currency(v);
 }
 
+//数字千分位
+function columnThousandNumberRender(v, cellmeta, record) {
+    return Ext.util.Format.number(v,"0,000.00");
+}
+
+//整数千分位
+function columnThousandIntRender(v, cellmeta, record) {
+    return Ext.util.Format.number(v,"0,000");
+}
+
 //*   判断在数组中是否含有给定的一个变量值
 //*   参数：
 //*   obj：需要查询的值
