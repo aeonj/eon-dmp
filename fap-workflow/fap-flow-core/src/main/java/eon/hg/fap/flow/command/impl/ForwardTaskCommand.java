@@ -17,6 +17,7 @@ package eon.hg.fap.flow.command.impl;
 
 import eon.hg.fap.flow.command.Command;
 import eon.hg.fap.flow.env.Context;
+import eon.hg.fap.flow.meta.ActionType;
 import eon.hg.fap.flow.model.ProcessDefinition;
 import eon.hg.fap.flow.model.ProcessInstance;
 import eon.hg.fap.flow.model.task.Task;
@@ -85,6 +86,7 @@ public class ForwardTaskCommand implements Command<Task> {
 		task.setState(state);
 		context.getSession().update(task);
 		context.getCommandService().executeCommand(new SaveHistoryTaskCommand(task,processInstance));
+		processInstance.setActionType(ActionType.FORWARD);
 		taskNode.leave(context, processInstance, targetFlowName);
 		return task;
 	}

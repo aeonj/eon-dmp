@@ -2,6 +2,7 @@ package eon.hg.fap.flow.command.impl;
 
 import eon.hg.fap.flow.command.Command;
 import eon.hg.fap.flow.env.Context;
+import eon.hg.fap.flow.meta.ActionType;
 import eon.hg.fap.flow.model.ProcessDefinition;
 import eon.hg.fap.flow.model.ProcessInstance;
 import eon.hg.fap.flow.model.task.Task;
@@ -80,6 +81,7 @@ public class RecallTaskCommand implements Command<Task> {
                     newFlow.setProcessId(task.getProcessId());
                     flows.add(newFlow);
                 }
+                pi.setActionType(ActionType.RECALL);
                 taskNode.leave(context, pi, targetFlowName);
             }
         }

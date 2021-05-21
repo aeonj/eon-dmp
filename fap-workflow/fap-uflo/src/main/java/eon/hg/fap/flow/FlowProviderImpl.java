@@ -298,6 +298,12 @@ public class FlowProviderImpl implements FlowProvider {
         doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)).addState(state), actionType, advice, records, "task_id", null, false);
     }
 
+    @Override
+    public void doWorkFlowByBusiness(Long menu_id, ActionType actionType, String advice,
+                                     List records) {
+        doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)), actionType, advice, records, "task_id", null, false);
+    }
+
     /**
      * 通用流程处理
      *

@@ -79,6 +79,9 @@ public class ProcessInstance{
 
 	@Transient
 	private Map<String,Object> metadata=new HashMap<String,Object>();
+
+	@Transient
+	private ActionType actionType;
 	
 	public long getId() {
 		return id;
@@ -172,5 +175,13 @@ public class ProcessInstance{
 	}
 	public Object getMetadata(String key) {
 		return metadata.get(key);
+	}
+
+	public ActionType getActionType() {
+		return actionType;
+	}
+
+	public void setActionType(ActionType actionType) {
+		this.actionType = actionType;
 	}
 }

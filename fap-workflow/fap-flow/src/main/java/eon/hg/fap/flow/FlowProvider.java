@@ -5,6 +5,7 @@ import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.flow.meta.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface FlowProvider {
 
@@ -54,8 +55,31 @@ public interface FlowProvider {
      * @param advice 流程处理意见
      * @param records 业务记录列表
      */
+    @Deprecated
     void doWorkFlowByBusiness(Long menu_id, NodeState state, ActionType actionType, String advice,
                               List records);
+
+    /**
+     * 通用流程处理
+     * @param menu_id 当前菜单ID
+     * @param actionType 操作类型
+     * @param advice 流程处理意见
+     * @param records 业务记录列表
+     */
+    void doWorkFlowByBusiness(Long menu_id, ActionType actionType, String advice,
+                              List records);
+
+    /**
+     * 通用流程处理
+     * @param menu_id 当前菜单ID
+     * @param actionType 操作类型
+     * @param advice 流程处理意见
+     * @param records 业务记录列表（允许map集合，对象集合，业务ID集合）
+     * @param variables 流程中需要的变量，注意涉及到权限的业务表字段建议指定,默认records集合全加
+     */
+    default void doWorkFlowByBusiness(Long menu_id, ActionType actionType, String advice,
+                              List records,String[] variables) {};
+
 
     /**
      * 通用流程处理
@@ -79,6 +103,21 @@ public interface FlowProvider {
      */
     void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice,
                               List records, String task_field, String business_field, boolean bUpdateVariants);
+
+    /**
+     * 通用流程处理
+     *
+     * @param node            流程节点信息
+     * @param actionType      操作类型
+     * @param advice          流程处理意见
+     * @param records         业务记录列表
+     * @param variables       流程中需要的变量，注意涉及到权限的业务表字段建议指定,默认records集合全加
+     * @param task_field      业务记录中对应的任务ID字段名
+     * @param business_field  业务记录中对应的业务ID字段名，仅records记录集中不存在task_field字段才有用
+     * @param bUpdateVariants 是否更新业务记录对应的流程变量
+     */
+    default void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice, List records, String[] variables,
+                                      String task_field, String business_field, boolean bUpdateVariants) {}
 
     /**
      * 获取操作日志

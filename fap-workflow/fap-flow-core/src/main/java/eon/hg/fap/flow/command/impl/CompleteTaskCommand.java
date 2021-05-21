@@ -18,6 +18,7 @@ package eon.hg.fap.flow.command.impl;
 import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.flow.command.Command;
 import eon.hg.fap.flow.env.Context;
+import eon.hg.fap.flow.meta.ActionType;
 import eon.hg.fap.flow.model.ProcessDefinition;
 import eon.hg.fap.flow.model.ProcessInstance;
 import eon.hg.fap.flow.model.task.Task;
@@ -98,6 +99,7 @@ public class CompleteTaskCommand implements Command<Task> {
 			context.getExpressionContext().addContextVariables(processInstance, variables);
 			context.getCommandService().executeCommand(new SaveProcessInstanceVariablesCommand(processInstance, variables));			
 		}
+		processInstance.setActionType(ActionType.NEXT);
 		node.leave(context,processInstance,flowName);
 		return task;
 	}

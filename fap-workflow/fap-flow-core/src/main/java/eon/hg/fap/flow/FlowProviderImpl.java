@@ -3,6 +3,7 @@ package eon.hg.fap.flow;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
@@ -20,7 +21,6 @@ import eon.hg.fap.flow.meta.*;
 import eon.hg.fap.flow.model.ProcessDefinition;
 import eon.hg.fap.flow.model.ProcessInstance;
 import eon.hg.fap.flow.model.task.Task;
-import eon.hg.fap.flow.model.task.TaskParticipator;
 import eon.hg.fap.flow.model.task.TaskState;
 import eon.hg.fap.flow.model.task.TaskType;
 import eon.hg.fap.flow.process.node.Node;
@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -321,6 +322,34 @@ public class FlowProviderImpl implements FlowProvider {
     /**
      * 通用流程处理
      *
+     * @param menu_id    当前菜单ID
+     * @param actionType 操作类型
+     * @param advice     流程处理意见
+     * @param records    业务记录列表
+     */
+    @Override
+    public void doWorkFlowByBusiness(Long menu_id, ActionType actionType, String advice,
+                                     List records) {
+        doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)), actionType, advice, records, "task_id", null, false);
+    }
+
+    /**
+     * 通用流程处理
+     * @param menu_id 当前菜单ID
+     * @param actionType 操作类型
+     * @param advice 流程处理意见
+     * @param records 业务记录列表（允许map集合，对象集合，业务ID集合）
+     * @param variables 流程中需要的变量，注意涉及到权限的业务表字段建议指定,默认records集合全加
+     */
+    @Override
+    public void doWorkFlowByBusiness(Long menu_id, ActionType actionType, String advice,
+                                      List records,String[] variables) {
+        doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)), actionType, advice, records, variables,"task_id", null, false);
+    };
+
+    /**
+     * 通用流程处理
+     *
      * @param node       流程节点信息
      * @param actionType 操作类型
      * @param advice     流程处理意见
@@ -344,18 +373,50 @@ public class FlowProviderImpl implements FlowProvider {
      * @param bUpdateVariants 是否更新业务记录对应的流程变量
      */
     @Override
-    public void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice, List records, String task_field, String business_field, boolean bUpdateVariants) {
+    public void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice, List records,
+                                     String task_field, String business_field, boolean bUpdateVariants) {
+        doWorkFlowByBusiness(node,actionType,advice,records,null,task_field,business_field,bUpdateVariants);
+    }
+
+    /**
+     * 通用流程处理
+     *
+     * @param node            流程节点信息
+     * @param actionType      操作类型
+     * @param advice          流程处理意见
+     * @param records         业务记录列表
+     * @param variables       流程中需要的变量，注意涉及到权限的业务表字段建议指定,默认records集合全加
+     * @param task_field      业务记录中对应的任务ID字段名
+     * @param business_field  业务记录中对应的业务ID字段名，仅records记录集中不存在task_field字段才有用
+     * @param bUpdateVariants 是否更新业务记录对应的流程变量
+     */
+    public void doWorkFlowByBusiness(CurrentNode node, ActionType actionType, String advice, List records, String[] variables,
+                                     String task_field, String business_field, boolean bUpdateVariants) {
         for (int i = 0; i < records.size(); i++) {
             Long taskId = null;
             Map mapRec = new HashMap();
             if (records.get(i) instanceof Long) {
-                throw new ResultException("暂不支持业务数据集是Long的类型！");
+                mapRec.put("id",records.get(i));
             } else if (records.get(i) instanceof String) {
-                throw new ResultException("暂不支持业务数据集是String的类型！");
+                mapRec.put("id",records.get(i));
             } else if (records.get(i) instanceof Map) {
-                mapRec = (Map) records.get(i);
+                if (variables==null || variables.length==0) {
+                    mapRec = (Map) records.get(i);
+                } else {
+                    Map<String,Object> mapTemp = (Map) records.get(i);
+                    for (String key :mapTemp.keySet()) {
+                        if (ArrayUtil.containsIgnoreCase(variables,key)) {
+                            mapRec.put(key,mapTemp.get(key));
+                        }
+                    };
+                }
             } else {
-                mapRec = BeanUtil.beanToMap(records.get(i));
+                if (variables==null || variables.length==0) {
+                    mapRec = BeanUtil.beanToMap(records.get(i));
+                } else {
+                    mapRec = BeanUtil.beanToMap(records.get(i),new LinkedHashMap<String, Object>(),false,
+                            (String key) -> ArrayUtil.containsIgnoreCase(variables,key) ? key : null);
+                }
             }
             Task task = null;
             if (ActionType.INPUT.equals(actionType)) {

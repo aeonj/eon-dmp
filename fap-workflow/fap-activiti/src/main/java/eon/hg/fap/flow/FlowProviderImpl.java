@@ -115,6 +115,11 @@ public class FlowProviderImpl implements FlowProvider {
 
     }
 
+    @Override
+    public void doWorkFlowByBusiness(Long menu_id, ActionType actionType, String advice, List records) {
+
+    }
+
     /**
      * 通用流程处理
      *
