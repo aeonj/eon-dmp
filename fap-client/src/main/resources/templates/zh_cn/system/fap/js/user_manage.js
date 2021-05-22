@@ -676,8 +676,6 @@ Ext.onReady(function () {
     //userTabs.activate(0);
 
     function addInit() {
-        belongObj.belong_source = [];
-        belongObj.belong_detail = [];
         addUserWindow.show();
         addUserWindow.setTitle('<span class="commoncss">新增用户</span>');
         Ext.getCmp('rdoEdtAuth').setValue("1");
@@ -686,8 +684,6 @@ Ext.onReady(function () {
     }
 
     function editInit() {
-        belongObj.belong_source = [];
-        belongObj.belong_detail = [];
         var selectNode = userTree.getSelectionModel().getSelected().items[0];
         // var selectNode = userTree.getSelectionModel().select(userTree.getRootNode());
         if (Ext.isEmpty(selectNode)) {
@@ -798,6 +794,7 @@ Ext.onReady(function () {
                 Ext.Msg.alert('提示', '自定义权限没有设置');
                 return;
             }
+            belongObj.belong_detail=[];
             Ext.each(belongObj.belong_source, function (eleObj) {
                 var eleCode = eleObj.eleCode,
                     tree = Ext.getCmp('tab_belong_' + eleCode),
@@ -878,6 +875,7 @@ Ext.onReady(function () {
                 Ext.Msg.alert('提示', '自定义权限没有设置');
                 return;
             }
+            belongObj.belong_detail=[];
             Ext.each(belongObj.belong_source, function (eleObj) {
                 var eleCode = eleObj.eleCode,
                     tree = Ext.getCmp('tab_belong_' + eleCode),

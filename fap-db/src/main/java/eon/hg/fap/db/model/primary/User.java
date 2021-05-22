@@ -31,11 +31,11 @@ import java.util.function.Supplier;
 @ToString
 @Entity
 @org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@Table(name = Globals.SYS_TABLE_SUFFIX + "user")
+@Table(name = Globals.SYS_TABLE_SUFFIX + "user", indexes = {
+		@Index(name = "idx_user", columnList = "userName")})
 public class User extends IdEntity {
 	private static final long serialVersionUID = -6076365663342941338L;
 	@Lock
-	@Column(unique = true)
 	private String userName;// 用户名
 	private String nickName;// 昵称
 	private String trueName;// 真实姓名

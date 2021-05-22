@@ -45,7 +45,7 @@ public class UserOP {
 	private GenericDao genericDao;
 
 	public List<Dto> getUserTreeList() {
-		List<User> userlist = this.userService.query("select obj from User obj where obj.manageType=0 and obj.rg_code=:rg_code and obj.is_deleted=0 order by obj.orgtype_id", new HashDto(){{put("rg_code",SecurityUserHolder.getRgCode());}}, -1, -1);
+		List<User> userlist = this.userService.query("select obj from User obj where obj.manageType=0 and obj.rg_code=:rg_code and obj.is_deleted=0 order by obj.orgtype_id,obj.userName", new HashDto(){{put("rg_code",SecurityUserHolder.getRgCode());}}, -1, -1);
 		List<Dto> rootlist = new ArrayList<>();
 		for (User user : userlist) {
 		    OrgType orgType = this.orgTypeService.getObjById(user.getOrgtype_id());
