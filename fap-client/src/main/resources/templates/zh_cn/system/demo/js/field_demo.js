@@ -4,6 +4,8 @@
  * @author aeon
  * @since 2014-08-20
  */
+var yearObj = {nextyear:2022};
+
 Ext.onReady(function () {
     var firstForm = new Ext.vcf.QueryPanel({
         id: 'firstForm',
@@ -133,7 +135,6 @@ Ext.onReady(function () {
             anchor: '100%' // 宽度百分比
         }]
     });
-
     var firstWindow = new Ext.Window({
         title: '<span class="commoncss">VCF平台录入组件</span>', // 窗口标题
         layout: 'fit', // 设置窗口布局模式
@@ -157,6 +158,8 @@ Ext.onReady(function () {
             text: '条件', // 按钮文本
             iconCls: 'BFIcon', // 按钮图标
             handler: function () { // 按钮响应函数
+                //alert(getUIDisplayTitle("{%year%}年{%month%}月{%day%}日，日期：{%yearObj.nextyear%}"));
+                alert(tagTpl("日期：{%yearObj.nextyear%}",yearObj));
                 alert(Ext.encode(firstForm.getQuery()));
             }
         }, { // 窗口底部按钮配置
