@@ -109,10 +109,10 @@ public class FlowProviderImpl implements FlowProvider {
                 TaskNode tn = (TaskNode) taskNode;
                 if (TaskType.Countersign.equals(tn.getTaskType())) {
                     sqlBuilder.append(" and exists(select 1 from wf_task unu where unu.id_=ct.current_task_id_ and unu.owner_='").append(oUser.getUserid()).append("')");
-                } else if (TaskType.Participative.equals(tn.getTaskType())) {
-                    sqlBuilder.append(" and exists(select 1 from wf_task unu where unu.id_=ct.current_task_id_ and unu.assignee_='").append(oUser.getUserid()).append("')");
                 } else {
-                    sqlBuilder.append(" and exists(select 1 from wf_task_participator unu where unu.task_id_=ct.current_task_id_ and unu.user_='").append(oUser.getUserid()).append("')");
+                    sqlBuilder.append(" and exists(select 1 from wf_his_task unu where unu.task_id_=ct.current_task_id_ and unu.process_id_=ct.process_id_ and unu.assignee_='").append(oUser.getUserid()).append("')");
+//                } else {
+//                    sqlBuilder.append(" and exists(select 1 from wf_task_participator unu where unu.task_id_=ct.current_task_id_ and unu.user_='").append(oUser.getUserid()).append("')");
                 }
             } else {
                 sqlBuilder.append(" and 1=0");
@@ -137,8 +137,8 @@ public class FlowProviderImpl implements FlowProvider {
                 TaskNode tn = (TaskNode) taskNode;
                 if (TaskType.Countersign.equals(tn.getTaskType())) {
                     sqlBuilder.append(" and exists(select 1 from wf_task unu where unu.id_=ct.next_task_id_ and unu.owner_='").append(oUser.getUserid()).append("')");
-                } else if (TaskType.Participative.equals(tn.getTaskType())) {
-                    sqlBuilder.append(" and exists(select 1 from wf_task unu where unu.id_=ct.next_task_id_ and unu.assignee_='").append(oUser.getUserid()).append("')");
+//                } else if (TaskType.Normal.equals(tn.getTaskType())) {
+//                    sqlBuilder.append(" and exists(select 1 from wf_task unu where unu.id_=ct.next_task_id_ and unu.assignee_='").append(oUser.getUserid()).append("')");
                 } else {
                     sqlBuilder.append(" and exists(select 1 from wf_task_participator unu where unu.task_id_=ct.next_task_id_ and unu.user_='").append(oUser.getUserid()).append("')");
                 }
@@ -202,10 +202,10 @@ public class FlowProviderImpl implements FlowProvider {
                 TaskNode tn = (TaskNode) taskNode;
                 if (TaskType.Countersign.equals(tn.getTaskType())) {
                     sqlBuilder.append(" and exists(select 1 from Task unu where unu.id=ct.currentTaskId and unu.owner=:userId)");
-                } else if (TaskType.Participative.equals(tn.getTaskType())) {
-                    sqlBuilder.append(" and exists(select 1 from Task unu where unu.id=ct.currentTaskId and unu.assignee=:userId)");
                 } else {
-                    sqlBuilder.append(" and exists(select 1 from TaskParticipator unu where unu.taskId_=ct.currentTaskId and unu.user=:userId)");
+                    sqlBuilder.append(" and exists(select 1 from HistoryTask unu where unu.id=ct.currentTaskId and unu.processId=ct.processId and unu.assignee=:userId)");
+//                } else {
+//                    sqlBuilder.append(" and exists(select 1 from TaskParticipator unu where unu.taskId_=ct.currentTaskId and unu.user=:userId)");
                 }
             } else {
                 sqlBuilder.append(" and 1=0");
@@ -238,8 +238,8 @@ public class FlowProviderImpl implements FlowProvider {
                 TaskNode tn = (TaskNode) taskNode;
                 if (TaskType.Countersign.equals(tn.getTaskType())) {
                     sqlBuilder.append(" and exists(select 1 from Task unu where unu.id=ct.nextTaskId and unu.owner=:userId)");
-                } else if (TaskType.Participative.equals(tn.getTaskType())) {
-                    sqlBuilder.append(" and exists(select 1 from Task unu where unu.id=ct.nextTaskId and unu.assignee=:userId)");
+//                } else if (TaskType.Normal.equals(tn.getTaskType())) {
+//                    sqlBuilder.append(" and exists(select 1 from Task unu where unu.id=ct.nextTaskId and unu.assignee=:userId)");
                 } else {
                     sqlBuilder.append(" and exists(select 1 from TaskParticipator unu where unu.taskId_=ct.nextTaskId and unu.user=:userId)");
                 }
