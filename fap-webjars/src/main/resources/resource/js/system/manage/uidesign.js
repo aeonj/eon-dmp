@@ -196,7 +196,7 @@ function addUIByServer(comp, ray, pos) {
                 items.text = ray_detail[i].field_title;
             } else {
                 items.name = ray_detail[i].field_name;
-                items.fieldLabel = ray_detail[i].field_title;
+                items.fieldLabel = getUIDisplayTitle(ray_detail[i].field_title);
             }
             items.xtype = ray_detail[i].field_type;
             items.logic = ray_detail[i].field_logic;
@@ -428,7 +428,7 @@ function addGridByServer(comp, ray) {
             };
             for (var i = 0; ray != null && i < ray.length; i++) {
                 var newField = {
-                    header: ray[i].field_title,
+                    header: getUIDisplayTitle(ray[i].field_title),
                     dataIndex: ray[i].field_name,
                     sortable: true,
                     //用于表嵌套render事件处理
@@ -581,5 +581,47 @@ function addGridByServer(comp, ray) {
         comp.execMethod(items);
     }
 }
+
+/**
+ * 模板字串函数
+ *   全局变量（含简单的对象）可以作为模板变量完成替换
+ *   示例：var yearObj = {nextyear:2022};
+ *        getUIDisplayTitle('{yearObj.nextyear}年')
+ * @param names {%%}格式字符串
+ */
+function getUIDisplayTitle(names) {
+    function getUIVariables(key) {
+        if (key) {
+            if (key.toUpperCase()=='YEAR') {
+                return new Date().getFullYear(); //获取当前年份(4位)
+            } else if (key.toUpperCase()=='MONTH') {
+                return new Date().getMonth()+1; //获取当前月份(0-11,0代表1月)
+            } else if (key.toUpperCase()=='DAY') {
+                return new Date().getDate(); //获取当前日(1-31)
+            } else if (key.toUpperCase()=='DATE') {
+                return new Date().toLocaleDateString(); //获取当前日期
+            } else if (key.toUpperCase()=='TIME') {
+                return new Date().toLocaleTimeString(); //获取当前时间
+            } else if (key.toUpperCase()=='DATETIME') {
+                return new Date().toLocaleString( ); //获取日期与时间
+            } else {
+                if(key.indexOf('.') > -1){
+                    var params = key.split('.');
+                    return window[params[0]][params[1]] || "";
+                } else {
+                    return window[key] || "";
+                }
+            }
+        } else {
+            return "";
+        }
+    }
+    return names.replace(/\{%([^%\{\}]+)%}/g,function(orgin,item){
+        item = item.replace(/^\s+|\s+$/,"");
+        return getUIVariables(item);
+    });
+}
+
+
 
 

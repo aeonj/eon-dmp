@@ -643,6 +643,28 @@ function findArrayNew(arr, obj, arrfield) {
 function trim(str){ //删除左右两端的空格
     return str.replace(/(^\s*)|(\s*$)/g, "");
 }
+
+/**
+ * 模板字符串
+ *   var str = `<div class="{%data.className%}">{%data.name%}</div>`
+ *   var d = {data: {name: 123,className:'hd'}}
+ *   var t = tagTpl(str,d)
+ * @param template 用{% %}标签标识的字符串模板
+ * @param data 与模板内标签匹配的对象
+ */
+function tagTpl(template,data){
+    return template.replace(/\{%([^%\{\}]+)%}/g,function(orgin,item){
+        item = item.replace(/^\s+|\s+$/,"");
+        if(item.indexOf('.') > -1){
+            var params = [];
+            params = item.split('.');
+            return data[params[1]];
+        } else {
+            return data[item];
+        }
+    })
+}
+
 function showFlowOperation(business_id) {
     var pnl_tab = Ext.create('Ext.tab.Panel', {
         region: 'center',
