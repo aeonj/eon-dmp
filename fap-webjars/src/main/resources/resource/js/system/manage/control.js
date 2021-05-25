@@ -1334,6 +1334,9 @@ Ext.define('Ext.vcf.ChkGroup' , {
         this.items = this.getEnumData();
         this.callParent(arguments);
     },
+    getSubmitValue: function() {
+        return this.getValue();
+    },
     getEnumData : function() {
         var r = [];
         if (this.enumData!=null && this.enumData!='') {
@@ -1401,6 +1404,9 @@ Ext.define('Ext.vcf.RadioField' , {
         }
         Ext.resumeLayouts(true);
         return this;
+    },
+    getSubmitValue: function() {
+        return this.getValue();
     },
     getEnumData : function() {
         var r = [];
@@ -1482,7 +1488,9 @@ Ext.define('Ext.vcf.FormPanel', {
 Ext.define('Ext.vcf.QueryPanel', {
     extend: 'Ext.vcf.FormPanel',
     xtype: 'querypanel',
-    //状态关键字state是否放进查询条件
+    /**
+     * 状态关键字state是否放进查询条件
+     */
     contain_state: false,
     initComponent: function() {
         this.callParent();
@@ -1494,12 +1502,22 @@ Ext.define('Ext.vcf.QueryPanel', {
         for (var i = 0; i < fields.getCount(); i++) {
             var field = fields.get(i);
             if (me.contain_state || field.getName()!='state') {
-                var meta = {field: field.getName(), op: field.logic || '=', data: field.getSubmitValue(), type: field.data_type || 'string'};
-                rules.push(meta);
+                if (!containsArrayNew(rules,field.getName(),'field')) {
+                    var meta = {
+                        field: field.getName(),
+                        op: field.logic || '=',
+                        data: field.getSubmitValue(),
+                        type: field.data_type || 'string'
+                    };
+                    rules.push(meta);
+                }
             }
         }
         return rules;
     },
+    /**
+     * 获取Json格式的条件参数
+     */
     getQueryString : function () {
         return Ext.encode(this.getQuery());
     },
@@ -1512,7 +1530,10 @@ Ext.define('Ext.vcf.QueryPanel', {
             return '';
         }
     },
-    //获取
+    /**
+     * 获取条件参数对象，querystr作为条件对象值
+     * @returns {*}
+     */
     getQueryParams : function () {
         var me=this;
         if (me.contain_state) {
@@ -1521,6 +1542,10 @@ Ext.define('Ext.vcf.QueryPanel', {
             return {querystr: me.getQueryString(), state: me.getState()};
         }
     },
+    /**
+     * 获取Request请求参数URL字串
+     * @returns {string}
+     */
     getReportParams : function () {
         var me=this,
             fields = me.form.getFields(),
