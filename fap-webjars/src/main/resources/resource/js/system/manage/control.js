@@ -798,6 +798,7 @@ Ext.define('Ext.vcf.TreeField', {
                 handler: function () {
                     combo.setValue(combo.picker.getRootNode());
                     combo.collapse();
+                    combo.fireEvent('afterok', me, me.value);
                 }
             }, '-',
                 {
