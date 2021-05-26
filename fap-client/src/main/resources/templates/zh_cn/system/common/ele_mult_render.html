@@ -1,27 +1,31 @@
 <script type="text/javascript">
     <#list fieldList as field>
-	function ${field.getKey()}IdMultRender(value) {
+	function ${field.getKey()}IdMultRender(value, cellmeta) {
         if (value==null) return null;
         var ids = value.split(','),
             text = [];
-        for (var id in ids) {
+        for (var idx in ids) {
         <#list field.getValue() as code>
-            if (id == '${code.id}') text.push('${code.name}');
+            if (ids[idx] == '${code.id}') text.push('${code.name}');
         </#list>
         }
-        return text.join(',');
+        var result = text.join(',');
+        cellmeta.tdAttr = 'data-qtip="' + result + '"';
+        return result;
 	}
 	<#if (iscode)??>
-	function ${field.getKey()}CodeMultRender(value) {
+	function ${field.getKey()}CodeMultRender(value, cellmeta) {
         if (value==null) return null;
         var codes = value.split(','),
             text = [];
-        for (var code in codes) {
+        for (var idx in codes) {
         <#list field.getValue() as code>
-            if (code == '${code.code}') text.push('${code.name}');
+            if (codes[idx] == '${code.code}') text.push('${code.name}');
         </#list>
         }
-        return text.join(',');
+        var result = text.join(',');
+        cellmeta.tdAttr = 'data-qtip="' + result + '"';
+        return result;
 	}
 	</#if>
 	</#list>
