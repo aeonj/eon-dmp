@@ -168,6 +168,46 @@ public class TplManageAction {
 		return mv;
 	}
 
+	@RequestMapping("/ele_mult_render.htm")
+	public ModelAndView ele_mult_render(HttpServletRequest request,
+								   HttpServletResponse response) throws Exception {
+		ModelAndView mv = new JModelAndView("common/ele_mult_render.html",
+				configService.getSysConfig(),
+				this.userConfigService.getUserConfig(), 0, request, response);
+		EleRenderTagDto eleDto=WebHandler.toAPo(request, EleRenderTagDto.class);
+		String[] arrayFields = eleDto.getFields().split(",");
+		List<SysMap> fieldList = new ArrayList<SysMap>();
+		for (int i = 0; i < arrayFields.length; i++) {
+			Element ele = eleOP.getEleSource(arrayFields[i]);
+			if (ele==null) {
+				continue;
+			}
+			//只要要素设置了类名，必须使用类方式获取树
+			boolean istable = false;
+			Dto dtoTemp = new HashDto();
+			if (CommUtil.isEmpty(ele.getClass_name())) {
+				istable = true;
+			} else {
+				dtoTemp.put("class_name",ele.getClass_name());
+			}
+			dtoTemp.put("table_name",ele.getEle_source());
+
+			dtoTemp.put("source", arrayFields[i]);
+			List lstEle;
+			if (istable) {
+				lstEle = baseTreeService.getCache(dtoTemp);
+			} else {
+
+				lstEle = eleOP.getObject(dtoTemp);
+			}
+			SysMap fields = new SysMap(arrayFields[i],getRenderShowList(lstEle));
+			fieldList.add(fields);
+		}
+		mv.addObject("iscode", eleDto.getIscode());
+		mv.addObject("fieldList", fieldList);
+		return mv;
+	}
+
 	private List getRenderShowList(List lstEle) {
 		List lstV = new ArrayList();
 		for(int i=0; lstEle!=null && i<lstEle.size(); i++){
