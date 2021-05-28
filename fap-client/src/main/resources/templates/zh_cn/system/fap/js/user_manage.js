@@ -119,7 +119,7 @@ Ext.onReady(function () {
             }
         }, {
             id: 'user:f_user_set',
-            text: 'F3用户对照',
+            text: '用户对照',
             iconCls: 'x-fa fa-users',
             handler: function () {
                 linkFUser();
@@ -1054,7 +1054,7 @@ Ext.onReady(function () {
         var linkPanel = Ext.create('Ext.vcf.FormPanel',{
             layout : 'form',
             items : [{
-                fieldLabel: 'F3用户',
+                fieldLabel: '对方用户',
                 name: 'f_user_id',
                 isFullLevel : false,
                 afterLabelTextTpl: [
@@ -1065,7 +1065,7 @@ Ext.onReady(function () {
                 isPermission : false,
                 anchor: '99%'
             },{
-                fieldLabel: 'F3角色',
+                fieldLabel: '对方角色',
                 name: 'f_role_id',
                 afterLabelTextTpl: [
                     '<span style="color:red;font-weight:bold" data-qtip="Required">*</span>'
@@ -1090,7 +1090,7 @@ Ext.onReady(function () {
         var linkwindow = Ext.create('Ext.vcf.Window', {
             width : 460,
             height : 300,
-            title : "F3用户角色对照",
+            title : "系统间用户角色对照",
             items: linkPanel,
             tbar : [{
                 text: '退出',

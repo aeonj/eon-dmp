@@ -43,10 +43,10 @@ function pageLoad() {
         }, '-', {
             id: 'menu:group_do',
             text: '菜单组维护',
-            iconCls: 'page_delIcon',
+            iconCls: 'FoldereditIcon',
             handler: mgInit
         }, '-', {
-            text: 'F3功能对照',
+            text: '功能对照',
             iconCls: 'page_delIcon',
             handler: linkFModule
         }]
