@@ -56,22 +56,35 @@ public class LeaveTaskCommand implements Command<Task> {
 			if (ActionType.INPUT.equals(actionType)) {
 				taskBusiness.setNextStatusCode(NodeState.UN_CHECK.getCode());
 				taskBusiness.setCurrentStatusCode(NodeState.CHECK.getCode());
+				taskBusiness.setCurrentNodeName(task.getNodeName());
+				taskBusiness.setCurrentTaskId(task.getId());
 			} else if (ActionType.NEXT.equals(actionType)) {
 				taskBusiness.setNextStatusCode(NodeState.UN_CHECK.getCode());
 				taskBusiness.setCurrentStatusCode(NodeState.CHECK.getCode());
+				taskBusiness.setCurrentNodeName(task.getNodeName());
+				taskBusiness.setCurrentTaskId(task.getId());
 			} else if (ActionType.RECALL.equals(actionType)) {
 				taskBusiness.setNextStatusCode(NodeState.UN_CHECK.getCode());
 				taskBusiness.setCurrentStatusCode(NodeState.CHECK.getCode());
+				taskBusiness.setNextTaskId(taskBusiness.getCurrentTaskId());
+				taskBusiness.setNextNodeName(taskBusiness.getCurrentNodeName());
+				taskBusiness.setCurrentNodeName(task.getPrevTask());
+				List<Task> tempList = context.getTaskService().createTaskQuery().nodeName(task.getPrevTask()).processInstanceId(task.getProcessInstanceId()).addOrderDesc("createDate").list();
+				if (tempList!=null && tempList.size()>0) {
+					taskBusiness.setCurrentTaskId(tempList.get(0).getId());
+				}
 			} else if (ActionType.BACK.equals(actionType)) {
 				taskBusiness.setNextStatusCode(NodeState.FROM_BACK.getCode());
 				taskBusiness.setCurrentStatusCode(NodeState.BACK.getCode());
+				taskBusiness.setCurrentNodeName(task.getNodeName());
+				taskBusiness.setCurrentTaskId(task.getId());
 			} else if (ActionType.DISCARD.equals(actionType)) {
 				taskBusiness.setNextStatusCode(null);
 				taskBusiness.setCurrentStatusCode(NodeState.DISCARD.getCode());
+				taskBusiness.setCurrentNodeName(task.getNodeName());
+				taskBusiness.setCurrentTaskId(task.getId());
 			}
-			taskBusiness.setCurrentNodeName(task.getNodeName());
 			taskBusiness.setActionType(actionType);
-			taskBusiness.setCurrentTaskId(task.getId());
 			session.update(taskBusiness);
 		}
 		return task;

@@ -7,6 +7,7 @@ import eon.hg.fap.db.model.primary.Accessory;
 import eon.hg.fap.db.model.primary.SysConfig;
 import eon.hg.fap.db.service.ISysConfigService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -41,7 +42,7 @@ public class SysConfigServiceImpl extends AbstractCacheOperator implements ISysC
 		return this.sysConfigDao.update( sysConfig);
 	}
 	
-	@Transactional(readOnly = true)
+	@Transactional(propagation= Propagation.NEVER)
 	public SysConfig getSysConfig() {
 		try {
 			SysConfig sc = this.getCache();

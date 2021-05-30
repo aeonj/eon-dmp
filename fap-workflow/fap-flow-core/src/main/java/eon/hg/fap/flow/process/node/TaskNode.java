@@ -344,7 +344,7 @@ public class TaskNode extends Node {
 			throw new IllegalArgumentException("Unsupported current task type :"+taskType);
 		}
 		//建立nodeUser关联
-		saveNodeUsers(context,processInstance,users);
+		//saveNodeUsers(context,processInstance,users);
 	}
 
 	/**

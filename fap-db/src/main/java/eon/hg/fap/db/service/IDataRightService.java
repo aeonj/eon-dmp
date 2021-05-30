@@ -7,4 +7,11 @@ public interface IDataRightService {
      * @return
      */
     String getDataRightSql(String alias);
+
+    /**
+     * 获取权限hql语句
+     * @param alias
+     * @return
+     */
+    String getDataRightHql(String alias);
 }

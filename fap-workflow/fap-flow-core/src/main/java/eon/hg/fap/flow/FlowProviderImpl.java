@@ -97,13 +97,13 @@ public class FlowProviderImpl implements FlowProvider {
         StringBuilder sqlBuilder = new StringBuilder();
         if (NodeState.ALL.equals(node.getState())) {
             //sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' and exists(select 1 from wf_node_users unu where unu.process_instance_id_=ct.process_instance_id_ and unu.node_name_=ct.current_node_name_ and unu.user_id_='").append(oUser.getUserid()).append("')");
-            sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' ");
+            sqlBuilder.append(" and ct.process_id_=").append(pd.getId());//.append(" and ct.current_node_name_='").append(node.getNodeName()).append("' ");
             sqlBuilder.append(dataRightService.getDataRightSql(alias));
             sqlRelation.setColumns(",ct.current_task_id_ task_id");
             sqlRelation.setJoins(StrUtil.concat(true, " inner join wf_task_business ct on ct.business_id_=", alias, ".", id_field));
             sqlRelation.setConditions(sqlBuilder.toString());
         } else if (NodeState.CHECK.equals(node.getState()) || NodeState.BACK.equals(node.getState()) || NodeState.DISCARD.equals(node.getState())) {
-            sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' and ct.current_status_code_='").append(node.getState().getCode()).append("' and ct.action_type_='NEXT'");
+            sqlBuilder.append(" and ct.process_id_=").append(pd.getId()).append(" and ct.current_node_name_='").append(node.getNodeName()).append("' and ct.current_status_code_='").append(node.getState().getCode()).append("'");
             Node taskNode = pd.getNode(node.getNodeName());
             if (taskNode instanceof TaskNode) {
                 TaskNode tn = (TaskNode) taskNode;
@@ -183,20 +183,20 @@ public class FlowProviderImpl implements FlowProvider {
         if (NodeState.ALL.equals(node.getState())) {
             params.put("currentNodeName", node.getNodeName());
             params.put("userId", oUser.getUserid());
-            qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName and exists(select 1 from NodeUsers unu where unu.processInstanceId=ct.processInstanceId and unu.nodeName=ct.currentNodeName and unu.userId=:userId))", params);
+            //qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName and exists(select 1 from NodeUsers unu where unu.processInstanceId=ct.processInstanceId and unu.nodeName=ct.currentNodeName and unu.userId=:userId))", params);
             //qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName)", params);
+            qo.addQuery(dataRightService.getDataRightHql(qo.getAlias()),null);
         } else if (NodeState.CHECK.equals(node.getState()) || NodeState.BACK.equals(node.getState()) || NodeState.DISCARD.equals(node.getState())) {
             params.put("currentNodeName", node.getNodeName());
             params.put("currentStatusCode", node.getState().getCode());
             params.put("user_id", oUser.getUserid());
-            params.put("actionType", ActionType.NEXT);
             params.put("state",FlowTaskUtils.getTaskStates(node.getState()));
             //基于nodeUsers生成的流程条件
             //qo.addQuery("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName and ct.currentStatusCode=:currentStatusCode and exists(select 1 from NodeUsers unu where unu.processInstanceId=ct.processInstanceId and unu.nodeName=ct.currentNodeName and unu.userId=:userId))", params);
 
             //基于TaskBusines和TaskParticipator生成的流程条件
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName and ct.currentStatusCode=:currentStatusCode and ct.actionType=:actionType");
+            sqlBuilder.append("exists(select 1 from TaskBusiness ct where obj.id=ct.businessId and ct.processId=:processId and ct.currentNodeName=:currentNodeName and ct.currentStatusCode=:currentStatusCode");
             Node taskNode = pd.getNode(node.getNodeName());
             if (taskNode instanceof TaskNode) {
                 TaskNode tn = (TaskNode) taskNode;
@@ -505,6 +505,7 @@ public class FlowProviderImpl implements FlowProvider {
                         taskService.complete(taskId, new TaskOpinion(advice));
                     }
                 } else if (ActionType.RECALL.equals(actionType)) {
+                    task.setAssignee(SecurityUserHolder.getOnlineUser().getUserid());
                     //撤销
                     if (task.getState().equals(TaskState.InProgress)) {
                         throw new IllegalStateException("Task " + task.getTaskName() + " state is InProgress,can not be withdraw.");
@@ -515,6 +516,7 @@ public class FlowProviderImpl implements FlowProvider {
                         commandService.executeCommand(new RecallTaskCommand(task, null, new TaskOpinion(advice)));
                     }
                 } else if (ActionType.BACK.equals(actionType)) {
+                    task.setAssignee(SecurityUserHolder.getOnlineUser().getUserid());
                     //退回
                     if (bUpdateVariants) {
                         taskService.rollback(task, task.getPrevTask(), mapRec, new TaskOpinion(advice));
@@ -522,6 +524,7 @@ public class FlowProviderImpl implements FlowProvider {
                         taskService.rollback(task, task.getPrevTask(), null, new TaskOpinion(advice));
                     }
                 } else if (ActionType.BACK_FIRST.equals(actionType)) {
+                    task.setAssignee(SecurityUserHolder.getOnlineUser().getUserid());
                     ProcessDefinition pd = processService.getProcessById(task.getProcessId());
                     String nodeName = pd.getStartNode().getName();
                     //退回
@@ -531,7 +534,12 @@ public class FlowProviderImpl implements FlowProvider {
                         taskService.rollback(task, nodeName, null, new TaskOpinion(advice));
                     }
                 } else if (ActionType.DISCARD.equals(actionType)) {
+                    if (TaskType.Participative.equals(task.getType())) {
+                        taskService.claim(taskId, SecurityUserHolder.getOnlineUser().getUserid());
+                    }
                     taskService.cancelTask(taskId, new TaskOpinion(advice));
+                } else if (ActionType.EDIT.equals(actionType)) {
+
                 }
                 commandService.executeCommand(new LeaveTaskCommand(task, actionType));
             }
@@ -555,10 +563,7 @@ public class FlowProviderImpl implements FlowProvider {
                 taskService.complete(taskId, new TaskOpinion(advice));
             } else if (ActionType.RECALL.equals(actionType)) {
                 //撤销
-                if (!taskService.canWithdraw(task)) {
-                    throw new ResultException("当前任务不能回退到上一任务节点");
-                }
-                taskService.withdraw(taskId, new TaskOpinion(advice));
+                commandService.executeCommand(new RecallTaskCommand(task, null, new TaskOpinion(advice)));
             } else if (ActionType.BACK.equals(actionType)) {
                 //退回
                 taskService.rollback(task, task.getPrevTask(), null, new TaskOpinion(advice));
