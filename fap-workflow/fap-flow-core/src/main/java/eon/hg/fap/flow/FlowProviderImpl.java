@@ -15,6 +15,7 @@ import eon.hg.fap.db.model.virtual.OnlineUser;
 import eon.hg.fap.db.service.IDataRightService;
 import eon.hg.fap.db.service.IMenuService;
 import eon.hg.fap.flow.command.CommandService;
+import eon.hg.fap.flow.command.impl.EditTaskCommand;
 import eon.hg.fap.flow.command.impl.LeaveTaskCommand;
 import eon.hg.fap.flow.command.impl.RecallTaskCommand;
 import eon.hg.fap.flow.meta.*;
@@ -203,7 +204,7 @@ public class FlowProviderImpl implements FlowProvider {
                 if (TaskType.Countersign.equals(tn.getTaskType())) {
                     sqlBuilder.append(" and exists(select 1 from Task unu where unu.id=ct.currentTaskId and unu.owner=:userId)");
                 } else {
-                    sqlBuilder.append(" and exists(select 1 from HistoryTask unu where unu.id=ct.currentTaskId and unu.processId=ct.processId and unu.assignee=:userId)");
+                    sqlBuilder.append(" and exists(select 1 from HistoryTask unu where unu.taskId=ct.currentTaskId and unu.processId=ct.processId and unu.assignee=:userId)");
 //                } else {
 //                    sqlBuilder.append(" and exists(select 1 from TaskParticipator unu where unu.taskId_=ct.currentTaskId and unu.user=:userId)");
                 }
@@ -506,10 +507,6 @@ public class FlowProviderImpl implements FlowProvider {
                     }
                 } else if (ActionType.RECALL.equals(actionType)) {
                     task.setAssignee(SecurityUserHolder.getOnlineUser().getUserid());
-                    //撤销
-                    if (task.getState().equals(TaskState.InProgress)) {
-                        throw new IllegalStateException("Task " + task.getTaskName() + " state is InProgress,can not be withdraw.");
-                    }
                     if (bUpdateVariants) {
                         commandService.executeCommand(new RecallTaskCommand(task, mapRec, new TaskOpinion(advice)));
                     } else {
@@ -518,6 +515,9 @@ public class FlowProviderImpl implements FlowProvider {
                 } else if (ActionType.BACK.equals(actionType)) {
                     task.setAssignee(SecurityUserHolder.getOnlineUser().getUserid());
                     //退回
+                    if (task.getState().equals(TaskState.InProgress) || task.getState().equals(TaskState.Rollback)) {
+                        throw new IllegalStateException("Task " + task.getTaskName() + " state is InProgress,can not be rollback.");
+                    }
                     if (bUpdateVariants) {
                         taskService.rollback(task, task.getPrevTask(), mapRec, new TaskOpinion(advice));
                     } else {
@@ -539,7 +539,13 @@ public class FlowProviderImpl implements FlowProvider {
                     }
                     taskService.cancelTask(taskId, new TaskOpinion(advice));
                 } else if (ActionType.EDIT.equals(actionType)) {
-
+                    if (bUpdateVariants) {
+                        commandService.executeCommand(new EditTaskCommand(task, mapRec));
+                    } else {
+                        commandService.executeCommand(new EditTaskCommand(task, null));
+                    }
+                } else if (ActionType.DELETE.equals(actionType)) {
+                    processService.deleteProcessInstanceById(task.getProcessInstanceId());
                 }
                 commandService.executeCommand(new LeaveTaskCommand(task, actionType));
             }

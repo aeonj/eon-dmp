@@ -20,5 +20,5 @@ package eon.hg.fap.flow.model.task;
  * @since 2013年7月25日
  */
 public enum TaskState {
-	Created,Ready,Reserved,InProgress,Completed,Suspended,Canceled,Forwarded,Rollback,Withdraw,Recall;
+	Created,Ready,Reserved,InProgress,Completed,Suspended,Canceled,Forwarded,Rollback,Withdraw,Recall,Edit;
 }

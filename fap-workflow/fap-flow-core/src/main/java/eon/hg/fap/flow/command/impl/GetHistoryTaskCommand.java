@@ -20,12 +20,22 @@ import eon.hg.fap.flow.env.Context;
 import eon.hg.fap.flow.model.HistoryTask;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.List;
+
+/**
+ * 只取historytask的第一条记录，应用时需注意
+ */
 public class GetHistoryTaskCommand implements Command<HistoryTask> {
 	private long taskId;
 	public GetHistoryTaskCommand(long taskId){
 		this.taskId=taskId;
 	}
 	public HistoryTask execute(Context context) {
-		return (HistoryTask)context.getSession().createCriteria(HistoryTask.class).add(Restrictions.eq("taskId", taskId)).uniqueResult();
+		List<HistoryTask> tasks = context.getSession().createCriteria(HistoryTask.class).add(Restrictions.eq("taskId", taskId)).list();
+		if (tasks==null || tasks.size()==0) {
+			return null;
+		} else {
+			return tasks.get(0);
+		}
 	}
 }

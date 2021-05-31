@@ -39,7 +39,9 @@ public class RecallTaskCommand implements Command<Task> {
     }
     public Task execute(Context context) {
         TaskService taskService=context.getTaskService();
-
+        if (!TaskState.Completed.equals(task.getState())) {
+            throw new IllegalArgumentException("Task "+task.getTaskName()+" is not complete state.");
+        }
         String nodeName = task.getNodeName();
         ProcessDefinition pd = context.getProcessService().getProcessById(task.getProcessId());
         ProcessInstance pi = context.getProcessService().getProcessInstanceById(task.getProcessInstanceId());
