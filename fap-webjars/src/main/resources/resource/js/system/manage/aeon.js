@@ -683,34 +683,43 @@ function showFlowOperation(business_id) {
                 xtype: 'rownumberer',
                 width: 30
             }, {
-                header: '流程节点',
+                header: '任务名称',
                 dataIndex: 'taskName',
                 width: 140,
                 sortable: true
             }, {
-                header: '处理意见',
-                dataIndex: 'opinion',
-                width: 100,
+                header: '任务状态',
+                dataIndex: 'state',
+                width: 70,
                 sortable: true
             }, {
-                header: '操作人',
-                dataIndex: 'userName',
+                header: '处理意见',
+                dataIndex: 'opinion',
+                width: 110,
                 sortable: true,
-                width: 100
+                renderer: columnTooltipRender
+            }, {
+                header: '操作人',
+                dataIndex: 'assignee',
+                sortable: true,
+                width: 100,
+                renderer: columnTooltipRender
             }, {
                 header: '操作时间',
                 dataIndex: 'endDate',
                 sortable: true,
-                width: 100
+                width: 135
             }],
             fieldBase: [{
                 name : 'businessId'
             }, {
                 name : 'taskName'
             }, {
+                name : 'state'
+            }, {
                 name : 'opinion'
             }, {
-                name : 'userName'
+                name : 'assignee'
             }, {
                 name : 'endDate'
             }, {
@@ -727,7 +736,7 @@ function showFlowOperation(business_id) {
         title: '流程显示',
         autoShow: true,
         height: 580,
-        width: 500,
+        width: 600,
         closeAction: 'destroy',
         items: pnl_tab,
         buttons : [{
