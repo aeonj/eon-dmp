@@ -708,7 +708,7 @@ function showFlowOperation(business_id) {
                 header: '操作时间',
                 dataIndex: 'endDate',
                 sortable: true,
-                width: 135
+                width: 140
             }],
             fieldBase: [{
                 name : 'businessId'

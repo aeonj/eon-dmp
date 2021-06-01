@@ -523,10 +523,17 @@ public class FlowProviderImpl implements FlowProvider {
                     if (task.getState().equals(TaskState.InProgress) || task.getState().equals(TaskState.Rollback)) {
                         throw new IllegalStateException("Task " + task.getTaskName() + " state is InProgress,can not be rollback.");
                     }
-                    if (bUpdateVariants) {
-                        taskService.rollback(task, task.getPrevTask(), mapRec, new TaskOpinion(advice));
+                    //获取前一流程节点（取complete状态的task）
+                    List<Task> listTask = taskService.createTaskQuery().processInstanceId(task.getProcessInstanceId()).nodeName(task.getNodeName()).addOrderAsc("endDate").list();
+                    if (listTask.size()>0) {
+                        Task backTask = listTask.get(0);
+                        if (bUpdateVariants) {
+                            taskService.rollback(task, backTask.getPrevTask(), mapRec, new TaskOpinion(advice));
+                        } else {
+                            taskService.rollback(task, backTask.getPrevTask(), null, new TaskOpinion(advice));
+                        }
                     } else {
-                        taskService.rollback(task, task.getPrevTask(), null, new TaskOpinion(advice));
+                        throw new IllegalStateException("Task " + task.getTaskName() + " not found.");
                     }
                 } else if (ActionType.BACK_FIRST.equals(actionType)) {
                     task.setAssignee(SecurityUserHolder.getOnlineUser().getUserid());
