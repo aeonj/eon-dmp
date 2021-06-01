@@ -11,9 +11,11 @@ import eon.hg.fap.core.exception.ResultException;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
+import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.model.virtual.OnlineUser;
 import eon.hg.fap.db.service.IDataRightService;
 import eon.hg.fap.db.service.IMenuService;
+import eon.hg.fap.db.service.IUserService;
 import eon.hg.fap.flow.command.CommandService;
 import eon.hg.fap.flow.command.impl.EditTaskCommand;
 import eon.hg.fap.flow.command.impl.LeaveTaskCommand;
@@ -64,6 +66,9 @@ public class FlowProviderImpl implements FlowProvider {
 
     @Autowired
     private IDataRightService dataRightService;
+
+    @Autowired
+    private IUserService userService;
 
     public ProcessService getProcessService() {
         return processService;
@@ -595,7 +600,10 @@ public class FlowProviderImpl implements FlowProvider {
         taskQuery.processId(pd.getId());
         taskQuery.businessId(business_id);
         taskQuery.addOrderDesc("endDate");
-        return FlowTaskUtils.convertTaskLog(taskQuery.list());
+        return FlowTaskUtils.convertTaskLog(taskQuery.list(),(value)->{
+            User user = userService.getObjById(Convert.toLong(value));
+            return user.getTrueName();
+        });
     }
 
     @Override
@@ -605,8 +613,12 @@ public class FlowProviderImpl implements FlowProvider {
         ProcessDefinition pd = getProcessDefinition(node);
         taskQuery.processId(pd.getId());
         taskQuery.businessId(business_id);
-        taskQuery.addOrderDesc("endDate").page(page, limit);
-        return FlowTaskUtils.getPageList(taskQuery.list(), taskQuery.count(), page, limit);
+        taskQuery.addOrderDesc("endDate").page((page-1)*limit, limit);
+        List taskList =FlowTaskUtils.convertTaskLog(taskQuery.list(),(value)->{
+            User user = userService.getObjById(Convert.toLong(value));
+            return user.getTrueName();
+        });
+        return FlowTaskUtils.getPageList(taskList, taskQuery.count(), page, limit);
     }
 
     @Override

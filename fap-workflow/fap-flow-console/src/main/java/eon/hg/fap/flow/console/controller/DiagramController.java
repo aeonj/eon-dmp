@@ -11,6 +11,7 @@ import eon.hg.fap.core.mv.JModelAndView;
 import eon.hg.fap.db.model.primary.User;
 import eon.hg.fap.db.service.IMenuService;
 import eon.hg.fap.db.service.IUserService;
+import eon.hg.fap.flow.FlowProvider;
 import eon.hg.fap.flow.console.bean.TaskDiagramInfoProviderBeanList;
 import eon.hg.fap.flow.diagram.*;
 import eon.hg.fap.flow.meta.CurrentNode;
@@ -55,6 +56,8 @@ public class DiagramController {
     private TaskService taskService;
     @Autowired
     private HistoryService historyService;
+    @Autowired(required = false)
+    private FlowProvider flowProvider;
     @Autowired
     private TaskDiagramInfoProviderBeanList taskDiagramInfoProviderBeanList;
 
@@ -525,27 +528,7 @@ public class DiagramController {
     public PageBody operaHistory(String businessId,int page, int limit) {
         Long menu_id = UserContextHolder.getUserContext().getMenuId();
         Assert.notNull(menu_id,"获取的菜单不能为空");
-        CurrentNode node = CurrentNode.menuInstance(menuService.getObjById(menu_id));
-        ProcessDefinition pd = getProcessDefinition(node);
-        HistoryTaskQuery htq = historyService.createHistoryTaskQuery();
-        htq.processId(pd.getId());
-        htq.businessId(businessId);
-        htq.addOrderDesc("endDate");
-        htq.page((page-1)*limit,limit);
-        List<HistoryTask> htList = htq.list();
-        List<Map> dtoList = new ArrayList<>();
-        for (HistoryTask ht : htList) {
-            Map map = BeanUtil.beanToMap(ht);
-            if (CommUtil.isNotEmpty(ht.getAssignee())) {
-                User user = userService.getObjById(Convert.toLong(ht.getAssignee()));
-                map.put("userId", ht.getAssignee());
-                map.put("userCode", user.getUserName());
-                map.put("userName", user.getTrueName());
-            }
-            dtoList.add(map);
-        }
-        int count= htq.count();
-        return PageBody.success().addPageInfo(dtoList,page,count);
+        return PageBody.success().addPageInfo(flowProvider.loadTaskLogList(menu_id,businessId,page,limit));
     }
 
     private ProcessDefinition getProcessDefinition(CurrentNode node) {

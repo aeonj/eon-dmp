@@ -1,6 +1,7 @@
 package eon.hg.fap.flow.utils;
 
 import cn.hutool.core.convert.Convert;
+import eon.hg.fap.common.util.tools.GetValue;
 import eon.hg.fap.core.query.PageList;
 import eon.hg.fap.flow.meta.NodeState;
 import eon.hg.fap.flow.meta.TaskVO;
@@ -10,6 +11,7 @@ import eon.hg.fap.flow.model.task.TaskState;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * @author eonook
@@ -46,16 +48,33 @@ public class FlowTaskUtils {
     }
 
 
-    public static List<TaskVO> convertTaskLog(List<HistoryTask> taskList) {
+    public static List<TaskVO> convertTaskLog(List<HistoryTask> taskList, GetValue<String,String> user) {
         List<TaskVO> taskLogs = new ArrayList<>();
         for (HistoryTask ht : taskList) {
             TaskVO taskLog = new TaskVO();
             taskLog.setTaskId(Convert.toStr(ht.getTaskId()));
             taskLog.setTaskName(ht.getTaskName());
+            if (TaskState.Completed.equals(ht.getState())) {
+                taskLog.setState("完成");
+            } else if (TaskState.Recall.equals(ht.getState())) {
+                taskLog.setState("撤销");
+            } else if (TaskState.Rollback.equals(ht.getState())) {
+                taskLog.setState("退回");
+            } else if (TaskState.Withdraw.equals(ht.getState())) {
+                taskLog.setState("撤回");
+            } else if (TaskState.Canceled.equals(ht.getState())) {
+                taskLog.setState("作废");
+            } else if (TaskState.Forwarded.equals(ht.getState())) {
+                taskLog.setState("转发");
+            } else if (TaskState.Ready.equals(ht.getState())) {
+                taskLog.setState("待办");
+            } else if (TaskState.Edit.equals(ht.getState())) {
+                taskLog.setState("修改");
+            }
             taskLog.setProcessId(Convert.toStr(ht.getProcessId()));
             taskLog.setProcessInstanceId(Convert.toStr(ht.getProcessInstanceId()));
             taskLog.setBusinessId(ht.getBusinessId());
-            taskLog.setAssignee(ht.getAssignee());
+            taskLog.setAssignee(user.get(ht.getAssignee()));
             taskLog.setCreateDate(ht.getCreateDate());
             taskLog.setDueDate(ht.getDuedate());
             taskLog.setEndDate(ht.getEndDate());

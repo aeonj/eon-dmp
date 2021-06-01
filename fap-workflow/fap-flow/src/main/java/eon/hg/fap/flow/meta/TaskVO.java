@@ -7,6 +7,8 @@ public class TaskVO {
     private String taskId;
     //任务名称
     private String taskName;
+    //任务状态
+    private String state;
     //处理人
     private String assignee;
     //拥有者
@@ -44,6 +46,14 @@ public class TaskVO {
 
     public void setTaskName(String taskName) {
         this.taskName = taskName;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     public String getAssignee() {
@@ -116,6 +126,14 @@ public class TaskVO {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public String getProcessId() {
