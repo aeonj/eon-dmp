@@ -154,7 +154,6 @@ Ext.override(Ext.vcf.TableGrid, {
 function addUIByServer(comp, ray, pos) {
     var initcol = 0,
         initrow = 0,
-        pnl,
         isonecol = false,
         relations = [],
         elenames = [];
@@ -243,11 +242,43 @@ function addUIByServer(comp, ray, pos) {
                         items.fieldStyle = 'cursor: default; pointer-events: none; color: black !important; background: #F6F6F6;';
                     }
                 }
-                if (comp.getLayout().type=='form') {
+                if (ray_detail[i].field_type == 'hidden' || items.hidden) {
+                    comp.add(Ext.create(items));
+                } else if (comp.getLayout().type=='form') {
                     comp.add(Ext.create(items));
                     isonecol = true;
-                } else if (ray_detail[i].field_type == 'hidden' || items.hidden) {
+                } else if (comp.getLayout().type=='table') {
+                    if (i==0) {
+                        comp.getLayout().columns = ray_detail[i].total_column;
+                        comp.getLayout().tableAttrs = {
+                            style : {
+                                width : '100%'
+                            }
+                        };
+                    }
+                    if (i>lastcol) {
+                        if (initrow==0) {
+                            padding = "10 12 10 12";
+                        } else {
+                            padding = "0 12 0 12";
+                        }
+                    } else {
+                        if (initrow==0) {
+                            padding = "10 12 3 12";
+                        } else {
+                            padding = "0 12 0 12";
+                        }
+                    }
+                    items.colspan = ray_detail[i].cols;
+                    items.style = 'width:95%;margin:0px 0px;';
+                    items.padding = padding;
                     comp.add(Ext.create(items));
+                    if (initcol + ray_detail[i].cols >= ray_detail[i].total_column || i == ray_detail.length - 1) {
+                        initcol = 0;
+                        initrow++;
+                    } else {
+                        initcol = initcol + ray_detail[i].cols;
+                    }
                 } else {
                     var colWidth = (initcol + ray_detail[i].cols >= ray_detail[i].total_column) ? ((ray_detail[i].total_column - initcol) / ray_detail[i].total_column) : ray_detail[i].cols / ray_detail[i].total_column;
                     var pnlCol,padding;
