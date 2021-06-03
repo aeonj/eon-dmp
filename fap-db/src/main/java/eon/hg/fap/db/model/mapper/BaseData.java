@@ -10,6 +10,7 @@ import com.alibaba.fastjson.annotation.JSONField;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.core.beans.SpringUtils;
+import eon.hg.fap.core.cache.RedisPool;
 import eon.hg.fap.core.domain.entity.IdEntity;
 import eon.hg.fap.db.service.IBaseDataService;
 import lombok.Data;
@@ -86,6 +87,10 @@ public abstract class BaseData extends IdEntity implements Serializable {
 	
 	public String getStandard_code() {
 		return code;
+	}
+
+	public boolean isRedis() {
+		return SpringUtils.getBean("redisPool")!=null;
 	}
 
 }

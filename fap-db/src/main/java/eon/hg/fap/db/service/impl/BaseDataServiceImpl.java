@@ -7,7 +7,10 @@
 
 package eon.hg.fap.db.service.impl;
 
+import cn.hutool.core.util.ClassUtil;
 import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.core.cache.RedisPool;
+import eon.hg.fap.core.constant.Globals;
 import eon.hg.fap.core.domain.virtual.SysMap;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.query.support.IPageList;
@@ -16,6 +19,11 @@ import eon.hg.fap.db.dao.primary.BaseDataDao;
 import eon.hg.fap.db.dao.primary.GenericDao;
 import eon.hg.fap.db.model.mapper.BaseData;
 import eon.hg.fap.db.service.IBaseDataService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,12 +40,16 @@ import java.util.Stack;
  */
 @Service
 @Transactional
+@CacheConfig(cacheNames = Globals.DEFAULT_TABLE_SUFFIX+"base_data")
 public class BaseDataServiceImpl implements IBaseDataService {
     @Resource
     private BaseDataDao basedataDao;
     @Resource
     private GenericDao genericDao;
+    @Autowired(required = false)
+    private RedisPool redisPool;
 
+    @CacheEvict(allEntries = true, condition = "#basedata.isRedis() eq false")
     @Override
     public BaseData save(BaseData basedata) {
         //获取父级
@@ -54,9 +66,13 @@ public class BaseDataServiceImpl implements IBaseDataService {
         BaseData bd = this.basedataDao.save(basedata);
         basedata.setTreepath(basedata.getParentpath());
         this.basedataDao.update(bd);
+        if (redisPool!=null) {
+            redisPool.del("hg_base_data::"+ ClassUtil.getClassName(basedata,true)+"-*");
+        }
         return bd;
     }
 
+    @CacheEvict(allEntries = true, condition = "#basedata.isRedis() eq false")
     @Override
     public BaseData update(BaseData basedata) {
         //获取父级
@@ -109,12 +125,18 @@ public class BaseDataServiceImpl implements IBaseDataService {
                 curr.setTreepath(curr.getParentpath());
                 this.basedataDao.update(curr);
             }
+        } else {
+            this.basedataDao.update(basedata);
+        }
+        if (redisPool!=null) {
+            redisPool.del("hg_base_data::"+ ClassUtil.getClassName(basedata,true)+"-*");
         }
         return basedata;
     }
 
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+    @Cacheable(key = "#clz.getSimpleName()+'-'+#id")
     @Override
     public synchronized BaseData getObjById(Class clz, Long id) {
         if (id==null) return null;
@@ -122,6 +144,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
         return this.basedataDao.get(id);
     }
 
+    @CacheEvict(allEntries = true)
     @Override
     public void delete(Class clz, Long id) {
         BaseData bd = this.getObjById(clz,id);
@@ -160,6 +183,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
         }
     }
 
+    @CacheEvict(allEntries = true)
     @Override
     public void batchDelete(Class clz, List<Long> ids) {
         this.basedataDao.setEntityClass(clz);

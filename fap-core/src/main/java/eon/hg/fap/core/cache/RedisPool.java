@@ -59,8 +59,8 @@ public class RedisPool {
      * 获取所有的key
      * @return
      */
-    public Set<String> getKeys() {
-         return redisTemplate.keys("*");
+    public Set<String> getKeys(String keys) {
+         return redisTemplate.keys(keys);
     }
 
     /**
@@ -81,10 +81,8 @@ public class RedisPool {
      * 重置，删除所有缓存
      */
     public void reset() {
-        Set<String> keys = getKeys();
-        for (String key : keys) {
-            del(key);
-        }
+        Set<String> keys = getKeys("*");
+        redisTemplate.delete(keys);
     }
 
     /**
@@ -95,7 +93,7 @@ public class RedisPool {
     public void del(String... key) {
         if (key != null && key.length >0) {
             if (key.length == 1) {
-                redisTemplate.delete(key[0]);
+                redisTemplate.delete(getKeys(key[0]));
             } else {
                 redisTemplate.delete(CollectionUtils.arrayToList(key));
             }
