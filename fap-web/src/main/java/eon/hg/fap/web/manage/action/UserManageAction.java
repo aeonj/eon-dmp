@@ -109,6 +109,7 @@ public class UserManageAction extends BizAction {
     @RequestMapping("/user_query_orgtype.htm")
     public List<OrgType> user_query_orgtype() {
         QueryObject qo = new QueryObject();
+        qo.setOrderBy("orgCode");
         return this.orgTypeService.find(qo);
     }
 

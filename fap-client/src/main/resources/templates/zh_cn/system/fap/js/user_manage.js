@@ -60,6 +60,10 @@ Ext.onReady(function () {
                 url: 'user_ele_by_orgtype.htm',
                 success: function (response) {
                     comp_ele.setSource(response.responseText);
+                    var cmb = Ext.getCmp("add_cmb_org_code");
+                    if (cmb) {
+                        cmb.setSource(response.responseText);
+                    }
                     userPanel.getForm().load({
                         url: 'user_browse.htm',
                         params: {
