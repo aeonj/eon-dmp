@@ -89,8 +89,8 @@ public abstract class BaseData extends IdEntity implements Serializable {
 		return code;
 	}
 
-	public boolean isRedis() {
-		return SpringUtils.getBean("redisPool")!=null;
+	public String getCacheType() {
+		return SpringUtils.getBean("redisPool",RedisPool.class)!=null ? "redis" : "other";
 	}
 
 }

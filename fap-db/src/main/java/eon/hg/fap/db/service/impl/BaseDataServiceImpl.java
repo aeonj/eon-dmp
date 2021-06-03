@@ -49,7 +49,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
     @Autowired(required = false)
     private RedisPool redisPool;
 
-    @CacheEvict(allEntries = true, condition = "#basedata.isRedis() eq false")
+    @CacheEvict(allEntries = true, condition = "#basedata.getCacheType() != 'redis'")
     @Override
     public BaseData save(BaseData basedata) {
         //获取父级
@@ -72,7 +72,7 @@ public class BaseDataServiceImpl implements IBaseDataService {
         return bd;
     }
 
-    @CacheEvict(allEntries = true, condition = "#basedata.isRedis() eq false")
+    @CacheEvict(allEntries = true, condition = "#basedata.getCacheType() != 'redis'")
     @Override
     public BaseData update(BaseData basedata) {
         //获取父级
