@@ -92,7 +92,11 @@ public class UserManageAction extends BizAction {
             qo.addQuery("user_id","user_id",user.getId(),"=");
             return this.userBelongService.find(qo);
         });
-        user.setBelong_source(JsonHandler.toJson(dtoList));
+        if (dtoList!=null && dtoList.size()>0) {
+            user.setBelong_source(JsonHandler.toJson(dtoList));
+        } else {
+            user.setBelong_source(null);
+        }
         return JsonHandler.toExtJson(user,true,new JsonIncludePreFilter(User.class, "id", "username", "userName", "nickName", "trueName", "orgtype_id", "orgtype_ele_id", "birthday", "telephone", "QQ", "years", "address", "sex", "email", "mobile", "card", "pg_id", "belong_source"));
     }
 
@@ -213,7 +217,7 @@ public class UserManageAction extends BizAction {
         user.setPassword(passwordEncoder.encode(password));
         user.setPg_id(pg_id);
         user.setId(null);
-        user.setBelong_source(belong_source);
+        user.setBelong_source("[]".equals(belong_source)?null:belong_source);
         user = this.userService.save(user);
         if (CommUtil.isNotEmpty(belong_source)) {
             List detail = JsonHandler.parseList(belong_detail);
@@ -289,7 +293,7 @@ public class UserManageAction extends BizAction {
             user.setPassword(passwordEncoder.encode(password));
         }
         user.setPg_id(pg_id);
-        user.setBelong_source(belong_source);
+        user.setBelong_source("[]".equals(belong_source)?null:belong_source);
         userService.update(user);
         this.userBelongService.deleteByUser(user.getId());
         if (CommUtil.isNotEmpty(belong_source)) {
