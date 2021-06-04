@@ -66,7 +66,7 @@ public class UserManageAction extends BizAction {
 
     @RequestMapping("/user_tree.htm")
     public String user_tree(String node) {
-        List list = userOp.getUserTreeList();
+        List list = userOp.getUserTreeList_new();
         return JsonHandler.toJson(list);
     }
 
