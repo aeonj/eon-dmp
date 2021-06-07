@@ -33,8 +33,9 @@ spring:
           provider_configuration_file_resource_path: ehcache.xml
           region:
             factory_class: org.hibernate.cache.ehcache.EhCacheRegionFactory
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
   cache:
-    type: redis   #支持ehcache、redis
+    type: ehcache   #支持ehcache、redis
   redis:
     database: 1
     host: 212.64.7.68
@@ -89,6 +90,7 @@ eon:
         resourceId: oauth2-resource
       login_url: /manage/login.htm   #自定义登录地址
       index_url: /portal/index.htm    #自定义首页地址
+      welcome_url: /manage/workbench.htm    #自定义我的工作台地址
     external:
       slow_req_millis: 10000
       user_context_class: eon.hg.fap.support.session.UserContext
