@@ -7,6 +7,7 @@ import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.properties.PropertiesFactory;
 import eon.hg.fap.common.properties.PropertiesFile;
 import eon.hg.fap.common.properties.PropertiesHelper;
+import eon.hg.fap.common.properties.SecurityProperties;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.core.constant.AeonConstants;
@@ -69,6 +70,8 @@ public class TplManageAction {
 	private MenuOP menuOP;
 	@Autowired(required = false)
 	private IRelation relation;
+	@Autowired
+	private SecurityProperties securityProperties;
 
 	@RequestMapping("/html_tag.htm")
 	public ModelAndView html_tag(HttpServletRequest request,
@@ -288,6 +291,30 @@ public class TplManageAction {
 //			menumap.put(menuGroup.getId().toString(),menuListJson);
 //		}
 		mv.addObject("cardmgs",menuOP.getCardMgs());
+		mv.addObject("workbench_url",securityProperties.getWelcome_url());
+		return mv;
+	}
+
+	@RequestMapping("/desktop_tag.htm")
+	public ModelAndView desktop_tag(HttpServletRequest request,
+								 HttpServletResponse response) {
+		ModelAndView mv = new JModelAndView("common/desktop_tag.html",
+				configService.getSysConfig(),
+				this.userConfigService.getUserConfig(), 0, request, response);
+		HtmlTagDto dto= WebHandler.toAPo(request, HtmlTagDto.class);
+		mv.addObject("htmltag",dto);
+		PropertiesHelper pHelper = PropertiesFactory.getPropertiesHelper(PropertiesFile.MANAGE);
+		mv.addObject("extMode", pHelper.getValue("extMode","run"));
+		String micolor = pHelper.getValue("micolor", "blue");
+		mv.addObject("micolor", micolor);
+		String urlSecurity = pHelper.getValue("urlSecurity", "1");
+		mv.addObject("urlSecurity", urlSecurity);
+		mv.addObject("ajaxErrCode", AeonConstants.Ajax_Timeout);
+		mv.addObject("tplOp",tplOp);
+		String currDate = DateUtil.today();
+		mv.addObject("dateweek",currDate+" "+DateUtil.thisDayOfWeek());
+		mv.addObject("cardmgs",menuOP.getCardMgs());
+		mv.addObject("workbench_url",securityProperties.getWelcome_url());
 		return mv;
 	}
 

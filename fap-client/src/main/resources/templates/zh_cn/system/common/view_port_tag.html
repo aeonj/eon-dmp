@@ -31,9 +31,10 @@
                 listeners: {
                     activate: function(comp){
                     	Ext.getCmp('centerPanel').setTitle('${viewporttag.centerTitle} -> 我的工作台');
+                        Ext.fly('taskIFrame').dom.contentWindow.location.reload();
                     }
                 },
-                //html:"<iframe name='mainFrame'  src='${webPath}/manage/index_load.htm' scrolling='auto' frameborder='0' width='100%' height='100%' ></iframe>"
+                html:"<iframe id='taskIFrame' name='mainFrame'  src='${webPath}${workbench_url}' scrolling='auto' frameborder='0' width='100%' height='100%' ></iframe>"
             }],
 			listeners: {
 				tabchange: function(tabpanel, newcard, oldcard) {
