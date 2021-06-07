@@ -154,6 +154,7 @@ Ext.override(Ext.vcf.TableGrid, {
 function addUIByServer(comp, ray, pos) {
     var initcol = 0,
         initrow = 0,
+        pnl,
         isonecol = false,
         relations = [],
         elenames = [];
@@ -247,6 +248,30 @@ function addUIByServer(comp, ray, pos) {
                 } else if (comp.getLayout().type=='form') {
                     comp.add(Ext.create(items));
                     isonecol = true;
+                } else if (comp.getLayout().type=='anchor') {
+                    var colWidth = (initcol + ray_detail[i].cols >= ray_detail[i].total_column) ? ((ray_detail[i].total_column - initcol) / ray_detail[i].total_column) : ray_detail[i].cols / ray_detail[i].total_column;
+                    var pnlCol = Ext.create('Ext.panel.Panel', {
+                        columnWidth: colWidth,
+                        layout: 'fit',
+                        padding : '4 10 4 10',
+                        labelWidth: comp.labelWidth,
+                        border: false,
+                        items: [items]
+                    });
+                    if (initcol == 0) {
+                        pnl = Ext.create('Ext.panel.Panel', {
+                            anchor: '100%',
+                            border: false,
+                            layout: 'column'
+                        });
+                    }
+                    pnl.add(pnlCol);
+                    if (initcol + ray_detail[i].cols >= ray_detail[i].total_column || i == ray_detail.length - 1) {
+                        initcol = 0;
+                        comp.add(pnl);
+                    } else {
+                        initcol = initcol + ray_detail[i].cols;
+                    }
                 } else if (comp.getLayout().type=='table') {
                     if (i==0) {
                         comp.getLayout().columns = ray_detail[i].total_column;
