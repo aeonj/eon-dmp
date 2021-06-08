@@ -136,3 +136,25 @@
     background-position: 3px 50% ! important;
     padding-left: 24px ! important;
 }
+
+.title-panel-triton {
+    background-color: #157fcc;
+}
+.title-panel-crisp {
+    background-color: #5d95b6;
+}
+.title-panel-crisp-touch {
+    background-color: #5d95b6;
+}
+.title-panel-neptune {
+    background-color: #0868cc;
+}
+.title-panel-neptune-touch {
+    background-color: #0868cc;
+}
+.title-panel-gray {
+    background-color: #d7d7d7;
+}
+.title-panel-classic {
+    background-color: #b0c7e9;
+}

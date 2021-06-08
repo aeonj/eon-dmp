@@ -86,7 +86,7 @@ Ext.onReady(function () {
         tooltip: '快速切换主题包',
         // emptyText: '快速切换主题',
         displayField: 'name',
-        style: 'background:transparent; border-color: #FFFFFF',
+        style: 'background:transparent;',
         border: false,
         width: 80,
         valueField: 'value',

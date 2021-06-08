@@ -263,12 +263,13 @@
 </DIV>
 <div id="north">
 	<table border="0" cellpadding="0" cellspacing="0" width="100%"
-		   height="46" background="/webjars/eon_fap/resource/image/banner_background/${uconfig.theme}.png">
+		   height="46" class="title-panel-${uconfig.theme}">
 		<tr >
-			<#assign imgUrl=webPath+"/webjars/eon_fap/resource/style/system/manage/images/title_banner.png">
 			<#if (config.admin_manage_logo)??>
 			<#assign imgUrl=imageWebServer+"/"+(config.admin_manage_logo.path)+"/"+(config.admin_manage_logo.name)>
-		</#if>
+			<#else>
+			<#assign imgUrl=webPath+"/resource/image/title_banner.png">
+			</#if>
 		<td style="padding-left:15px"><img class="IEPNG"
 										   src="${imgUrl}" />
 		</td>

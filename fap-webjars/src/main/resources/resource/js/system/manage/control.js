@@ -2165,6 +2165,8 @@ Ext.define('Ext.vcf.CustomNumberField', {
 
     _submitVal : 0,
 
+    selectOnFocus : true,
+
     listeners: {
         'focus': function(_this, event, eOpts) {
             if (this.editable) {
