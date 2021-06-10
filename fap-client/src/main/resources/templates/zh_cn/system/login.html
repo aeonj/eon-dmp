@@ -1,113 +1,166 @@
 <!DOCTYPE html>
 <html>
-    ${httpInclude.include("/manage/html_tag.htm?showLoading=false&exportParams=false&isSubPage=false&exportExceptionWindow=false&exportUserinfo=false")}
-
-    <link href="/webjars/eon_fap/resource/login/cloud/css/login.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="/webjars/eon_fap/resource/login/cloud/css/l_css/base.css" />
-
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>${config.title}</title>
     <link rel="Shortcut Icon" href="/webjars/eon_fap/resource/images/favicon.ico"/>
-
-    <style type="text/css">
-        .top{ width:auto; height:96px; top : 0px; left:0px;margin:auto 320;}
-        .logo{ width:245px;potision: absolute ;padding-left: 60px;}
-        /*幻灯片*/
-        #banner {background-color: #fff; height:430px; margin: 0 auto; min-width: 864px; overflow: hidden; position: relative; width: 100%; z-index: 100;}
-        #full-screen-slider { width:100%; height:430px; *top:-4px; position:relative; z-index:99;}
-        #slides { display:block; width:100%; height:430px; list-style:none; padding:0; margin:0; position:relative}
-        #slides li { display:block; width:100%; height:100%; list-style:none; padding:0; margin:0; position:absolute}
-        #slides li a { display:block; width:100%; height:100%; text-indent:-9999px}
-        #pagination { display:block; list-style:none; position:absolute; left:30%; top:370px; z-index:9900;padding:5px 15px 5px 0; margin:0}
-        #pagination li { display:block; background: url(/resource/login/cloud/image/btn_bg2.png)  no-repeat; list-style:none; width:16px; height:16px; float:left; margin-left:0px; }
-        #pagination li a { display:block; width:100%; height:100%; padding:0; margin:0;  text-indent:-9999px;}
-        #pagination li.current { background: url(/resource/login/cloud/image/btn_bg1.png)  no-repeat; width:16px; height:16px;}
-
-        /*登录*/
-        .login-box-a {height: 0; margin: 0 0;position:relative; top:-340px; left:1164px; width: 864px; zoom: 1; z-index: 120;}
-
-        .nlogin-a {width: 312px; height:272px;position:relative;right:0\0;}
-        .login-modern-a {border: 1px solid transparent;background:url(/resource/login/cloud/image/login-bg.png) no-repeat;}
-
-        #banner .login-box-a .nav{ width:312px;height:46px;}
-        #banner .login-box-a .nav a.email_1{ width:154px; height:46px; float:left; display:block; font-size:16px; color:#FFFFFF; line-height:46px; text-align:center;}
-        #banner .login-box-a .nav a.email{ width:154px; height:46px; float:left; display:block; font-size:16px; color:#5e5d5d; line-height:46px; text-align:center;background:url(../l_images/email-h.png) no-repeat}
-        #banner .login-box-a .nav a.dz1{  background:url(/resource/login/cloud/image/email-h.png) no-repeat; width:212px; height:46px; float:left; display:block; font-size:16px; color:#6a6767; line-height:63px; text-align:center}
-
-        #banner .login-box-a .nav a.tel{ width:158px; height:46px; float:right; display:block; font-size:16px; color:#FFFFFF; line-height:46px; text-align:center}
-        #banner .login-box-a .nav a.tel_1{ width:158px; height:46px; float:right; display:block; font-size:16px; color:#5e5d5d; line-height:46px; text-align:center;background:url(../l_images/tel-h.png) no-repeat}
-        #banner .login-box-a .nav a.dz2{ background:url(/resource/login/cloud/image/tel-h.png) no-repeat;width:147px; height:46px; float:right; display:block; font-size:16px; color:#6a6767; line-height:63px; text-align:center}
-
-        #banner .login-box-a ul.dl{padding-left : 30px; padding-top:18px;}
-        #banner .login-box-a ul.dl li{ width:250px; height:39px;}
-        #banner .login-box-a ul.dl1{padding-left : 30px; padding-top:18px;}
-        #banner .login-box-a ul.dl1 li{ width:250px; height:19px;}
-
-        #footer{ height:16px;font-size:14px;}
-        .zhdl{
-            width:308px;
-            height:46px;
-            display:block;
-            font-size:16px;
-            color:#ffffff;
-            line-height:66px;
-            text-align:center;
-        }
-
+    <link rel="stylesheet" href="/webjars/eon_fap/resource/components/layui/css/layui.css" media="all"/>
+    <link rel="stylesheet" href="/resource/css/login.css" media="all"/>
+    <style>
+        /* 覆盖原框架样式 */
+        .layui-elem-quote{background-color: inherit!important;}
+        .layui-input, .layui-select, .layui-textarea{background-color: inherit; padding-left: 30px;}
     </style>
+</head>
+<body>
+<!-- Head -->
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-sm12 layui-col-md12 eon_mar_01">
+            <blockquote class="eon_left_elem_quote">${config.title}后台登录界面</blockquote>
+        </div>
+    </div>
+</div>
+<!-- Head End -->
 
-    <script type="text/javascript" language="javascript">
+<!-- Carousel -->
+<div class="layui-row">
+    <div class="layui-col-sm12 layui-col-md12">
+        <div class="layui-carousel eon_login_height" id="eonlogin" lay-filter="eonlogin">
+            <div carousel-item="">
+                <div>
+                    <div class="eon_login_cont"></div>
+                </div>
+                <#--<div>-->
+                    <#--<div class="background">-->
+                        <#--<span></span><span></span><span></span>-->
+                        <#--<span></span><span></span><span></span>-->
+                        <#--<span></span><span></span><span></span>-->
+                        <#--<span></span><span></span><span></span>-->
+                    <#--</div>-->
+                <#--</div>-->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Carousel End -->
 
-        //定义加入收藏夹函数
-        function join_favorite(siteUrl, siteName) {
-            //捕获加入收藏过程中的异常
-            try {
-                //判断浏览器是否支持document.all
-                if (document.all) {
-                    //如果支持则用external方式加入收藏夹
-                    window.external.addFavorite(siteUrl, siteName);
-                } else if (window.sidebar) {
-                    //如果支持window.sidebar，则用下列方式加入收藏夹
-                    window.sidebar.addPanel(siteName, siteUrl, '');
+<!-- Footer -->
+<div class="layui-row">
+    <div class="layui-col-sm12 layui-col-md12 eon_center eon_mar_01">
+        © 2019 - 2022 法律声明　|　隐私条约　|　技术支持：025-85350875
+    </div>
+</div>
+<!-- Footer End -->
+
+
+
+<!-- LoginForm -->
+<div class="eon_lofo_main">
+    <fieldset class="layui-elem-field layui-field-title eon_mar_02">
+        <legend>管理员登录</legend>
+    </fieldset>
+    <div class="layui-row layui-col-space15">
+        <form class="layui-form eon_pad_01" action="">
+            <div class="layui-col-sm12 layui-col-md12">
+                <div class="layui-form-item">
+                    <input type="text" id="USERNAME" name="username" lay-verify="required|userName" autocomplete="off" placeholder="账号" class="layui-input">
+                    <i class="layui-icon layui-icon-username eon_lofo_icon"></i>
+                </div>
+            </div>
+            <div class="layui-col-sm12 layui-col-md12">
+                <div class="layui-form-item">
+                    <input type="password" id="PASSWORD" name="password" lay-verify="required|pass" autocomplete="off" placeholder="密码" class="layui-input">
+                    <i class="layui-icon layui-icon-password eon_lofo_icon"></i>
+                </div>
+            </div>
+            <div class="layui-col-sm12 layui-col-md12">
+                <div class="layui-row">
+                    <div class="layui-col-xs7 layui-col-sm7 layui-col-md7">
+                        <div class="layui-form-item">
+                            <input type="text" name="verifycode" id="vercode" lay-verify="required|vercodes" autocomplete="off" placeholder="验证码" class="layui-input" maxlength="4">
+                            <i class="layui-icon layui-icon-vercode eon_lofo_icon"></i>
+                        </div>
+                    </div>
+                    <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+                        <div class="eon_lofo_vercode eonVerCode" onclick="eonVerCode()"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-sm12 layui-col-md12">
+                <button class="layui-btn layui-btn-fluid eon_login_btn" lay-submit="" lay-filter="form-login">立即登录</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- LoginForm End -->
+
+
+<!-- Jquery Js -->
+<script type="text/javascript" src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+<!-- Layui Js -->
+<script type="text/javascript" src="/webjars/eon_fap/resource/components/layui/layui.js"></script>
+<!-- Jqarticle Js -->
+<script type="text/javascript" src="/webjars/eon_fap/resource/js/jparticle.min.js"></script>
+<!-- zwVerificationCode Js-->
+<script type="text/javascript" src="/webjars/eon_fap/resource/js/zwVerificationCode.js"></script>
+<script>
+    function setCookie(name, value, minuts) {
+        var argv = setCookie.arguments;
+        var argc = setCookie.arguments.length;
+        var expiration = new Date((new Date()).getTime() + minuts * 60000 * 60);
+        document.cookie = name
+            + "="
+            + escape(value)
+            + "; expires=" + expiration
+                .toGMTString();
+    }
+
+    layui.use(['carousel', 'form'], function(){
+        var carousel = layui.carousel
+                ,form = layui.form;
+
+        //自定义验证规则
+        form.verify({
+            userName: function(value){
+                if(value.length < 3){
+                    return '账号至少得3个字符';
                 }
             }
-                //处理异常
-            catch (e) {
-                alert("加入收藏夹失败，请使用Ctrl+D快捷键进行添加操作!");
+            ,pass: [/^[\S]{6,12}$/,'密码必须6到12位，且不能出现空格']
+            ,vercodes: function(value){
+                //获取验证码
+                var eonVerCode = $(".eonVerCode").html();
+                if(value!=eonVerCode){
+                    return '验证码错误（区分大小写）';
+                }
             }
-        }
-
-        function doRedirect() {
-            var u = document.getElementById("USERID").value;
-            var m = document.getElementById("PASSWORD").value;
-            if (u == '' || u == 'username') {
-                alert("请输入用户名！");
-                return;
+            ,content: function(value){
+                layedit.sync(editIndex);
             }
+        });
 
-            if (m == '' || m == null) {
-                alert("请输入密码！");
-                return;
-            }
-
-            /**
-             * 提交登陆请求
-             */
-            Ext.Ajax.request({
-                url : '${webPath}/iaeon_login.htm',
-                method: 'POST',
-                success : function(response) {
-                    var resultArray = Ext.util.JSON.decode(response.responseText);
-                    if (resultArray.success === true) {
-                        var account = u;
+        //监听提交
+        form.on('submit(form-login)', function(element){
+            jQuery.ajax({
+                type: 'POST',
+                url: '${webPath}/iaeon_login.htm',
+                dataType : "json",
+                data: $.extend(element.field,{login_role : 'manage'}),
+                success: function (data) {
+                    if (data.success === true) {
+                        var account = element.field.username;
                         setCookie("vcf.login.account", account, 240);
-                        setCookie("vcf.login.userid", resultArray.userid, 240);
+                        setCookie("vcf.login.userid", data.userid, 240);
                         setCookie("vcf.lockflag", '0', 240);
-                        window.location.href = resultArray.url;
+                        window.location.href = data.url;
                     } else {
-                        var errmsg = resultArray.msg;
-                        var errtype = resultArray.errorType;
+                        var errmsg = data.msg;
+                        var errtype = data.errorType;
 
                         var formRedirect = function() {
-                            var account = document.all("USERID");
+                            var account = document.all("USERNAME");
                             var password = document.all("PASSWORD");
                             if (errtype == '1') {
                                 account.value = "";
@@ -123,139 +176,52 @@
                         alert(errmsg);
                         formRedirect();
                     }
-                },
-                failure : function(response) {
-
-                },
-                params : {
-                    login_role : 'manage',
-                    username : u,
-                    password : m
                 }
+
             });
-
-        };
-
-        function doKeyDown(event) {
-            var keyCode = event.keyCode;
-            var src = event.srcElement || event.target;
-            var edt1 = document.all("USERID");
-            var edt2 = document.all("PASSWORD");
-            var BTN = document.all("BTN");
-            switch (keyCode) {
-                case 27: // ESC
-                    edt1.value = "";
-                    edt2.value = "";
-                    return false;
-                    break;
-                case 38: // UP
-                    if (src == edt1) {
-                        BTN.focus();
-                    } else if (src == edt2) {
-                        edt1.focus();
-                    } else if (src == BTN) {
-                        edt2.focus();
-                    }
-                    return false;
-                    break;
-                case 40: // Down
-                    if (src == edt1) {
-                        edt2.focus();
-                    } else if (src == edt2) {
-                        BTN.focus();
-                    } else if (src == BTN) {
-                        edt1.focus();
-                    }
-                    return false;
-                    break;
-                case 13: // Enter
-                case 108: // Enter(小键盘上)
-                    if (src == edt1) {
-                        edt2.focus();
-                    } else if ((src == edt2) || (src == BTN)) {
-                        doRedirect();
-                        return true;
-                    }
-                    return false;
-            }
             return false;
-        };
-    </script>
-
-    <body >
-
-        <div id="index">
-            <div class="top">
-                <!--    <div class="logo"><img src="login/cloud/image/vcf.png" /></div> -->
-                <div class="el"><a href="reader.exe" >插件下载</a>　|　<a href="javaScript:void(0)" onclick="join_favorite(window.location,document.title);">加入收藏夹</a></div>
-            </div>
-
-            <div id="banner" class="slide">
-                <div id="full-screen-slider">
-                    <ul id="slides">
-                        <li style="background: url('/webjars/eon_fap/resource/login/cloud/image/banner1.png') no-repeat center top"><a href="javaScript:void(0)">
-                            01</a></li>
-                     </ul>
-                </div>
-
-                <div class="login-box-a">
-                    <div id="J-login" class="nlogin-a login-modern-a clearfix">
-
-                        <div class="nav" id="nav">
-                            <span class="zhdl">账号登录</span>
-                        </div>
-
-                        <ul class="dl">
-                            <li style="margin-bottom:21px;">
-                                <input id="USERID" type="text" onkeydown="doKeyDown(event)"  value=""   style="color:#000000;width:255px; height:40px; background:url(/resource/login/cloud/image/user.png) no-repeat; line-height:40px; text-indent:40px; font-size:19px; border:none"/>
-                            </li>
-
-                            <li>
-                                <input id="PASSWORD" onkeydown="doKeyDown(event)" type="password" value="" style="width:255px; height:40px; background:url(/resource/login/cloud/image/pass.png) no-repeat; line-height:40px;   text-indent:40px; font-size:19px; color:#000000; border:none"/>
-                            </li>
-
-                        </ul>
-                        <ul class="dl1">
-
-                            <li style="height:12px;line-height45px;">
-                            </li>
-                            <li>
-                                <a href='javascript:doRedirect();'><img id="BTN" src="/webjars/eon_fap/resource/login/cloud/image/login.png" /></a>
-                            </li>
-
-                        </ul>
+        });
 
 
-                    </div><!--j-login -->
-                </div><!--  login-box -->
-            </div> <!--  banner-->
-            <div id="footer">
-
-                <p style="height:34px; line-height:34px; text-align:center; padding-top:20px;">
-                    法律声明　|　隐私条约　|　技术支持：0514-86531039 0514-86559120
-                </p>
-
-            </div>
+        //设置轮播主体高度
+        var eon_login_height = $(window).height()/1.3;
+        var eon_car_height = $(".eon_login_height").css("cssText","height:" + eon_login_height + "px!important");
 
 
+        //Login轮播主体
+        carousel.render({
+            elem: '#eonlogin'//指向容器选择器
+            ,width: '100%' //设置容器宽度
+            ,height:'eon_car_height'
+            ,arrow: 'always' //始终显示箭头
+            ,anim: 'fade' //切换动画方式
+            ,autoplay: true //是否自动切换false true
+            ,arrow: 'hover' //切换箭头默认显示状态||不显示：none||悬停显示：hover||始终显示：always
+            ,indicator: 'none' //指示器位置||外部：outside||内部：inside||不显示：none
+            ,interval: '5000' //自动切换时间:单位：ms（毫秒）
+        });
 
-        </div><!--index-->
+        //监听轮播--案例暂未使用
+        carousel.on('change(eonlogin)', function(obj){
+            var loginCarousel = obj.index;
+        });
 
-    </body>
-    <script type="text/javascript" language="javascript">
-        // if (window.ActiveXObject) {
-        //   $("#banner .login-box-a ul.dl").css("position","relative");
-        //   $("#banner .login-box-a ul.dl").css("left","-40px");
-        //   $("#banner .login-box-a ul.dl1").css("padding-top","0px");
-        // }
-        if(window !== window.top){
-            window.top.location=window.location;
-        }
+        //粒子线条
+        $(".eon_login_cont").jParticle({
+            background: "rgba(0,0,0,0)",//背景颜色
+            color: "#dfe5ea",//粒子和连线的颜色
+            particlesNumber:100,//粒子数量
+            //disableLinks:true,//禁止粒子间连线
+            //disableMouse:true,//禁止粒子间连线(鼠标)
+            particle: {
+                minSize: 1,//最小粒子
+                maxSize: 3,//最大粒子
+                speed: 30,//粒子的动画速度
+            }
+        });
 
-        var c_account = getCookie('vcf.login.account');
-        var useraccount = document.getElementById("USERID");
-        if (typeof c_account!='undefined') {
-            useraccount.value = c_account;
-        }
-    </script>
+    });
+
+</script>
+</body>
 </html>
