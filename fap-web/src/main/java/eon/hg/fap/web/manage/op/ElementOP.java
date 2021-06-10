@@ -27,9 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 基础数据操作类，用于对基础数据的查询等操作
@@ -330,9 +329,15 @@ public class ElementOP {
 				if (getPid(node)==null) {
 					return node;
 				} else {
-					BaseData parent = baseDataService.getObjById(node.getClass(), node.getParent_id());
+					BaseData parent = map.get(getPid(node));
+					if (parent==null) {
+						parent = baseDataService.getObjById(node.getClass(), node.getParent_id());
+						if (parent!=null) {
+							map.put(getId(parent), parent);
+							setText(parent);
+						}
+					}
 					if (parent!=null) {
-						map.put(getId(parent), parent);
 						if (getChildren(parent)==null) {
 							List<BaseData> ch = new ArrayList<>();
 							ch.add(node);
@@ -349,6 +354,10 @@ public class ElementOP {
 			}
 		};
 		bds = tree.buildTree(bds,"code");
+//		bds = addParentNodes(bds);
+//		Map<Long,List<BaseData>> parentMap = bds.stream().collect(Collectors.groupingBy(BaseData::getParent_id));
+//		bds.forEach(node->node.setChildren(parentMap.get(node.getId())));
+//		bds = bds.stream().filter(v->v.getParent_id()==null).collect(Collectors.toList());
 		//转换为dto，并设置leaf和check属性
 		List<Dto> lstTree = ListBase2Dto(bds,treeDto);
 //		for (BaseData bd : bds) {
@@ -358,6 +367,32 @@ public class ElementOP {
 //			CommUtil.setCheckTreeList(lstTree,dtoParam.getString("checkids"));
 //		}
 		return lstTree;
+	}
+
+	public List<BaseData> addParentNodes(List<BaseData> bds) {
+		Stack<BaseData> stack = new Stack<>();
+		Map<Object, BaseData> map = new HashMap<>();
+		for (BaseData node : bds) {
+			if (node.getParent_id()!=null) {
+				if (!map.containsKey(node.getParent_id())) {
+					BaseData parent = baseDataService.getObjById(node.getClass(), node.getParent_id());
+					map.put(parent.getId(), parent);
+					stack.push(parent);
+				}
+			}
+		}
+		while (!stack.isEmpty()) {
+			BaseData node = stack.pop();
+			bds.add(node);
+			if (node.getParent_id()!=null) {
+				if (!map.containsKey(node.getParent_id())) {
+					BaseData parent = baseDataService.getObjById(node.getClass(), node.getParent_id());
+					map.put(parent.getId(), parent);
+					stack.push(parent);
+				}
+			}
+		}
+		return bds;
 	}
 
 	private List<Dto> ListBase2Dto(List<BaseData> bds, ElementTreeDto treeDto) {
