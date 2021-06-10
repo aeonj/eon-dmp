@@ -7,12 +7,12 @@
     <parent>
         <groupId>eon.hg.fap</groupId>
         <artifactId>fap-project</artifactId>
-        <version>2.1.0-RELEASE</version>
+        <version>2.1.1-SNAPSHOT</version>
     </parent>
 
     <groupId>eon.hg.fap</groupId>
     <artifactId>fap-workflow</artifactId>
-    <version>2.1.0-RELEASE</version>
+    <version>2.1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
