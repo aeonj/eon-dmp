@@ -110,12 +110,23 @@ Ext.onReady(function () {
             fieldLabel: '金额', // 标签
             name: 'name4', // name:后台根据此name属性取值
             xtype: 'moneyfield',
-            editable: false,
             anchor: '100%' // 宽度百分比
         }, {
             fieldLabel: '百分比', // 标签
             name: 'name5', // name:后台根据此name属性取值
             xtype: 'percentfield',
+            allowDecimals: false,
+            anchor: '100%' // 宽度百分比
+        }, {
+            fieldLabel: '数字', // 标签
+            name: 'name56', // name:后台根据此name属性取值
+            xtype: 'numberfield',
+            hideTrigger: true,
+            allowDecimals: false,
+            allowExponential: false,
+            minValue: 0,
+            fieldStyle: 'text-align:right;',
+            selectOnFocus : true,
             anchor: '100%' // 宽度百分比
         }, {
             fieldLabel: '值为1和0的复选框', // 标签
