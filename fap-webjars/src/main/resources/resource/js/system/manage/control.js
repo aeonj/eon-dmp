@@ -2277,7 +2277,7 @@ Ext.define('Ext.vcf.CustomNumberField', {
         this.stripCharsRe = new RegExp('[^'+allowed+']', 'gi');
         var keyPress = function(e){
             var k = e.getKey();
-            if(!Ext.isIE && (e.isSpecialKey() || k == e.BACKSPACE || k == e.DELETE)){
+            if(!Ext.isIE && (e.isSpecialKey())){
                 return;
             }
             var c = e.getCharCode();
