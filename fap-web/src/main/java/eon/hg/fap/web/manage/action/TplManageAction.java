@@ -282,8 +282,7 @@ public class TplManageAction {
 		ViewPortTagDto dto=WebHandler.toAPo(request, ViewPortTagDto.class);
 		mv.addObject("viewporttag",dto);
 		mv.addObject("tplOp",tplOp);
-		String currDate = DateUtil.today();
-		mv.addObject("dateweek",currDate+" "+DateUtil.thisDayOfWeek());
+		mv.addObject("dateweek",DateUtil.formatChineseDate(DateUtil.date(),false)+" "+DateUtil.thisDayOfWeekEnum().toChinese());
 //		User user =  SecurityUserHolder.getCurrentUser();
 //		Map<String,String> menumap = new HashMap<>();
 //		for (MenuGroup menuGroup : user.getMgs()) {
@@ -311,8 +310,6 @@ public class TplManageAction {
 		mv.addObject("urlSecurity", urlSecurity);
 		mv.addObject("ajaxErrCode", AeonConstants.Ajax_Timeout);
 		mv.addObject("tplOp",tplOp);
-		String currDate = DateUtil.today();
-		mv.addObject("dateweek",currDate+" "+DateUtil.thisDayOfWeek());
 		mv.addObject("cardmgs",menuOP.getCardMgs());
 		mv.addObject("workbench_url",securityProperties.getWelcome_url());
 		return mv;
