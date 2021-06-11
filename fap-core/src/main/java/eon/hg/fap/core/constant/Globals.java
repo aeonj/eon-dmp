@@ -6,7 +6,7 @@ package eon.hg.fap.core.constant;
  * 
  */
 public class Globals {
-	public final static String DEFAULT_SYSTEM_TITLE = " Dinosaur Workstation 定制化平台系统";// 系统默认名称
+	public final static String DEFAULT_SYSTEM_TITLE = " 禾冠行业云平台系统";// 系统默认名称
 	public final static String DEFAULT_MANAGE_FRAME = "ext";// 系统后台业务管理默认框架
 	public final static boolean SSO_SIGN = true;// 是否允许单点登录
 	public final static int DEFAULT_DNS_VERSION = 201907101;// 软件发布小版本号

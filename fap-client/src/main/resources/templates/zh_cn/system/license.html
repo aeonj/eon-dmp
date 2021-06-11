@@ -17,8 +17,7 @@
 
     <link href="/webjars/eon_fap/resource/css/animate.min.css" rel="stylesheet">
     <link href="/webjars/eon_fap/resource/css/style.min862f.css?v=4.1.0" rel="stylesheet">
-    <link rel="stylesheet" href="/webjars/eon_fap/resource/layui/css/layui.css">
-    <script href="/webjars/eon_fap/resource/layui/layui.all.js"></script>
+    <link rel="stylesheet" href="/webjars/eon_fap/resource/components/layui/css/layui.css">
     <!--[if lt IE 9]>
     <meta http-equiv="refresh" content="0;ie.html"/>
     <![endif]-->
@@ -91,12 +90,12 @@
                     </p><br/><br/>
                     <ul class="text-left" style="width: 400px;margin-left: auto;margin-right: auto;">
                         <li>联 系 人:客服</li>
-                        <li>联系电话:17705190200</li>
+                        <li>联系电话:025-85350875</li>
                         <li>联系邮箱:kefu@hcrown.com.cn</li>
                     </ul>
                     <div style="width:255px;margin-left: auto;margin-right: auto;">
-                        <a href="vcf.docx" class="btn btn-primary m-t">下载授权模板</a>&nbsp;
-                        <a id="upload_lic" href="javascript:doUpload();" class="btn btn-primary m-t">导入授权文件</a>
+                        <a href="/webjars/eon_fap/resource/license.docx" class="btn btn-primary m-t">下载授权模板</a>&nbsp;
+                        <a id="upload_lic" href="javascript:void(0);" class="btn btn-primary m-t">导入授权文件</a>
                     </div>
                 </div>
             </div>
@@ -106,9 +105,10 @@
 <div class="vcf_footer">
     <span>copyright 2018-2019 江苏禾冠信息技术有限公司 All rights reserved </span>
 </div>
-<script href="/webjars/eon_fap/resource/js/jquery.min.js?v=2.1.4"></script>
-<script href="/webjars/eon_fap/resource/js/bootstrap.min.js?v=3.3.6"></script>
-<script href="/webjars/eon_fap/resource/js/jquery-zclip/jquery.zclip.js"></script>
+<script type="text/javascript" src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript" src="/webjars/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/webjars/eon_fap/resource/components/layui/layui.all.js"></script>
+<script type="text/javascript" src="/webjars/eon_fap/resource/js/jquery-zclip/jquery.zclip.js"></script>
 <script type="text/javascript">
     layui.use('upload', function() {
         var $ = layui.jquery
@@ -118,8 +118,10 @@
             , url: '/manage/license_upload.htm'
             , accept: 'file' //普通文件
             , done: function (res) {
-                if (res.code=='success') {
-                    window.location.href = res.data.redirect;
+                if (res.success==true) {
+                    layer.msg('导入并认证成功！', {time:2000},function(index) {
+                        window.location.href = res.data.redirect;
+                    });
                 } else {
                     layer.msg(res.msg);
                 }
