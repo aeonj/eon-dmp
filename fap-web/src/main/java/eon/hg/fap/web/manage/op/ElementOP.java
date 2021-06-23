@@ -9,11 +9,14 @@ package eon.hg.fap.web.manage.op;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.crypto.SecureUtil;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.tools.tree.List2Tree;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
 import eon.hg.fap.common.util.tools.StringUtils;
+import eon.hg.fap.core.cache.AbstractCacheOperator;
+import eon.hg.fap.core.cache.CacheOperator;
 import eon.hg.fap.core.constant.AeonConstants;
 import eon.hg.fap.core.query.QueryObject;
 import eon.hg.fap.core.security.SecurityUserHolder;
@@ -28,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 基础数据操作类，用于对基础数据的查询等操作
@@ -37,7 +39,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
-public class ElementOP {
+public class ElementOP extends AbstractCacheOperator implements CacheOperator {
 	@Autowired
 	private ISysConfigService configService;
 	@Autowired
@@ -252,7 +254,7 @@ public class ElementOP {
 		return null;
 	}
 
-	public List<Dto> getObject(Dto dto) throws Exception {
+	public List<Dto> getElementTreeList(Dto dto) throws Exception {
 		if (!AeonConstants.VLicense.verify()) {
 			throw new Exception("未经许可的认证，证书验证失败！");
 		}
@@ -662,6 +664,29 @@ public class ElementOP {
 			}
 		}
 		return false;
+	}
+
+	@Override
+	public String getCacheId(Object... params) {
+		return "ele_table_values";
+	}
+
+	@Override
+	public String getKey(Object... params) throws Exception {
+		if (params != null && params.length > 0) {
+			Dto parameters = (Dto) params[0];
+			String sResult ="#eleset="+ SecureUtil.md5(parameters.toString());
+			return sResult;
+		}
+		throw new Exception(getCacheId());
+	}
+
+	@Override
+	public List<Dto> getObject(Object... params) throws Exception {
+		if (params != null && params.length > 0) {
+			return getElementTreeList((Dto) params[0]);
+		}
+		throw new Exception("传入的参数为空！");
 	}
 
 	private class ElementTreeDto {

@@ -76,7 +76,8 @@ public class DictionaryAction extends BizAction {
 					dto.put("values", dto.get("checkids"));
 				}
 			} else {
-				list = eleOp.getObject(dto);
+				list = isDirect ? eleOp.getObject(dto) : eleOp.getCache(dto);
+				//实体类的checkids已经在eleOp里面处理过了
 			}
 			if (isChecked && dto.get("values")!=null) {
 				eleOp.setCheckNodeList(list,dto.getString("values"));

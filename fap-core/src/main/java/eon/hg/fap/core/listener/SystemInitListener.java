@@ -55,5 +55,6 @@ public class SystemInitListener implements ServletContextListener {
         if (redisPool.hasKey("ele_table_values")) {
             redisPool.del("ele_table_values");
         }
+        redisPool.reset();
     }
 }
