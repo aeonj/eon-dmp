@@ -1,6 +1,9 @@
 package eon.hg.fap.web.manage.action;
 
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ReflectUtil;
 import eon.hg.fap.common.CommUtil;
+import eon.hg.fap.common.properties.ExternalProperties;
 import eon.hg.fap.common.properties.SecurityProperties;
 import eon.hg.fap.core.annotation.Log;
 import eon.hg.fap.core.constant.AeonConstants;
@@ -52,9 +55,13 @@ public class BaseManageAction extends BizAction{
 	@Autowired
 	private IUserService userService;
 	@Autowired
-	SecurityManager securityManager;
+	private SecurityManager securityManager;
 	@Autowired
-	SecurityProperties securityProperties;
+	private SecurityProperties securityProperties;
+	@Autowired
+	private ExternalProperties externalProperties;
+	@Autowired
+	private HttpSession httpSession;
 	//重定向策略
 	private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 	//请求缓存session
@@ -343,6 +350,18 @@ public class BaseManageAction extends BizAction{
 			mv.addObject("op_title", "域名绑定错误，请与aeonj@163.com联系");
 		}
 		return mv;
+	}
+
+	@RequestMapping("/manage/change_menu_tab.htm")
+	public void change_menu_tab(String menu_id) {
+		httpSession.setAttribute("cur_menu_id",menu_id);
+		OnlineUser user = SecurityUserHolder.getOnlineUser();
+		if (user != null) {
+			if (user.getContext()==null) {
+				user.setContext(ReflectUtil.newInstance(externalProperties.getUser_context_class()));
+			}
+			user.getContext().setMenuId(Convert.toLong(menu_id));
+		}
 	}
 
 	/**
