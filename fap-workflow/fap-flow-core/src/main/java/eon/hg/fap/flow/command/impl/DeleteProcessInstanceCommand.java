@@ -83,7 +83,7 @@ public class DeleteProcessInstanceCommand implements Command<Object> {
 			session.createQuery("delete "+TaskParticipator.class.getName()+" where taskId=:taskId").setLong("taskId", task.getId()).executeUpdate();
 			session.delete(task);
 		}
-		session.delete(pi);
+		session.createQuery("delete "+ProcessInstance.class.getName()+" where id=:id").setLong("id", pi.getId()).executeUpdate();
 		context.getExpressionContext().removeContext(pi);
 		return null;
 	}
