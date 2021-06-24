@@ -44,6 +44,12 @@
                         url : '/manage/vcf/change_menu_tab.htm',
                         params : {menu_id:menu_id}
 					});
+					<#else>
+                    var menu_id =newcard.getItemId().replace("tab_id_","");
+                    Ext.Ajax.request({
+                        url : '/manage/change_menu_tab.htm',
+                        params : {menu_id:menu_id}
+                    });
 					</#if>
 				}
 			}
