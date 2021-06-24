@@ -2,6 +2,7 @@ package eon.hg.fap.core.filter;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ReflectUtil;
+import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.properties.ExternalProperties;
 import eon.hg.fap.core.exception.ExceptionUtil;
 import eon.hg.fap.core.security.SecurityUserHolder;
@@ -11,7 +12,6 @@ import eon.hg.fap.support.session.UserContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.helper.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -76,7 +76,6 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
                 menuId = "-1";
             }
         }
-        userContext.setOnlineUser(user);
         userContext.setMenuId(Convert.toLong(menuId));
         UserContextHolder.setUserContext(userContext);
     }

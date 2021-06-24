@@ -2,6 +2,7 @@ package eon.hg.fap.security.session;
 
 import eon.hg.fap.core.security.SecurityUserHolder;
 import eon.hg.fap.db.model.virtual.OnlineUser;
+import eon.hg.fap.support.session.UserContext;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
@@ -14,7 +15,7 @@ public class SessionUser extends User implements OnlineUser {
 
     private String nickname;
 
-    private Object context;
+    private UserContext context = new UserContext();
 
     public String getUserid() {
         return userid;
@@ -40,11 +41,11 @@ public class SessionUser extends User implements OnlineUser {
         this.cookie = cookie;
     }
 
-    public Object getContext() {
+    public UserContext getContext() {
         return context;
     }
 
-    public void setContext(Object context) {
+    public void setContext(UserContext context) {
         this.context = context;
     }
 

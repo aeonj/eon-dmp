@@ -1,7 +1,8 @@
 package eon.hg.fap.db.model.virtual;
 
+import eon.hg.fap.support.session.UserContext;
+
 import java.io.Serializable;
-import java.util.Collection;
 
 
 public interface OnlineUser extends Serializable,Cloneable {
@@ -18,9 +19,9 @@ public interface OnlineUser extends Serializable,Cloneable {
 
     public void setCookie(String cookie);
 
-    public Object getContext();
+    public UserContext getContext();
 
-    public void setContext(Object context);
+    public void setContext(UserContext context);
 
     String getPassword();
 

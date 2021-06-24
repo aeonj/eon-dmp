@@ -9,19 +9,18 @@ import java.util.HashMap;
  * 当前登录的用户对象模型
  */
 public class UserContext implements Serializable,Cloneable {
-
-    private OnlineUser onlineUser;
+    private String rgCode;
     private Long menuId;
     private Integer year;
     // 用户其他信息的HashMap
     protected HashMap context = new HashMap();
 
-    public OnlineUser getOnlineUser() {
-        return onlineUser;
+    public String getRgCode() {
+        return rgCode;
     }
 
-    public void setOnlineUser(OnlineUser onlineUser) {
-        this.onlineUser = onlineUser;
+    public void setRgCode(String rgCode) {
+        this.rgCode = rgCode;
     }
 
     public Long getMenuId() {
