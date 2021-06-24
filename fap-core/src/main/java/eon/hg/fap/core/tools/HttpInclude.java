@@ -41,7 +41,11 @@ public class HttpInclude {
 		if (StrUtil.contains(path[0],'.')) {
 			path[0] = StrUtil.replace(path[0],".","/");
 		}
-		include("/manage/jsload.htm?name="+path[0]+"/js/"+path[1], sw);
+		if (StrUtil.contains(path[1],'.')) {
+			include("/manage/jsload.htm?name=" + path[0] + "/js/" + path[1], sw);
+		} else {
+			include("/manage/jsload.htm?name=" + path[0] + "/js/" + path[1]+".js", sw);
+		}
 		return sw.toString();
 	}
 	
