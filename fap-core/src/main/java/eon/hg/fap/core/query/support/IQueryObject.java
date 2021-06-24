@@ -176,6 +176,7 @@ public interface IQueryObject extends Serializable {
 	String getFetchs();
 
 
+	IQueryObject nativeSql(String sql);
 	/**
 	 * 获取原生sql语句
 	 * @return

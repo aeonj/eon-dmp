@@ -31,9 +31,9 @@ public class QueryObject implements IQueryObject {
 
 	protected String fetchs = ""; //在from表和where条件之间，用于懒加载fetch join 对象实现
 
-	protected String nativeSql;   //原生sql语句
+	protected StringBuilder nativeSql = new StringBuilder();   //原生sql语句
 
-	protected boolean isAllSql;    //是否全sql，包括条件也是sql
+	protected boolean isAllSql = false;    //是否全sql，包括条件也是sql
 
 	private String alias = "obj";
 
@@ -117,7 +117,7 @@ public class QueryObject implements IQueryObject {
 	 */
 	@Override
 	public String getNativeSql() {
-		return nativeSql;
+		return nativeSql.toString();
 	}
 
 	@Override
@@ -290,12 +290,22 @@ public class QueryObject implements IQueryObject {
 
 	public static QueryObject SqlCreate(String nativeSql, Map params, boolean isAllSql) {
 		QueryObject qo = new QueryObject();
-		qo.nativeSql = nativeSql;
+		qo.nativeSql.append(nativeSql);
 		if (params!=null) {
 			qo.params = params;
 		}
 		qo.isAllSql=isAllSql;
 		return qo;
+	}
+
+	public static QueryObject HqlCreate() {
+		QueryObject qo = new QueryObject();
+		return qo;
+	}
+
+	public QueryObject nativeSql(String nativeSql) {
+		this.nativeSql.append(" ").append(nativeSql);
+		return this;
 	}
 
 	/**
