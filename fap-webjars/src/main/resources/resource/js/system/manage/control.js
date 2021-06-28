@@ -1311,6 +1311,230 @@ Ext.define('Ext.vcf.TreeField', {
     }
 });
 
+Ext.define('Ext.vcf.MonthField', {
+    extend: 'Ext.form.field.Picker',
+    xtype : 'monthfield',
+    requires: ['Ext.picker.Month'],
+
+    format: "Y-m",
+
+    showButtons: true,
+
+    altFormats: "m/y|m/Y|m-y|m-Y|my|mY|y/m|Y/m|y-m|Y-m|ym|Ym",
+
+    triggerCls: Ext.baseCSSPrefix + 'form-date-trigger',
+
+    componentCls: Ext.baseCSSPrefix + 'form-field-date',
+
+    matchFieldWidth: false,
+
+    useStrict: undefined,
+
+    invalidText : "{0} 是无效的月份 - 必须符合格式 {1}",
+
+    startDay: new Date(),
+
+    initComponent: function () {
+        var me = this;
+
+        me.disabledDatesRE = null;
+
+        me.callParent();
+    },
+
+    initValue: function () {
+        var me = this,
+            value = me.value;
+
+        if (Ext.isString(value)) {
+            me.value = me.rawToValue(value);
+            me.rawDate = me.value;
+            me.rawDateText = me.parseMonth(me.value);
+        } else {
+            me.value = value || null;
+            me.rawDate = me.value;
+            me.rawDateText = me.value ? me.parseMonth(me.value) : '';
+        }
+        if (me.value)
+            me.startDay = me.value;
+        me.callParent();
+    },
+
+    rawToValue: function (rawValue) {
+        return Ext.Date.parse(rawValue, this.format) || this.parseMonth(rawValue) || null;
+    },
+
+    valueToRaw: function (value) {
+        return this.formatDate(value);
+    },
+
+    formatDate: function (date) {
+        return Ext.isDate(date) ? Ext.Date.dateFormat(date, this.format) : date;
+    },
+    createPicker: function () {
+        var me = this,
+            format = Ext.String.format;
+
+        return Ext.create('Ext.picker.Month', {
+            id: me.id + '-picker',
+            pickerField: me,
+            floating: true,
+            preventRefocus: true,
+            hidden: true,
+            focusOnShow: true,
+            shadow: false,
+            showButtons: me.showButtons,
+            listeners: {
+                scope: me,
+                cancelclick: me.onCancelClick,
+                okclick: me.onOkClick,
+                yeardblclick: me.onOkClick,
+                monthdblclick: me.onOkClick
+            }
+        });
+    },
+
+    onExpand: function () {
+        this.picker.setValue(this.startDay);
+    },
+
+    setValue: function(v) {
+        var me = this;
+
+        me.lastValue = me.rawDateText;
+        me.lastDate = me.rawDate;
+        if (Ext.isDate(v)) {
+            me.rawDate  = v;
+            me.rawDateText = me.formatDate(v);
+        }
+        else {
+            me.rawDate = me.rawToValue(v);
+            me.rawDateText = me.formatDate(v);
+            if (me.rawDate === v) {
+                me.rawDate = null;
+                me.rawDateText = '';
+            }
+        }
+        me.callParent(arguments);
+    },
+    getValue: function() {
+        return this.rawDate || null;
+    },
+    getSubmitValue: function() {
+        var format = this.submitFormat || this.format,
+            value = this.rawDate;
+
+        return value ? Ext.Date.format(value, format) : '';
+    },
+
+    setRawValue: function(value) {
+        var me = this;
+
+        me.callParent([value]);
+
+        me.rawDate = Ext.isDate(value) ? value : me.rawToValue(value);
+        me.rawDateText = this.formatDate(value);
+    },
+
+    getErrors: function(value) {
+        value = arguments.length > 0 ? value : this.formatDate(this.processRawValue(this.getRawValue()));
+        var me = this,
+            format = Ext.String.format,
+            errors = me.callParent([value]),
+            svalue;
+        if (value === null || value.length < 1) { // if it's blank and textfield didn't flag it then it's valid
+            return errors;
+        }
+
+        svalue = value;
+        value = me.parseMonth(value);
+        if (!value) {
+            errors.push(format(me.invalidText, svalue, Ext.Date.unescapeFormat(me.format)));
+            return errors;
+        }
+        return errors;
+    },
+
+    parseMonth: function(value) {
+        if(!value || Ext.isDate(value)){
+            return value;
+        }
+        var me = this,
+            val = me.safeParse(value, me.format),
+            altFormats = me.altFormats,
+            altFormatsArray = me.altFormatsArray,
+            i = 0,
+            len;
+
+        if (!val && altFormats) {
+            altFormatsArray = altFormatsArray || altFormats.split('|');
+            len = altFormatsArray.length;
+            for (; i < len && !val; ++i) {
+                val = me.safeParse(value, altFormatsArray[i]);
+            }
+        }
+        return val;
+    },
+
+    safeParse : function(value, format) {
+        var me = this,
+            utilDate = Ext.Date,
+            result = null,
+            strict = me.useStrict,
+            parsedDate;
+
+        // set time to 12 noon, then clear the time
+        parsedDate = utilDate.parse(value, format, strict);
+        return parsedDate;
+    },
+    checkChange: function() {
+        var me = this,
+            newVal, oldVal, lastDate;
+
+        if (!me.suspendCheckChange) {
+            newVal = me.getRawValue();
+            oldVal = me.lastValue;
+            lastDate = me.lastDate;
+
+            if (!me.destroyed && me.didValueChange(newVal, oldVal)) {
+                me.rawDate = me.rawToValue(newVal);
+                me.rawDateText = me.formatDate(newVal);
+                me.lastValue = newVal;
+                me.lastDate = me.rawDate;
+                me.fireEvent('change', me, me.getValue(), lastDate);
+                me.onChange(newVal, oldVal);
+            }
+        }
+    },
+
+    onOkClick: function (picker, value) {
+        var me = this,
+            month = value[0],
+            year = value[1],
+            date = new Date(year, month, 1);
+        me.startDay = date;
+        me.setValue(date);
+        this.picker.hide();
+        //this.blur();
+    },
+
+    onCancelClick: function () {
+        this.picker.hide();
+        //this.blur();
+    },
+
+    onBlur: function(e) {
+        var me = this,
+            v = me.rawToValue(me.getRawValue());
+
+        if (v === '' || Ext.isDate(v)) {
+            me.setValue(v);
+        }
+        me.callParent([e]);
+    }
+
+});
+
 Ext.define('Ext.vcf.CheckboxField', {
     extend : 'Ext.form.field.Checkbox',
     xtype : 'chkfield',
@@ -1588,6 +1812,8 @@ Ext.define('Ext.vcf.TableGrid', {
     checkOnly: false,
     //是否启用分页
     isPaged: true,
+    //是否启用序号列
+    isRowNumber: true,
     //预定义的grid列
     /**@columnBase: [],*/
     //预定义的字段列
@@ -1622,7 +1848,9 @@ Ext.define('Ext.vcf.TableGrid', {
         me.fieldBase = me.fieldBase || [];
         if (typeof me.columns == 'undefined') {
             if (columnBase.length == 0) {
-                columnBase.push({xtype: 'rownumberer', width: 40});
+                if (isRowNumber) {
+                    columnBase.push({xtype: 'rownumberer', width: 40});
+                }
                 if (me.isChecked) {
                     var sm = Ext.create('Ext.selection.CheckboxModel', {checkOnly: this.checkOnly, injectCheckbox: 1});
                     me.selModel = sm;
