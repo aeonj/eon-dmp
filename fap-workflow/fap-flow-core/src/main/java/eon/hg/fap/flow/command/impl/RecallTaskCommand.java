@@ -82,11 +82,14 @@ public class RecallTaskCommand implements Command<Task> {
         }
         task.setCreateDate(new Date());
         context.getCommandService().executeCommand(new SaveHistoryTaskCommand(task,pi));
-        task.setState(TaskState.Ready);
+
         task.setOpinion(old_opinion);
         task.setEndDate(null);
         if (task.getType().equals(TaskType.Participative)) {
             task.setAssignee(null);
+            task.setState(TaskState.Ready);
+        } else {
+            task.setState(TaskState.Created);
         }
         session.update(task);
         session.update(pi);
