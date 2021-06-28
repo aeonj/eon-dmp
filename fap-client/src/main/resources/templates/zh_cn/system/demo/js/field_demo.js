@@ -129,6 +129,17 @@ Ext.onReady(function () {
             selectOnFocus : true,
             anchor: '100%' // 宽度百分比
         }, {
+            fieldLabel: '月份', // 标签
+            name: 'name9', // name:后台根据此name属性取值
+            xtype: 'monthfield',
+            anchor: '100%' // 宽度百分比
+        }, {
+            fieldLabel: '日期', // 标签
+            name: 'name10', // name:后台根据此name属性取值
+            xtype: 'datefield',
+            format: 'Y年m月d日',
+            anchor: '100%' // 宽度百分比
+        }, {
             fieldLabel: '值为1和0的复选框', // 标签
             name: 'name6', // name:后台根据此name属性取值
             xtype: 'chkfield',
