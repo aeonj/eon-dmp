@@ -12,7 +12,14 @@ import java.util.Map;
 
 @NoRepositoryBean
 public interface GenericRepository<T, ID extends Serializable> extends Repository<T,ID> {
-    Object get(Class clazz, Serializable id);
+    <S extends T> S get(Class<S> clazz, Serializable id);
+    <S extends T> S save(S entity);
+    <S extends T> S update(S entity);
+    void remove(T entity);
+    <S extends T> S  getBy(Class<S> clazz, Object... properties);
+
+    List<T> query(String queryStr, Map params, int begin, int max);
+
     List<Dto> findDtoBySql(final String nnq);
     List<Map> findBySql(final String nnq);
     List<Dto> findDtoBySql(final String nnq, final Map params);

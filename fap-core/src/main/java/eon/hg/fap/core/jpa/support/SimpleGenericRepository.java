@@ -1,20 +1,26 @@
 package eon.hg.fap.core.jpa.support;
 
+import cn.hutool.core.convert.Convert;
 import eon.hg.fap.common.CommUtil;
 import eon.hg.fap.common.util.metatype.Dto;
+import eon.hg.fap.core.constant.AeonConstants;
+import eon.hg.fap.core.domain.entity.IdEntity;
 import eon.hg.fap.core.jpa.GenericRepository;
 import eon.hg.fap.core.query.PageObject;
 import eon.hg.fap.core.query.query.GenericPageList;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
+import eon.hg.fap.core.security.SecurityUserHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.query.internal.NativeQueryImpl;
 import org.hibernate.transform.Transformers;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -37,10 +43,109 @@ public class SimpleGenericRepository<T, ID extends Serializable> implements Gene
 		this.entityManager = entityManager;
 	}
 
-	public Object get(Class clazz, Serializable id) {
+	public <S extends T> S get(Class<S> clazz, Serializable id) {
 		if (id == null)
 			return null;
 		return this.entityManager.find(clazz, id);
+	}
+
+	@Transactional
+	public <S extends T> S save(S entity) {
+		if (entity instanceof IdEntity) {
+			if (CommUtil.isExistsAttr(entity.getClass(), "rg_code")) {
+				Object obj = CommUtil.invokeGetMethod(entity, "rg_code");
+				if (CommUtil.isEmpty(obj) || CommUtil.null2String(obj).equals(AeonConstants.SUPER_RG_CODE)) {
+					CommUtil.invokeSetMethod(entity, "rg_code", SecurityUserHolder.getRgCode());
+				}
+			}
+			if (SecurityUserHolder.getOnlineUser() != null) {
+				CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getOnlineUser().getUsername());
+			}
+			CommUtil.invokeSetMethod(entity, "addTime", new Date());
+			CommUtil.invokeSetMethod(entity, "lastTime", new Date());
+		}
+		entityManager.persist(entity);
+		return entity;
+	}
+
+	@Transactional
+	public <S extends T> S update(S entity) {
+		if (entity instanceof IdEntity) {
+			if (SecurityUserHolder.getOnlineUser() != null) {
+				CommUtil.invokeSetMethod(entity, "lastUser", SecurityUserHolder.getOnlineUser().getUsername());
+			}
+			CommUtil.invokeSetMethod(entity, "lastTime", new Date());
+		}
+		return entityManager.merge(entity);
+	}
+
+	@Transactional
+	public void remove(T entity) {
+		Assert.notNull(entity, "Entity must not be null!");
+		Object existing = entityManager.find(entity.getClass(), CommUtil.invokeGetMethod(entity,"id"));
+		// if the entity to be deleted doesn't exist, delete is a NOOP
+		if (existing == null) {
+			return;
+		}
+		entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
+	}
+
+	@Override
+	public <S extends T> S getBy(Class<S> clazz, Object... properties) {
+		if (properties.length % 2!=0) {
+			return null;
+		}
+		StringBuffer sb = new StringBuffer("select obj from ");
+		sb.append(clazz.getName()).append(" obj");
+		Query query = null;
+		sb.append(" where obj.is_deleted=0");
+		if (CommUtil.isExistsAttr(clazz, "rg_code")) {
+			sb.append(" and obj.rg_code=:rg_code");
+			query.setParameter("rg_code", SecurityUserHolder.getRgCode());
+		}
+		for (int i=0; i<properties.length; i++) {
+			if (CommUtil.isEmpty(properties[i])) {
+				return null;
+			}
+			String propertyName = CommUtil.null2String(properties[i]);
+			i++;
+			Object propertyValue = properties[i];
+			if (propertyValue == null) {
+				sb.append(" and obj.").append(propertyName)
+						.append(" = :").append(propertyName);
+				query.setParameter(propertyName, propertyValue);
+			} else {
+				sb.append(" and obj.").append(propertyName)
+						.append(" is NULL");
+			}
+		}
+		//query.setHint("org.hibernate.cacheable", true);
+		List<S> ret = query.getResultList();
+		if (ret != null && ret.size() == 1) {
+			return ret.get(0);
+		} else if (ret != null && ret.size() > 1) {
+			throw new IllegalStateException(
+					"worning  --more than one object find!!");
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public List<T> query(String queryStr, Map params, int begin, int max) {
+		Query query = this.entityManager.createQuery(queryStr);
+		if (params != null && params.size() > 0) {
+			for (Object key : params.keySet()) {
+				//通过转换，解决querypanel查询视图自定义查询类型转换问题
+				Object val = Convert.convert(query.getParameter(key.toString()).getParameterType(),params.get(key));
+				query.setParameter(key.toString(), val);
+			}
+		}
+		if (begin >= 0 && max > 0) {
+			query.setFirstResult(begin);
+			query.setMaxResults(max);
+		}
+		return query.getResultList();
 	}
 
 	public List<Dto> findDtoBySql(final String nnq) {
