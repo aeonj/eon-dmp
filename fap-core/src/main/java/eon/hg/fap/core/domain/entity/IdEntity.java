@@ -21,11 +21,13 @@ public class IdEntity implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(unique = true, nullable = false)
 	protected Long id;// 域模型id，这里为自增类型
+	@Column(name = "add_time")
 	protected Date addTime;// 添加时间，这里为长时间格式
 	@Lock
 	protected boolean is_deleted;// 是否删除,默认为0未删除，-1表示删除状态
+	@Column(name = "last_time")
 	protected Date lastTime;// 添加时间，这里为长时间格式
-	@Column(length=60)
+	@Column(name = "last_user", length=60)
 	protected String lastUser; //最后修改用户
 
 	public IdEntity() {
