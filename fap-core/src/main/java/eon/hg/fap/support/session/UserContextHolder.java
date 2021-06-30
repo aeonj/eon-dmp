@@ -21,4 +21,8 @@ public class UserContextHolder {
         userContext.remove();
     }
 
+    public static Long getMenuId() {
+        return userContext.get()==null ? -1l : userContext.get().getMenuId();
+    }
+
 }

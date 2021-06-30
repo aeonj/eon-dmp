@@ -73,10 +73,13 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
         if(StringUtil.isBlank(menuId) || "undefined".equals(menuId)) {
             menuId = request.getParameter(REQUEST_CUR_MENU_KEY);
             if(StringUtil.isBlank(menuId) || "undefined".equals(menuId)) {
-                menuId = "-1";
+                userContext.setMenuId(user.getContext().getMenuId());
+            } else {
+                userContext.setMenuId(Convert.toLong(menuId));
             }
+        } else {
+            userContext.setMenuId(Convert.toLong(menuId));
         }
-        userContext.setMenuId(Convert.toLong(menuId));
         UserContextHolder.setUserContext(userContext);
     }
 
