@@ -1848,7 +1848,7 @@ Ext.define('Ext.vcf.TableGrid', {
         me.fieldBase = me.fieldBase || [];
         if (typeof me.columns == 'undefined') {
             if (columnBase.length == 0) {
-                if (isRowNumber) {
+                if (me.isRowNumber) {
                     columnBase.push({xtype: 'rownumberer', width: 40});
                 }
                 if (me.isChecked) {
