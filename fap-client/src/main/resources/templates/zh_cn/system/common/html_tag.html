@@ -76,7 +76,7 @@
 				//延时避免被failure回调函数中的aler覆盖
 				top.Ext.MessageBox.alert('提示', '很遗憾的通知您：您没有权限请求该资源，请与管理员联系!');
 			},200);
-		}else{
+		}else if (response.status != '200') {
 		    if (parent.showException) {
                 parent.showException(response.responseText);
             }
