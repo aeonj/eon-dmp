@@ -162,6 +162,11 @@ Ext.onReady(function () {
         dataIndex: 'level',
         width: 60
     }, {
+        header: '标准码',
+        dataIndex: 'standard_code',
+        sortable: true,
+        width: 100
+    }, {
         header: '是否启用',
         dataIndex: 'enabled',
         width: 80,
@@ -182,7 +187,7 @@ Ext.onReady(function () {
     }, {
         name: 'code'
     }, {
-        name: 'disp_code'
+        name: 'standard_code'
     }, {
         name: 'name'
     }, {
@@ -630,6 +635,11 @@ Ext.onReady(function () {
         selectNodeModel: 'all',
         isDirect: true,
         isPermission: false,
+        anchor: '99%'
+    }, {
+        fieldLabel: '标准码',
+        name: 'standard_code',
+        xtype: 'textfield',
         anchor: '99%'
     }, {
         fieldLabel: '是否启用',

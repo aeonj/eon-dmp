@@ -32,6 +32,8 @@ public abstract class BaseData extends IdEntity implements Serializable {
 	
 	@Column(length = 42)
 	private String code;
+	@Column(length = 42)
+	private String standard_code;
 	@Column
 	private String name;
 	@Transient
