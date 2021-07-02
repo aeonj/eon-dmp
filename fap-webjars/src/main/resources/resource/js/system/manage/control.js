@@ -1141,6 +1141,12 @@ Ext.define('Ext.vcf.TreeField', {
             if (typeof v == "object" && v!=null) {
                 var checkedNodes = me.getPicker().getChecked();
                 if (Ext.isEmpty(checkedNodes)) {
+                    me.lastSelectionText = '';
+                    if (me.hiddenField) {
+                        me.hiddenField.value = '';
+                    }
+                    Ext.form.field.Picker.superclass.setValue.call(this, '');
+                    me.value = '';
                     (oldvalue == null || oldvalue !== me.value) ? me.fireEvent('afterchange',
                         me, me.value, oldvalue) : '';
                     return me;
