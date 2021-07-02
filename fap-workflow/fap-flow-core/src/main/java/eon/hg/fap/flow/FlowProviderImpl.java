@@ -2,11 +2,11 @@ package eon.hg.fap.flow;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import eon.hg.fap.common.util.metatype.Dto;
 import eon.hg.fap.common.util.metatype.impl.HashDto;
+import eon.hg.fap.core.exception.Assert;
 import eon.hg.fap.core.exception.ResultException;
 import eon.hg.fap.core.query.support.IPageList;
 import eon.hg.fap.core.query.support.IQueryObject;
@@ -82,12 +82,9 @@ public class FlowProviderImpl implements FlowProvider {
         return commandService;
     }
 
-    public String getTaskSqlCondition(Long menu_id) {
-        return null;
-    }
-
     @Override
     public SqlRelation getTaskSqlCondition(Long menu_id, NodeState state, String alias, String id_field) {
+        Assert.notNull(menu_id,"未获取到当前菜单！");
         return getTaskSqlCondition(CurrentNode.menuInstance(menuService.getObjById(menu_id)).addState(state), alias, id_field);
     }
 
@@ -98,7 +95,7 @@ public class FlowProviderImpl implements FlowProvider {
             throw new ResultException("未找到对应的流程节点");
         }
         OnlineUser oUser = SecurityUserHolder.getOnlineUser();
-        Assert.notNull(oUser);
+        Assert.notNull(oUser,"未能获取到当前登录用户！");
         SqlRelation sqlRelation = new SqlRelation();
         StringBuilder sqlBuilder = new StringBuilder();
         if (NodeState.ALL.equals(node.getState())) {
@@ -172,6 +169,7 @@ public class FlowProviderImpl implements FlowProvider {
 
     @Override
     public IQueryObject getTaskHqlCondition(Long menu_id, NodeState state, IQueryObject qo) {
+        Assert.notNull(menu_id,"未获取到当前菜单！");
         return getTaskHqlCondition(CurrentNode.menuInstance(menuService.getObjById(menu_id)).addState(state), qo);
     }
 
@@ -182,8 +180,8 @@ public class FlowProviderImpl implements FlowProvider {
             throw new ResultException("未找到对应的流程节点");
         }
         OnlineUser oUser = SecurityUserHolder.getOnlineUser();
-        Assert.notNull(oUser);
-        Assert.notNull(oUser.getUserid());
+        Assert.notNull(oUser,"未获取到当前登录用户！");
+        Assert.notNull(oUser.getUserid(),"未获取到当前登录用户ID！");
         Dto params = new HashDto();
         params.put("processId", pd.getId());
         if (NodeState.ALL.equals(node.getState())) {
@@ -322,6 +320,7 @@ public class FlowProviderImpl implements FlowProvider {
     @Override
     public void doWorkFlowByBusiness(Long menu_id, NodeState state, ActionType actionType, String advice,
                                      List records) {
+        Assert.notNull(menu_id,"未获取到当前菜单！");
         doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)).addState(state), actionType, advice, records, "task_id", null, false);
     }
 
@@ -336,6 +335,7 @@ public class FlowProviderImpl implements FlowProvider {
     @Override
     public void doWorkFlowByBusiness(Long menu_id, ActionType actionType, String advice,
                                      List records) {
+        Assert.notNull(menu_id,"未获取到当前菜单！");
         doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)), actionType, advice, records, "task_id", null, false);
     }
 
@@ -350,6 +350,7 @@ public class FlowProviderImpl implements FlowProvider {
     @Override
     public void doWorkFlowByBusiness(Long menu_id, ActionType actionType, String advice,
                                       List records,String[] variables) {
+        Assert.notNull(menu_id,"未获取到当前菜单！");
         doWorkFlowByBusiness(CurrentNode.menuInstance(menuService.getObjById(menu_id)), actionType, advice, records, variables,"task_id", null, false);
     };
 
@@ -437,7 +438,7 @@ public class FlowProviderImpl implements FlowProvider {
                     throw new ResultException("业务数据集流程中所需字段不存在，没有任务ID字段或业务ID字段！");
                 }
                 OnlineUser oUser = SecurityUserHolder.getOnlineUser();
-                Assert.notNull(oUser);
+                Assert.notNull(oUser,"未获取到当前登录用户！");
                 StartProcessInfo spi = new StartProcessInfo(oUser.getUserid());
                 spi.setBusinessId(business_id);
                 spi.setVariables(mapRec);
@@ -467,7 +468,7 @@ public class FlowProviderImpl implements FlowProvider {
                         throw new ResultException("业务数据集流程中所需字段不存在，没有任务ID字段或业务ID字段！");
                     }
                     ProcessDefinition pd = getProcessDefinition(node);
-                    Assert.notNull(pd);
+                    Assert.notNull(pd,"未获取到对应流程！");
                     if (ActionType.NEXT.equals(actionType)) {
                         //没有流程实例将自动创建
                         ProcessInstanceQuery piQuery = processService.createProcessInstanceQuery();
@@ -601,6 +602,7 @@ public class FlowProviderImpl implements FlowProvider {
 
     @Override
     public List<TaskVO> loadTaskLogList(Long menu_id, String business_id) {
+        Assert.notNull(menu_id,"未获取到当前菜单！");
         HistoryTaskQuery taskQuery = historyService.createHistoryTaskQuery();
         CurrentNode node = CurrentNode.menuInstance(menuService.getObjById(menu_id));
         ProcessDefinition pd = getProcessDefinition(node);
@@ -615,6 +617,7 @@ public class FlowProviderImpl implements FlowProvider {
 
     @Override
     public IPageList loadTaskLogList(Long menu_id, String business_id, int page, int limit) {
+        Assert.notNull(menu_id,"未获取到当前菜单！");
         HistoryTaskQuery taskQuery = historyService.createHistoryTaskQuery();
         CurrentNode node = CurrentNode.menuInstance(menuService.getObjById(menu_id));
         ProcessDefinition pd = getProcessDefinition(node);
@@ -630,6 +633,7 @@ public class FlowProviderImpl implements FlowProvider {
 
     @Override
     public List<TaskVO> loadTaskInfoList(Long menu_id, String business_id) {
+        Assert.notNull(menu_id,"未获取到当前菜单！");
         TaskQuery taskQuery = taskService.createTaskQuery();
         CurrentNode node = CurrentNode.menuInstance(menuService.getObjById(menu_id));
         ProcessDefinition pd = getProcessDefinition(node);
@@ -641,6 +645,7 @@ public class FlowProviderImpl implements FlowProvider {
 
     @Override
     public IPageList loadTaskInfoList(Long menu_id, String business_id, int page, int limit) {
+        Assert.notNull(menu_id,"未获取到当前菜单！");
         HistoryTaskQuery taskQuery = historyService.createHistoryTaskQuery();
         CurrentNode node = CurrentNode.menuInstance(menuService.getObjById(menu_id));
         ProcessDefinition pd = getProcessDefinition(node);
