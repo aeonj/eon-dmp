@@ -20,10 +20,7 @@ import org.springframework.util.Assert;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 
@@ -95,13 +92,14 @@ public class SimpleGenericRepository<T, ID extends Serializable> implements Gene
 		if (properties.length % 2!=0) {
 			return null;
 		}
+		Map<String,Object> paras = new HashMap<String,Object>();
 		StringBuffer sb = new StringBuffer("select obj from ");
 		sb.append(clazz.getName()).append(" obj");
-		Query query = null;
+
 		sb.append(" where obj.is_deleted=0");
 		if (CommUtil.isExistsAttr(clazz, "rg_code")) {
 			sb.append(" and obj.rg_code=:rg_code");
-			query.setParameter("rg_code", SecurityUserHolder.getRgCode());
+			paras.put("rg_code", SecurityUserHolder.getRgCode());
 		}
 		for (int i=0; i<properties.length; i++) {
 			if (CommUtil.isEmpty(properties[i])) {
@@ -113,12 +111,17 @@ public class SimpleGenericRepository<T, ID extends Serializable> implements Gene
 			if (propertyValue == null) {
 				sb.append(" and obj.").append(propertyName)
 						.append(" = :").append(propertyName);
-				query.setParameter(propertyName, propertyValue);
+                paras.put(propertyName, propertyValue);
 			} else {
 				sb.append(" and obj.").append(propertyName)
 						.append(" is NULL");
 			}
 		}
+		Query query = this.entityManager.createQuery(sb.toString());
+        Set<Map.Entry<String,Object>> entries=paras.entrySet();
+		for (Map.Entry entry:entries) {
+            query.setParameter(CommUtil.null2String(entry.getKey()),entry.getValue());
+        }
 		//query.setHint("org.hibernate.cacheable", true);
 		List<S> ret = query.getResultList();
 		if (ret != null && ret.size() == 1) {
